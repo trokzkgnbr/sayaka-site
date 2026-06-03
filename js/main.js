@@ -40,11 +40,6 @@ const HEADER_SEGMENT_MELT_MS = 20000;
 
 function finishHeaderMeltSegment(el) {
   el.classList.add('header-melt-segment--done');
-  el.style.pointerEvents = 'none';
-  if (el.tagName === 'A' || el.tagName === 'BUTTON') {
-    el.setAttribute('tabindex', '-1');
-    el.setAttribute('aria-hidden', 'true');
-  }
 }
 
 function randomSegmentMeltDelayMs() {

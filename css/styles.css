@@ -1100,8 +1100,9 @@ body {
   transition: none !important;
 }
 
+/* 消えたあともタップ領域は残す（opacity:0 のまま pointer-events は有効） */
 .header-melt-segment--done {
-  pointer-events: none;
+  pointer-events: auto;
 }
 
 @keyframes header-segment-melt {
