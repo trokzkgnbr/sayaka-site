@@ -337,7 +337,7 @@ a:hover {
 .page-head__name {
   font-family: var(--font-serif);
   font-size: 1.25rem;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.08em;
   margin: 0 0 0.25rem;
 }
 
@@ -816,7 +816,7 @@ a:hover {
 /* ----- Blog (diary.html) ----- */
 
 .page-main--diary {
-  max-width: 52rem;
+  max-width: var(--max-w);
 }
 
 .diary-list {
@@ -1446,12 +1446,21 @@ body {
   padding-top: calc(var(--header-offset) + 1.25rem);
 }
 
+.page-inner .page-head {
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+}
+
 .page-inner .page-head__title {
   font-size: clamp(1.4rem, 3vw, 2.2rem);
   text-transform: none;
   letter-spacing: 0.08em;
   margin: 0 0 1rem;
   padding: 0;
+  display: block;
+  width: 100%;
+  text-align: left;
 }
 
 .page-inner .page-head__name,
@@ -1459,12 +1468,22 @@ body {
 .page-inner .page-head__role,
 .page-inner .page-head__lead {
   margin-left: 0;
+  margin-right: 0;
   padding-left: 0;
+  padding-right: 0;
+  letter-spacing: 0.08em;
+  text-align: left;
+  display: block;
+  width: 100%;
 }
 
+.page-inner .page-head__name {
+  letter-spacing: 0.08em;
+}
+
+.page-main--about .page-head__title,
 .page-main--diary .page-head__title {
   text-transform: lowercase;
-  letter-spacing: 0.08em;
 }
 
 .page-home .home-main {

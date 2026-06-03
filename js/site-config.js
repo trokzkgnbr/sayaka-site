@@ -44,7 +44,7 @@ window.SITE = {
   nav: [
     { id: 'home', label: 'Home', href: 'index.html' },
     { id: 'gallery', label: 'Gallery', href: 'gallery-dawn.html' },
-    { id: 'about', label: 'Profile', href: 'about.html' },
+    { id: 'about', label: 'profile', href: 'about.html' },
     { id: 'diary', label: 'blog', href: 'diary.html' },
     { id: 'contact', label: 'Contact', href: 'contact.html' },
   ],
