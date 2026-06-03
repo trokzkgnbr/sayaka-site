@@ -105,8 +105,23 @@ function renderWorkMeta(work) {
   return renderGroup(titleLines) + renderGroup(metaLines) + renderGroup(poemLines);
 }
 
+var galleryArtworkFitSchedule = null;
+
+/** Home の fold と同じく、PC ではタイトル分だけ・スマホでは全文を高さ計算に使う */
+function getGalleryLeadCaptionEl(leadWork) {
+  if (!leadWork) return null;
+  var mobile = window.matchMedia('(max-width: 760px)').matches;
+  if (mobile) return leadWork.querySelector('.gallery__meta');
+  return (
+    leadWork.querySelector('.gallery__meta-group') ||
+    leadWork.querySelector('.gallery__meta')
+  );
+}
+
 function applyGalleryImageSize() {
-  if (window.ArtworkSize && ArtworkSize.restoreStoredMetrics()) return;
+  if (window.ArtworkSize) {
+    ArtworkSize.restoreStoredMetrics();
+  }
   fitGalleryLeadImage();
 }
 
@@ -118,22 +133,15 @@ function fitGalleryLeadImage() {
   var leadImg = leadWork && leadWork.querySelector('.gallery__img');
   if (!container || !leadImg) return;
 
-  var foldCaption = document.querySelector('.home-caption--fold');
-  var captionReserve = foldCaption
-    ? foldCaption.getBoundingClientRect().height
-    : 72;
-
   function runFit() {
-    ArtworkSize.bindArtworkFit({
+    if (galleryArtworkFitSchedule) {
+      galleryArtworkFitSchedule();
+      return;
+    }
+    galleryArtworkFitSchedule = ArtworkSize.bindStandardPageArtworkFit({
       container: container,
       img: leadImg,
-      captionEl: null,
-      scaleFactor: 0.9,
-      fitOptions: {
-        useViewportHeight: true,
-        captionReserve: captionReserve,
-        centerInContainer: true,
-      },
+      captionEl: getGalleryLeadCaptionEl(leadWork),
     });
   }
 
@@ -203,6 +211,7 @@ function renderGallery() {
     fragment.appendChild(article);
   });
 
+  galleryArtworkFitSchedule = null;
   root.replaceChildren(fragment);
   applyGalleryImageSize();
 }

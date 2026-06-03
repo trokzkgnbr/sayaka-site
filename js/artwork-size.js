@@ -62,7 +62,16 @@
     var padY =
       parseFloat(containerStyle.paddingTop) + parseFloat(containerStyle.paddingBottom);
     var captionH = captionEl ? captionEl.getBoundingClientRect().height : 0;
-    var availW = container.clientWidth - padX;
+    var availW;
+    if (options.useUniformPageWidth) {
+      var padXVal =
+        parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue('--artwork-pad-x')
+        ) || 0;
+      availW = window.innerWidth - 2 * padXVal;
+    } else {
+      availW = container.clientWidth - padX;
+    }
     var availH;
 
     if (options.useViewportHeight) {
@@ -71,7 +80,7 @@
           getComputedStyle(document.documentElement).getPropertyValue('--artwork-top-pad')
         ) || 0;
       var captionReserve = options.captionReserve || 0;
-      availH = window.innerHeight - topPad - captionReserve;
+      availH = window.innerHeight - topPad - captionReserve - captionH;
     } else {
       availH = container.clientHeight - padY - captionH;
     }
@@ -83,13 +92,8 @@
     var width = Math.floor(img.naturalWidth * fitScale);
     var height = Math.floor(img.naturalHeight * fitScale);
 
-    img.style.width = width + 'px';
-    img.style.height = height + 'px';
-    img.style.maxWidth = 'none';
-    img.style.maxHeight = 'none';
-
     var marginLeft;
-    if (options.centerInContainer) {
+    if (options.centerInContainer !== false) {
       marginLeft = (availW - width) / 2;
     } else {
       var containerRect = container.getBoundingClientRect();
@@ -144,10 +148,30 @@
     return schedule;
   }
 
+  var STANDARD_SCALE = 0.9;
+  var STANDARD_FIT_OPTIONS = {
+    useViewportHeight: true,
+    centerInContainer: true,
+    useUniformPageWidth: true,
+  };
+
+  function bindStandardPageArtworkFit(options) {
+    return bindArtworkFit({
+      container: options.container,
+      img: options.img,
+      captionEl: options.captionEl || null,
+      scaleFactor: options.scaleFactor != null ? options.scaleFactor : STANDARD_SCALE,
+      fitOptions: options.fitOptions || STANDARD_FIT_OPTIONS,
+      onMetrics: options.onMetrics,
+    });
+  }
+
   window.ArtworkSize = {
     applyMetrics: applyMetrics,
     restoreStoredMetrics: restoreStoredMetrics,
     computeArtworkMetrics: computeArtworkMetrics,
     bindArtworkFit: bindArtworkFit,
+    bindStandardPageArtworkFit: bindStandardPageArtworkFit,
+    STANDARD_SCALE: STANDARD_SCALE,
   };
 })();

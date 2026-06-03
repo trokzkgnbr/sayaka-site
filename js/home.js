@@ -72,7 +72,7 @@ function initHomeContent() {
   }
 
   if (visual && fold && window.ArtworkSize) {
-    ArtworkSize.bindArtworkFit({
+    ArtworkSize.bindStandardPageArtworkFit({
       container: fold,
       img: visual,
       captionEl: caption,

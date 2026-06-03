@@ -624,7 +624,7 @@ a:hover {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  align-items: center;
+  align-items: stretch;
   gap: clamp(3rem, 8vh, 5rem);
   width: 100%;
   max-width: 100%;
@@ -636,7 +636,7 @@ a:hover {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  align-items: center;
+  align-items: stretch;
   gap: clamp(2.5rem, 6vh, 4rem);
   width: 100%;
   max-width: 100%;
@@ -655,11 +655,16 @@ a:hover {
   text-align: left;
 }
 
+/* Home / Gallery 共通の作品画像スロット */
+.artwork-slot,
+.page-home .home-visual,
 .gallery__work {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
   align-items: stretch;
+  flex: 0 0 auto;
+  box-sizing: border-box;
   width: var(--home-image-display-w);
   max-width: calc(100% - 2 * var(--artwork-pad-x));
   margin-left: var(--home-image-display-left);
@@ -667,7 +672,9 @@ a:hover {
   padding: 0;
 }
 
-.gallery__img {
+.artwork-slot__img,
+.gallery__img,
+.page-home #home-visual {
   display: block;
   width: 100%;
   height: var(--home-image-display-h, auto);
@@ -675,7 +682,7 @@ a:hover {
   margin: 0;
   border: none;
   object-fit: contain;
-  object-position: center top;
+  object-position: left top;
 }
 
 .gallery__meta {
@@ -1499,7 +1506,7 @@ body {
 .page-home .home-fold {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   box-sizing: border-box;
   min-height: 100svh;
   min-height: 100dvh;
@@ -1517,33 +1524,11 @@ body {
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  width: fit-content;
+  width: 100%;
   max-width: 100%;
   flex: 1 1 0;
   min-height: 0;
   justify-content: flex-start;
-}
-
-.page-home .home-visual {
-  flex: 0 0 auto;
-  min-height: 0;
-  width: fit-content;
-  max-width: 100%;
-  margin: 0 auto;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
-}
-
-.page-home .home-visual .site-bg__img,
-.page-home #home-visual {
-  display: block;
-  width: auto;
-  height: auto;
-  margin: 0 auto;
-  object-fit: contain;
-  object-position: center top;
-  border: none;
 }
 
 .page-home .site-bg {
@@ -1689,10 +1674,6 @@ body {
 
   :root {
     --artwork-top-pad: calc(5.5rem + env(safe-area-inset-top, 0px) + var(--artwork-top-extra));
-  }
-
-  .page-home .home-fold {
-    --home-fold-pad-x: clamp(0.35rem, 2vw, 0.65rem);
   }
 
   .site-nav__submenu--row {
