@@ -687,19 +687,22 @@ a:hover {
 .gallery__meta {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: flex-end;
   align-self: stretch;
   gap: 0;
+  width: 100%;
   margin-top: 0.85rem;
-  padding-left: 0.65rem;
-  text-align: left;
+  padding: 0;
+  text-align: right;
+  box-sizing: border-box;
 }
 
 .gallery__meta-group {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: 0.15rem;
+  max-width: 100%;
 }
 
 .gallery__meta-group + .gallery__meta-group {
@@ -708,6 +711,8 @@ a:hover {
 
 .gallery__meta-line {
   display: block;
+  max-width: 100%;
+  text-align: right;
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   line-height: 1.65;
@@ -1545,11 +1550,14 @@ body {
   display: none;
 }
 
-.home-caption--fold {
+/* Home / Gallery 共通キャプション（画像幅に合わせて右揃え） */
+.page-home .home-caption.home-caption--fold,
+.page-home .home-caption.home-caption--rest {
   flex: 0 0 auto;
-  width: 100%;
-  max-width: none;
-  margin: 0;
+  width: var(--home-image-display-w);
+  max-width: calc(100% - 2 * var(--artwork-pad-x));
+  margin-left: auto;
+  margin-right: auto;
   box-sizing: border-box;
 }
 
@@ -1557,17 +1565,12 @@ body {
   padding: clamp(0.25rem, 0.8vh, 0.45rem) 0 0;
 }
 
-.page-home .home-stage {
-  --home-artwork-w: 100%;
+.page-home .home-caption.home-caption--rest {
+  padding: 0 0 2.5rem;
 }
 
-.page-home .home-caption.home-caption--rest {
-  width: var(--home-artwork-w);
-  max-width: calc(100% - 2 * var(--home-fold-pad-x, 0.75rem));
-  margin-left: auto;
-  margin-right: auto;
-  padding: 0 0 2.5rem;
-  box-sizing: border-box;
+.page-home .home-stage {
+  --home-artwork-w: var(--home-image-display-w);
 }
 
 .home-caption {
@@ -1581,7 +1584,8 @@ body {
   flex-direction: column;
   align-items: flex-end;
   gap: 0;
-  margin-left: auto;
+  width: 100%;
+  margin: 0;
   opacity: 1;
   transform: none;
 }
@@ -1591,6 +1595,7 @@ body {
   flex-direction: column;
   align-items: flex-end;
   gap: 0.15rem;
+  max-width: 100%;
 }
 
 .home-caption__group + .home-caption__group {
@@ -1599,6 +1604,8 @@ body {
 
 .home-caption__line {
   display: block;
+  max-width: 100%;
+  text-align: right;
   color: var(--text);
   line-height: 1.65;
   opacity: 1;
