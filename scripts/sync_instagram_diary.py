@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
@@ -92,15 +93,23 @@ def build_posts(
     return posts, warnings
 
 
-def load_existing_posts(data_path: Path) -> list[dict]:
+def load_existing_data(data_path: Path) -> tuple[list[dict], dict]:
     if not data_path.is_file():
-        return []
+        return [], {}
     try:
         data = json.loads(data_path.read_text(encoding="utf-8"))
     except (json.JSONDecodeError, OSError):
-        return []
+        return [], {}
+    if not isinstance(data, dict):
+        return [], {}
     posts = data.get("posts")
-    return posts if isinstance(posts, list) else []
+    posts = posts if isinstance(posts, list) else []
+    meta = {k: v for k, v in data.items() if k != "posts"}
+    return posts, meta
+
+
+def posts_signature(posts: list[dict]) -> str:
+    return json.dumps(posts, ensure_ascii=False, sort_keys=True)
 
 
 def merge_diary_posts(existing: list[dict], fresh_from_ig: list[dict]) -> list[dict]:
@@ -198,8 +207,9 @@ def main() -> int:
         skip_video=not args.keep_video,
     )
 
-    existing_posts = load_existing_posts(data_path)
+    existing_posts, existing_meta = load_existing_data(data_path)
     merged_posts = merge_diary_posts(existing_posts, fresh_posts)
+    content_changed = posts_signature(existing_posts) != posts_signature(merged_posts)
 
     fresh_ids = {
         str(p["instagramMediaId"])
@@ -224,6 +234,12 @@ def main() -> int:
         "syncLimit": limit,
         "syncRecentManaged": len(fresh_posts),
     }
+    if content_changed or deleted_recent or not existing_meta.get("lastSyncedAt"):
+        payload["lastSyncedAt"] = datetime.now(timezone.utc).strftime(
+            "%Y-%m-%dT%H:%M:%SZ"
+        )
+    else:
+        payload["lastSyncedAt"] = existing_meta["lastSyncedAt"]
 
     if args.dry_run:
         print(json.dumps(payload, ensure_ascii=False, indent=2))

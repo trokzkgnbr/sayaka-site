@@ -1,4 +1,4 @@
-# Instagram → Diary 自動同期（GitHub クラウド上・1日2回 + 手動実行）
+# Instagram → Blog データ自動同期（GitHub クラウド）
 # 必要: Secrets … INSTAGRAM_ACCESS_TOKEN, INSTAGRAM_USER_ID
 # 延長（推奨）: INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET
 name: Sync Instagram Diary
@@ -9,6 +9,12 @@ on:
     - cron: "0 3 * * *"
     - cron: "0 15 * * *"
   workflow_dispatch:
+  push:
+    branches: [main]
+
+concurrency:
+  group: sync-instagram-diary
+  cancel-in-progress: false
 
 permissions:
   contents: write
@@ -57,14 +63,26 @@ jobs:
         run: python3 scripts/verify_instagram_config.py
 
       - name: Sync diary from Instagram
+        id: sync
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ steps.instagram_token.outputs.value }}
           INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
           INSTAGRAM_SYNC_LIMIT: ${{ vars.INSTAGRAM_SYNC_LIMIT || '50' }}
-        run: python3 scripts/sync_instagram_diary.py
+        run: |
+          set -euo pipefail
+          python3 scripts/sync_instagram_diary.py | tee sync.log
+          POSTS=$(python3 -c "import json; d=json.load(open('data/diary.json')); print(len(d.get('posts',[])))")
+          echo "post_count=$POSTS" >> "$GITHUB_OUTPUT"
+          echo "Blog 投稿数: $POSTS"
 
       - name: Commit and push if changed
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "chore(diary): sync from Instagram"
+          commit_message: "chore(blog): sync from Instagram (${{ steps.sync.outputs.post_count }} posts)"
           file_pattern: "data/diary.json images/diary/*.jpg"
+
+      - name: Sync produced no data (fail)
+        if: steps.sync.outputs.post_count == '0'
+        run: |
+          echo "::error::Instagram 同期後の投稿が 0 件です。トークン・@4mnion の投稿を確認してください。"
+          exit 1

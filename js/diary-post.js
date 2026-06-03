@@ -48,7 +48,7 @@
     return;
   }
 
-  fetch('data/diary.json')
+  fetch('data/diary.json', { cache: 'no-store' })
     .then(function (res) {
       if (!res.ok) throw new Error('diary.json load failed');
       return res.json();

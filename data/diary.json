@@ -1,6 +1,14 @@
 {
   "posts": [
     {
+      "id": "ig-18220209157317589",
+      "date": "2026-06-03",
+      "title": "hajimemasite",
+      "body": "hajimemasite\n他SNSでは発信しないようなことを共有したいのではじめてみました.\n\n写真の撮られ方は 同じ時間･同じ場所でも全然違うように映るので その人のみているものに近いと思いうのですが …\n\n次の更新もお楽しみに⋰",
+      "image": "images/diary/18220209157317589.jpg",
+      "instagramMediaId": "18220209157317589"
+    },
+    {
       "id": "ig-18104195771059547",
       "date": "2026-06-03",
       "title": "ほしふるよるに",
@@ -10,5 +18,7 @@
     }
   ],
   "syncedFrom": "instagram",
-  "syncLimit": 50
+  "syncLimit": 50,
+  "syncRecentManaged": 2,
+  "lastSyncedAt": "2026-06-03T16:40:32Z"
 }

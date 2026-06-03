@@ -231,6 +231,13 @@ Drop だけだと Git の更新がサイトに反映されません。**GitHub �
 - **51 件目より古い** 投稿は、Instagram の取得枠から外れても **サイトには残ります**（勝手には消しません）。
 - 一覧ページは **30 件ずつ** 表示し、31 件以上あるときは下部の **next →** で次のページへ進みます。
 
+**デプロイと投稿データは別です**
+
+- Netlify への push は **HTML/CSS/JS** の見た目を更新します。
+- **Blog の投稿本文・画像** は `data/diary.json` と `images/diary/` で、**GitHub Actions「Sync Instagram Diary」** が更新します。
+- `main` に push するたびに Actions でも同期が走ります（加えて毎日 12:00・24:00 JST）。
+- Blog 一覧のリード文に **「同期 2026/6/4 10:39」** のように最終同期時刻が出ます。古いままなら Actions の成否を確認してください。
+
 急ぎで反映したいときだけ:
 
 - GitHub → **Actions** → **Sync Instagram Diary** → **Run workflow**
@@ -242,7 +249,9 @@ Drop だけだと Git の更新がサイトに反映されません。**GitHub �
 | 症状 | 対処 |
 |------|------|
 | Actions が赤い | Actions のログを開く。トークン期限切れなら `bash scripts/extend_instagram_token.sh --force` または D-2〜D-3 をやり直し Secrets を更新 |
-| Diary が空 | Instagram に画像付き投稿があるか確認。動画のみの投稿はスキップされます |
+| Blog が空・古い | Actions → **Sync Instagram Diary** を手動実行。`data/diary.json` のコミットがあるか確認 |
+| 見た目だけ新しい | 投稿データは Actions 同期。`git push` だけでは増えません |
+| 動画だけの投稿が出ない | 動画・リールはスキップされます（画像付き投稿を確認） |
 | `instagram_business_account` が無い | B の Facebook ページ連携をやり直す |
 | 403 / 権限エラー | C のテスター追加・権限チェックを見直す |
 
