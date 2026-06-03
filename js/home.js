@@ -1,3 +1,26 @@
+var homeArtworkFitSchedule = null;
+var HOME_DESKTOP_MQ = window.matchMedia('(min-width: 761px)');
+
+function measureHomeFoldCaptionMin() {
+  if (!HOME_DESKTOP_MQ.matches) {
+    document.documentElement.style.removeProperty('--home-caption-fold-min-h');
+    return 0;
+  }
+  var cap = document.querySelector('.home-caption--fold');
+  if (!cap) return 0;
+  var h = Math.ceil(cap.getBoundingClientRect().height);
+  var pad =
+    parseFloat(getComputedStyle(cap).paddingTop) +
+    parseFloat(getComputedStyle(cap).paddingBottom);
+  var minH = h + pad + 2;
+  document.documentElement.style.setProperty('--home-caption-fold-min-h', minH + 'px');
+  return minH;
+}
+
+function scheduleHomeArtworkFit() {
+  if (homeArtworkFitSchedule) homeArtworkFitSchedule();
+}
+
 function initHomeContent() {
   var visual = document.getElementById('home-visual');
   var fold = document.querySelector('.home-fold');
@@ -58,11 +81,17 @@ function initHomeContent() {
       }
     }
 
-    renderCaptionLayout();
+    function onCaptionLayoutChange() {
+      renderCaptionLayout();
+      measureHomeFoldCaptionMin();
+      scheduleHomeArtworkFit();
+    }
+
+    onCaptionLayoutChange();
     if (typeof mobileMq.addEventListener === 'function') {
-      mobileMq.addEventListener('change', renderCaptionLayout);
+      mobileMq.addEventListener('change', onCaptionLayoutChange);
     } else if (typeof mobileMq.addListener === 'function') {
-      mobileMq.addListener(renderCaptionLayout);
+      mobileMq.addListener(onCaptionLayoutChange);
     }
   }
 
@@ -72,10 +101,18 @@ function initHomeContent() {
   }
 
   if (visual && fold && window.ArtworkSize) {
-    ArtworkSize.bindStandardPageArtworkFit({
+    measureHomeFoldCaptionMin();
+    homeArtworkFitSchedule = ArtworkSize.bindStandardPageArtworkFit({
       container: fold,
       img: visual,
       captionEl: caption,
+      fitOptions: {
+        useViewportHeight: true,
+        useUniformPageWidth: true,
+        get captionMinReserve() {
+          return measureHomeFoldCaptionMin();
+        },
+      },
       onMetrics: function (metrics) {
         var stage = document.querySelector('.home-stage');
         if (stage && metrics.width > 0) {

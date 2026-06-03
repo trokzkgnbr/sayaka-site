@@ -47,6 +47,10 @@
     var padY =
       parseFloat(containerStyle.paddingTop) + parseFloat(containerStyle.paddingBottom);
     var captionH = captionEl ? captionEl.getBoundingClientRect().height : 0;
+    var captionMin = options.captionMinReserve || 0;
+    if (captionMin > 0) {
+      captionH = Math.max(captionH, captionMin);
+    }
     var availW;
     if (options.useUniformPageWidth) {
       var padXVal =
@@ -130,12 +134,13 @@
   };
 
   function bindStandardPageArtworkFit(options) {
+    var fitOptions = Object.assign({}, STANDARD_FIT_OPTIONS, options.fitOptions || {});
     return bindArtworkFit({
       container: options.container,
       img: options.img,
       captionEl: options.captionEl || null,
       scaleFactor: options.scaleFactor != null ? options.scaleFactor : STANDARD_SCALE,
-      fitOptions: options.fitOptions || STANDARD_FIT_OPTIONS,
+      fitOptions: fitOptions,
       onMetrics: options.onMetrics,
     });
   }

@@ -1636,6 +1636,31 @@ body {
   color: var(--text-muted);
 }
 
+/* PC: 年・タイトル（2行目まで）を常に表示 — キャプションは縮めず画像を縮小 */
+@media (min-width: 761px) {
+  .page-home .home-caption.home-caption--fold {
+    flex-shrink: 0;
+    flex-grow: 0;
+    overflow: visible;
+  }
+
+  .page-home .home-visual {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: calc(
+      100dvh - var(--artwork-top-pad) - var(--home-caption-fold-min-h, 3.75rem)
+    );
+    overflow: hidden;
+  }
+
+  .page-home #home-visual {
+    max-height: 100%;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+}
+
 .site-footer,
 .site-footer--glass,
 .site-footer--glass small {
