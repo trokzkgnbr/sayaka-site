@@ -39,8 +39,8 @@
       '<p class="diary-empty" role="alert">' +
       escapeHtml(message) +
       '</p>' +
-      '<p class="diary-back-wrap"><a class="diary-back" href="diary.html">Blog 一覧へ</a></p>';
-    document.title = 'Blog | Portfolio';
+      '<p class="diary-back-wrap"><a class="diary-back" href="diary.html">blog 一覧へ</a></p>';
+    document.title = 'blog | Portfolio';
   }
 
   if (!postId) {
@@ -62,10 +62,10 @@
         return;
       }
 
-      document.title = post.title + ' | Blog';
+      document.title = post.title + ' | blog';
 
       root.innerHTML =
-        '<p class="diary-back-wrap"><a class="diary-back" href="diary.html">← Blog 一覧</a></p>' +
+        '<p class="diary-back-wrap"><a class="diary-back" href="diary.html">← blog 一覧</a></p>' +
         '<header class="diary-detail__head">' +
         '<h1 class="diary-detail__title">' +
         escapeHtml(post.title) +

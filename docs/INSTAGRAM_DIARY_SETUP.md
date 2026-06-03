@@ -236,7 +236,7 @@ Drop だけだと Git の更新がサイトに反映されません。**GitHub �
 - Netlify への push は **HTML/CSS/JS** の見た目を更新します。
 - **Blog の投稿本文・画像** は `data/diary.json` と `images/diary/` で、**GitHub Actions「Sync Instagram Diary」** が更新します。
 - `main` に push するたびに Actions でも同期が走ります（加えて毎日 12:00・24:00 JST）。
-- Blog 一覧のリード文に **「同期 2026/6/4 10:39」** のように最終同期時刻が出ます。古いままなら Actions の成否を確認してください。
+- Blog が古いままなら Actions の成否と `data/diary.json` の更新を確認してください。
 
 急ぎで反映したいときだけ:
 

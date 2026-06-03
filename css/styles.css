@@ -320,6 +320,8 @@ a:hover {
 
 .page-head {
   margin-bottom: 2.5rem;
+  text-align: left;
+  padding: 0;
 }
 
 .page-head__title {
@@ -329,6 +331,7 @@ a:hover {
   letter-spacing: 0.12em;
   text-transform: uppercase;
   margin: 0 0 1rem;
+  padding: 0;
 }
 
 .page-head__name {
@@ -350,7 +353,8 @@ a:hover {
   font-size: 0.8rem;
   letter-spacing: 0.12em;
   color: var(--text-muted);
-  margin: 0;
+  margin: 0.5rem 0 0;
+  padding: 0;
 }
 
 .prose h3 {
@@ -813,13 +817,6 @@ a:hover {
 
 .page-main--diary {
   max-width: 52rem;
-}
-
-.page-head__lead {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  letter-spacing: 0.12em;
-  margin: 0.35rem 0 0;
 }
 
 .diary-list {
@@ -1449,9 +1446,25 @@ body {
   padding-top: calc(var(--header-offset) + 1.25rem);
 }
 
-.page-head__title {
+.page-inner .page-head__title {
   font-size: clamp(1.4rem, 3vw, 2.2rem);
   text-transform: none;
+  letter-spacing: 0.08em;
+  margin: 0 0 1rem;
+  padding: 0;
+}
+
+.page-inner .page-head__name,
+.page-inner .page-head__name-en,
+.page-inner .page-head__role,
+.page-inner .page-head__lead {
+  margin-left: 0;
+  padding-left: 0;
+}
+
+.page-main--diary .page-head__title {
+  text-transform: lowercase;
+  letter-spacing: 0.08em;
 }
 
 .page-home .home-main {

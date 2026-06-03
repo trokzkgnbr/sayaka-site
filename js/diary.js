@@ -72,22 +72,6 @@
     );
   }
 
-  function updateSyncNote(data) {
-    var lead = document.querySelector('.page-head__lead');
-    if (!lead || !data.lastSyncedAt) return;
-    var d = new Date(data.lastSyncedAt);
-    if (Number.isNaN(d.getTime())) return;
-    var fmt = new Intl.DateTimeFormat('ja-JP', {
-      year: 'numeric',
-      month: 'numeric',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: 'Asia/Tokyo',
-    });
-    lead.textContent = '日々の記録 · 同期 ' + fmt.format(d);
-  }
-
   function showEmpty(message) {
     listEl.innerHTML =
       '<p class="diary-empty" role="status">' + escapeHtml(message) + '</p>';
@@ -156,7 +140,6 @@
       return res.json();
     })
     .then(function (data) {
-      updateSyncNote(data);
       const posts = (data.posts || []).slice().sort(function (a, b) {
         return b.date.localeCompare(a.date);
       });

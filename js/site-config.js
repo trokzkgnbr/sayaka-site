@@ -45,7 +45,7 @@ window.SITE = {
     { id: 'home', label: 'Home', href: 'index.html' },
     { id: 'gallery', label: 'Gallery', href: 'gallery-dawn.html' },
     { id: 'about', label: 'Profile', href: 'about.html' },
-    { id: 'diary', label: 'Blog', href: 'diary.html' },
+    { id: 'diary', label: 'blog', href: 'diary.html' },
     { id: 'contact', label: 'Contact', href: 'contact.html' },
   ],
 
