@@ -96,7 +96,7 @@ a:hover {
   opacity: 0.55;
 }
 
-.site-nav__link:hover {
+.site-nav__link:not(.header-melt-segment):hover {
   opacity: 0.65 !important;
 }
 
@@ -147,7 +147,7 @@ a:hover {
   -webkit-backdrop-filter: none;
 }
 
-.page-home .site-header--ethereal .site-nav__link {
+.page-home .site-header--ethereal .site-nav__link:not(.header-melt-segment) {
   color: rgba(255, 255, 255, 0.94) !important;
   -webkit-text-fill-color: rgba(255, 255, 255, 0.94);
   text-shadow: var(--shadow-text-on-dark);
@@ -161,7 +161,7 @@ a:hover {
   background: transparent;
 }
 
-.page-home .site-header--ethereal.is-on-content .site-nav__link {
+.page-home .site-header--ethereal.is-on-content .site-nav__link:not(.header-melt-segment) {
   color: var(--text) !important;
   -webkit-text-fill-color: var(--text);
   text-shadow: var(--shadow-text-on-light);
@@ -285,7 +285,7 @@ a:hover {
   -webkit-backdrop-filter: none;
 }
 
-.page-has-bg .site-header--overlay:not(.site-header--ethereal) .site-nav__link {
+.page-has-bg .site-header--overlay:not(.site-header--ethereal) .site-nav__link:not(.header-melt-segment) {
   color: rgba(255, 255, 255, 0.93) !important;
   -webkit-text-fill-color: rgba(255, 255, 255, 0.93);
   font-weight: 400;
@@ -297,7 +297,7 @@ a:hover {
   background: transparent;
 }
 
-.page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-nav__link {
+.page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-nav__link:not(.header-melt-segment) {
   color: var(--text) !important;
   -webkit-text-fill-color: var(--text);
   text-shadow: var(--shadow-text-on-light);
@@ -1097,30 +1097,11 @@ body {
   animation: header-segment-melt var(--header-segment-melt-duration) linear forwards;
   animation-delay: var(--header-melt-delay, 0s);
   will-change: opacity, filter;
+  transition: none !important;
 }
 
 .header-melt-segment--done {
   pointer-events: none;
-}
-
-/* フェード中は !important の opacity を外し、アニメーションだけでゆっくり消す */
-.page-home .site-header--ethereal .site-nav__link.header-melt-segment,
-.page-home .site-header--ethereal .site-nav__submenu-link.header-melt-segment,
-.page-home .site-header--ethereal.is-on-content .site-nav__link.header-melt-segment,
-.page-home .site-header--ethereal.is-on-content .site-nav__submenu-link.header-melt-segment,
-.page-has-bg .site-header--overlay:not(.site-header--ethereal) .site-nav__link.header-melt-segment,
-.page-has-bg .site-header--overlay:not(.site-header--ethereal) .site-nav__submenu-link.header-melt-segment,
-.page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-nav__link.header-melt-segment,
-.page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-nav__submenu-link.header-melt-segment,
-.site-header .site-nav__link.header-melt-segment,
-.site-header .site-nav__submenu-link.header-melt-segment,
-.site-header .site-sns__link.header-melt-segment,
-.site-brand.header-melt-segment,
-.gallery-category-nav__link.header-melt-segment,
-.site-header .header-melt-segment:hover,
-.site-header .header-melt-segment:focus-visible,
-.gallery-category-nav__link.header-melt-segment:hover {
-  opacity: unset !important;
 }
 
 @keyframes header-segment-melt {
@@ -1297,15 +1278,18 @@ body {
   text-transform: lowercase;
   padding: 0.1rem 0;
   color: var(--text) !important;
-  opacity: 1 !important;
   -webkit-text-fill-color: var(--text);
   flex-shrink: 0;
   text-shadow: none;
   transition: opacity 0.2s var(--ease);
 }
 
-.site-header .site-nav__link:hover,
-.site-header .site-nav__link.is-active {
+.site-header .site-nav__link:not(.header-melt-segment) {
+  opacity: 1 !important;
+}
+
+.site-header .site-nav__link:not(.header-melt-segment):hover,
+.site-header .site-nav__link:not(.header-melt-segment).is-active {
   text-shadow: none !important;
   opacity: 0.72 !important;
 }
@@ -1405,7 +1389,7 @@ body {
   filter: none;
 }
 
-.site-header .site-sns__link:hover {
+.site-header .site-sns__link:not(.header-melt-segment):hover {
   opacity: 0.5 !important;
   transform: none;
 }

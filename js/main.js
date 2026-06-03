@@ -36,6 +36,7 @@ function initSiteBrand() {
 }
 
 const HEADER_SEGMENT_MELT_MAX_DELAY_MS = 10000;
+const HEADER_SEGMENT_MELT_MS = 20000;
 
 function finishHeaderMeltSegment(el) {
   el.classList.add('header-melt-segment--done');
@@ -60,6 +61,10 @@ function applyHeaderSegmentMelt(el) {
   el.addEventListener('animationend', function (e) {
     if (e.animationName === 'header-segment-melt') finishHeaderMeltSegment(el);
   });
+
+  window.setTimeout(function () {
+    if (!el.classList.contains('header-melt-segment--done')) finishHeaderMeltSegment(el);
+  }, delayMs + HEADER_SEGMENT_MELT_MS + 100);
 }
 
 /** バナー・メニュー・SNS を個別タイミングで消す（アニメーション終了までにじんで消える） */
@@ -82,7 +87,9 @@ function initMain() {
 
 function bootMain() {
   initMain();
-  window.addEventListener('load', initHeaderSegmentMelt);
+  window.addEventListener('load', function () {
+    window.setTimeout(initHeaderSegmentMelt, 0);
+  });
 }
 
 if (document.readyState === 'loading') {
