@@ -42,9 +42,27 @@ function initHomeContent() {
         return lineHtml(line, 'home-caption__poem');
       });
 
-    if (foldRoot) foldRoot.innerHTML = renderGroup(titleLines);
-    if (restRoot) {
-      restRoot.innerHTML = renderGroup(metaLines) + renderGroup(poemLines);
+    var mobileMq = window.matchMedia('(max-width: 760px)');
+
+    function renderCaptionLayout() {
+      if (!foldRoot) return;
+      if (mobileMq.matches) {
+        foldRoot.innerHTML =
+          renderGroup(titleLines) + renderGroup(metaLines) + renderGroup(poemLines);
+        if (restRoot) restRoot.innerHTML = '';
+      } else {
+        foldRoot.innerHTML = renderGroup(titleLines);
+        if (restRoot) {
+          restRoot.innerHTML = renderGroup(metaLines) + renderGroup(poemLines);
+        }
+      }
+    }
+
+    renderCaptionLayout();
+    if (typeof mobileMq.addEventListener === 'function') {
+      mobileMq.addEventListener('change', renderCaptionLayout);
+    } else if (typeof mobileMq.addListener === 'function') {
+      mobileMq.addListener(renderCaptionLayout);
     }
   }
 

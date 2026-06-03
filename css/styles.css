@@ -1647,9 +1647,40 @@ body {
     max-width: 100%;
   }
 
+  /* トップ: キャプション全文を1画面内（fold に統合、rest は非表示） */
+  .page-home .home-stage {
+    min-height: 100svh;
+    min-height: 100dvh;
+    max-height: 100svh;
+    max-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .page-home .home-fold {
+    flex: 1 1 0;
+    min-height: 0;
+    max-height: none;
+    overflow: hidden;
+  }
+
+  .page-home .home-artwork {
+    flex: 1 1 0;
+    min-height: 0;
+  }
+
   .page-home .home-caption.home-caption--rest {
-    width: var(--home-artwork-w, 100%);
-    max-width: calc(100% - 2 * var(--home-fold-pad-x));
+    display: none;
+  }
+
+  .page-home .home-caption.home-caption--fold {
+    flex: 0 0 auto;
+    padding-bottom: clamp(0.35rem, 1.5vh, 0.75rem);
+  }
+
+  .page-home .home-caption__group + .home-caption__group {
+    margin-top: 0.75rem;
   }
 
   .site-nav__submenu-link {
@@ -1660,10 +1691,8 @@ body {
     max-width: min(88vw, 100%);
   }
 
+  /* Gallery: サブカテゴリのサイドバーはスマホでは非表示（ヘッダーの Gallery から遷移） */
   .gallery-category-nav {
-    top: calc(var(--header-offset) + 0.35rem);
-    max-width: min(42vw, 14rem);
-    padding-bottom: 0.35rem;
-    background: linear-gradient(180deg, #fcfcfc 75%, rgba(252, 252, 252, 0));
+    display: none;
   }
 }

@@ -71,8 +71,12 @@ function applyHeaderSegmentMelt(el) {
 function initHeaderSegmentMelt() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
+  const segmentSelector =
+    '.site-brand, .site-header .site-nav__link, .site-header .site-nav__submenu-link, .site-header .site-sns__link';
   const segments = document.querySelectorAll(
-    '.site-brand, .site-header .site-nav__link, .site-header .site-nav__submenu-link, .site-header .site-sns__link, .gallery-category-nav__link'
+    window.matchMedia('(max-width: 760px)').matches
+      ? segmentSelector
+      : segmentSelector + ', .gallery-category-nav__link'
   );
   segments.forEach(applyHeaderSegmentMelt);
 }
