@@ -29,7 +29,6 @@
   --artwork-top-extra: clamp(1.75rem, 4.5vh, 3.5rem);
   --artwork-top-pad: calc(3.1rem + env(safe-area-inset-top, 0px) + var(--artwork-top-extra));
   --home-image-display-h: auto;
-  --home-image-display-left: auto;
   --font-serif: "Cormorant Garamond", "Noto Serif JP", serif;
   --font-sans: "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
@@ -667,7 +666,7 @@ a:hover {
   box-sizing: border-box;
   width: var(--home-image-display-w);
   max-width: calc(100% - 2 * var(--artwork-pad-x));
-  margin-left: var(--home-image-display-left);
+  margin-left: auto;
   margin-right: auto;
   padding: 0;
 }
@@ -682,7 +681,7 @@ a:hover {
   margin: 0;
   border: none;
   object-fit: contain;
-  object-position: left top;
+  object-position: center top;
 }
 
 .gallery__meta {

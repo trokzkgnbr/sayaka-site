@@ -1,39 +1,29 @@
 (function () {
   var STORAGE_W = 'homeArtworkDisplayW';
   var STORAGE_H = 'homeArtworkDisplayH';
-  var STORAGE_LEFT = 'homeArtworkDisplayLeft';
 
   function applyMetrics(metrics) {
     if (!metrics || metrics.width <= 0 || metrics.height <= 0) return;
 
     var wPx = Math.round(metrics.width) + 'px';
     var hPx = Math.round(metrics.height) + 'px';
-    var leftPx =
-      metrics.marginLeft != null ? Math.round(metrics.marginLeft) + 'px' : 'auto';
 
     document.documentElement.style.setProperty('--home-image-display-w', wPx);
     document.documentElement.style.setProperty('--home-image-display-h', hPx);
-    document.documentElement.style.setProperty('--home-image-display-left', leftPx);
 
     try {
       sessionStorage.setItem(STORAGE_W, String(Math.round(metrics.width)));
       sessionStorage.setItem(STORAGE_H, String(Math.round(metrics.height)));
-      if (metrics.marginLeft != null) {
-        sessionStorage.setItem(STORAGE_LEFT, String(Math.round(metrics.marginLeft)));
-      } else {
-        sessionStorage.removeItem(STORAGE_LEFT);
-      }
+      sessionStorage.removeItem('homeArtworkDisplayLeft');
     } catch (e) {}
   }
 
   function restoreStoredMetrics() {
     var w = null;
     var h = null;
-    var left = null;
     try {
       w = sessionStorage.getItem(STORAGE_W);
       h = sessionStorage.getItem(STORAGE_H);
-      left = sessionStorage.getItem(STORAGE_LEFT);
     } catch (e) {}
 
     if (w) {
@@ -41,11 +31,6 @@
     }
     if (h) {
       document.documentElement.style.setProperty('--home-image-display-h', h + 'px');
-    }
-    if (left) {
-      document.documentElement.style.setProperty('--home-image-display-left', left + 'px');
-    } else {
-      document.documentElement.style.setProperty('--home-image-display-left', 'auto');
     }
 
     return !!(w && h);
@@ -92,19 +77,9 @@
     var width = Math.floor(img.naturalWidth * fitScale);
     var height = Math.floor(img.naturalHeight * fitScale);
 
-    var marginLeft;
-    if (options.centerInContainer !== false) {
-      marginLeft = (availW - width) / 2;
-    } else {
-      var containerRect = container.getBoundingClientRect();
-      var imgRect = img.getBoundingClientRect();
-      marginLeft = imgRect.left - containerRect.left;
-    }
-
     return {
       width: width,
       height: height,
-      marginLeft: marginLeft,
     };
   }
 
@@ -151,7 +126,6 @@
   var STANDARD_SCALE = 0.9;
   var STANDARD_FIT_OPTIONS = {
     useViewportHeight: true,
-    centerInContainer: true,
     useUniformPageWidth: true,
   };
 
