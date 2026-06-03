@@ -2,7 +2,7 @@
 
 更新日: 2026-06-01 JST
 
-このサイトの **Blog** は、Instagram **@4mnion** の投稿を **手動同期**で取り込みます（自動同期はいまオフ）。  
+このサイトの **Blog** は、Instagram **@4mnion** に投稿した内容を **GitHub Actions（クラウド）で1日2回自動**で取り込みます（**12:00・24:00 日本時間**）。  
 （画像1枚・正方形の投稿を想定。動画・リールは取り込みません。）
 
 ※ サイト右上の Instagram / X リンク（**@pikinsaya**）とは別アカウントです。
@@ -23,7 +23,7 @@
 - [ ] **F.** GitHub にトークンを登録（Secrets）
 - [ ] **G.** 同期を1回テストする
 
-初回セットアップ後は、**更新したいタイミングで手動同期**してください（下記「手動で同期」）。
+初回が終われば **あとは自動** です（毎日 **12:00・24:00 JST** に GitHub 上で同期 → Netlify 連携時はサイト反映）。
 
 ---
 
@@ -223,7 +223,7 @@ Drop だけだと Git の更新がサイトに反映されません。**GitHub �
 ## あとから Instagram に投稿したら？
 
 **何もしなくて大丈夫です。**  
-**自動同期はオフ**です。Instagram に投稿したあと、下記の手順で同期してください。
+毎日 **12:00・24:00（日本時間）** に GitHub Actions がクラウド上で自動実行され、Blog が更新されます（パソコン電源は不要）。
 
 **同期のルール（重要）**
 
@@ -235,7 +235,7 @@ Drop だけだと Git の更新がサイトに反映されません。**GitHub �
 
 - Netlify への push は **HTML/CSS/JS** の見た目を更新します。
 - **Blog の投稿本文・画像** は `data/diary.json` と `images/diary/` で、**GitHub Actions「Sync Instagram Diary」** が更新します。
-- **いまは自動同期オフ**です。更新するときは下記「手動で同期」を実行してください。
+- `main` に push するたびに Actions でも同期が走ります（加えて毎日 12:00・24:00 JST）。
 - Blog 一覧のリード文に **「同期 2026/6/4 10:39」** のように最終同期時刻が出ます。古いままなら Actions の成否を確認してください。
 
 急ぎで反映したいときだけ:
@@ -264,7 +264,7 @@ Drop だけだと Git の更新がサイトに反映されません。**GitHub �
 | `data/diary.json` | サイトが読む日記データ（自動更新） |
 | `images/diary/*.jpg` | 投稿画像（自動ダウンロード） |
 | `config/instagram.env` | パソコンでのテスト用（Git に入れない） |
-| `.github/workflows/sync-instagram-diary.yml` | 手動同期用（Actions → Run workflow） |
+| `.github/workflows/sync-instagram-diary.yml` | 毎日12:00・24:00 JST の自動同期 + 手動実行（GitHub クラウド） |
 
 ---
 

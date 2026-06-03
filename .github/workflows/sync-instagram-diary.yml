@@ -3,9 +3,14 @@
 # 延長（推奨）: INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET
 name: Sync Instagram Diary
 
-# 自動同期はオフ。更新するときは Actions → Run workflow か scripts/run_sync.sh
 on:
+  schedule:
+    # cron は UTC。JST(UTC+9): 12:00 → 03:00 UTC / 24:00(0:00) → 15:00 UTC
+    - cron: "0 3 * * *"
+    - cron: "0 15 * * *"
   workflow_dispatch:
+  push:
+    branches: [main]
 
 concurrency:
   group: sync-instagram-diary
