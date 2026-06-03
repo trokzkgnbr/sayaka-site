@@ -35,21 +35,15 @@ function initSiteBrand() {
   header.prepend(brand);
 }
 
-const HEADER_SEGMENT_MELT_MAX_DELAY_MS = 13000;
-const HEADER_SEGMENT_HIDE_MS = 30000;
-const PAGE_LOAD_AT = Date.now();
+const HEADER_SEGMENT_MELT_MAX_DELAY_MS = 10000;
 
-function hideHeaderMeltEl(el) {
+function finishHeaderMeltSegment(el) {
+  el.classList.add('header-melt-segment--done');
   el.style.pointerEvents = 'none';
-  el.style.visibility = 'hidden';
-}
-
-function scheduleSegmentHideAt30s(el) {
-  const elapsed = Date.now() - PAGE_LOAD_AT;
-  const remaining = Math.max(0, HEADER_SEGMENT_HIDE_MS - elapsed);
-  window.setTimeout(function () {
-    hideHeaderMeltEl(el);
-  }, remaining);
+  if (el.tagName === 'A' || el.tagName === 'BUTTON') {
+    el.setAttribute('tabindex', '-1');
+    el.setAttribute('aria-hidden', 'true');
+  }
 }
 
 function randomSegmentMeltDelayMs() {
@@ -62,10 +56,13 @@ function applyHeaderSegmentMelt(el) {
   const delayMs = randomSegmentMeltDelayMs();
   el.style.setProperty('--header-melt-delay', delayMs / 1000 + 's');
   el.classList.add('header-melt-segment');
-  scheduleSegmentHideAt30s(el);
+
+  el.addEventListener('animationend', function (e) {
+    if (e.animationName === 'header-segment-melt') finishHeaderMeltSegment(el);
+  });
 }
 
-/** バナー・メニュー・SNS を個別タイミングで消す（非表示は表示後30秒） */
+/** バナー・メニュー・SNS を個別タイミングで消す（アニメーション終了までにじんで消える） */
 function initHeaderSegmentMelt() {
   if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 

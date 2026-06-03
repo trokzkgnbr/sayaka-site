@@ -18,8 +18,8 @@
   --header-nav-gap: clamp(0.75rem, 2.4vw, 1.8rem);
   --header-nav-letter-spacing: 0.08em;
   --header-melt-duration: 22s;
-  --header-segment-melt-duration: 17s;
-  --header-segment-melt-max-delay: 13s;
+  --header-segment-melt-duration: 20s;
+  --header-segment-melt-max-delay: 10s;
   --page-pad: clamp(1.25rem, 5vw, 2.5rem);
   --max-w: 720px;
   --max-w-wide: 1100px;
@@ -1092,11 +1092,15 @@ body {
   color: var(--text);
 }
 
-/* バナー・メニュー各項目 — JS で delay を付与（17秒でフェード、非表示は表示後30秒） */
+/* バナー・メニュー各項目 — JS で delay を付与（20秒でにじんで消える。visibility は切らない） */
 .header-melt-segment {
-  animation: header-segment-melt var(--header-segment-melt-duration) ease-out forwards;
+  animation: header-segment-melt var(--header-segment-melt-duration) linear forwards;
   animation-delay: var(--header-melt-delay, 0s);
   will-change: opacity, filter;
+}
+
+.header-melt-segment--done {
+  pointer-events: none;
 }
 
 /* フェード中は !important の opacity を外し、アニメーションだけでゆっくり消す */
@@ -1124,49 +1128,57 @@ body {
     opacity: 1;
     filter: blur(0);
   }
-  20% {
-    opacity: 0.88;
+  15% {
+    opacity: 0.92;
     filter: blur(0.5px);
   }
-  40% {
-    opacity: 0.68;
-    filter: blur(2px);
+  30% {
+    opacity: 0.78;
+    filter: blur(1.5px);
+  }
+  45% {
+    opacity: 0.6;
+    filter: blur(3px);
   }
   58% {
-    opacity: 0.48;
-    filter: blur(4px);
+    opacity: 0.45;
+    filter: blur(5px);
   }
-  72% {
-    opacity: 0.32;
-    filter: blur(6px);
-  }
-  82% {
-    opacity: 0.22;
+  68% {
+    opacity: 0.34;
     filter: blur(7px);
   }
-  90% {
-    opacity: 0.14;
-    filter: blur(8px);
-  }
-  94% {
-    opacity: 0.09;
+  76% {
+    opacity: 0.26;
     filter: blur(9px);
   }
-  97% {
-    opacity: 0.05;
-    filter: blur(10px);
-  }
-  99% {
-    opacity: 0.02;
+  83% {
+    opacity: 0.19;
     filter: blur(11px);
   }
-  99.8% {
-    opacity: 0.004;
-    filter: blur(11.5px);
+  88% {
+    opacity: 0.14;
+    filter: blur(13px);
+  }
+  92% {
+    opacity: 0.1;
+    filter: blur(15px);
+  }
+  95% {
+    opacity: 0.07;
+    filter: blur(17px);
+  }
+  97% {
+    opacity: 0.045;
+    filter: blur(19px);
+  }
+  98.5% {
+    opacity: 0.025;
+    filter: blur(21px);
   }
   100% {
     opacity: 0;
-    filter: blur(12px);
+    filter: blur(22px);
   }
 }
 
