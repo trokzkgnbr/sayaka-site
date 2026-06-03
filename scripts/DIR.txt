@@ -1,0 +1,1 @@
+Instagram → Diary 同期スクリプト。入口は run_sync.sh。手順は docs/INSTAGRAM_DIARY_SETUP.md。

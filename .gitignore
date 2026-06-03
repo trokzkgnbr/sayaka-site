@@ -1,0 +1,5 @@
+config/instagram.env
+__pycache__/
+*.pyc
+scripts/.venv/
+.DS_Store

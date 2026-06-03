@@ -1,0 +1,1 @@
+Home のメインビジュアル（main-visual.jpg）。差し替え時は site-config.js の homeVisual も確認。

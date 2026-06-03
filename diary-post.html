@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Diary entry">
+  <title>Diary | Portfolio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body class="page-inner page-has-bg" data-page="diary-post">
+  <div class="site-bg" aria-hidden="true">
+    <img class="site-bg__img" src="images/home/main-visual.jpg" alt="">
+  </div>
+
+  <header class="site-header site-header--overlay" id="site-header">
+    <nav class="site-nav" id="site-nav" aria-label="メインメニュー"></nav>
+    <div class="site-sns" id="site-sns" aria-label="SNS"></div>
+  </header>
+
+  <main class="page-main page-main--diary">
+    <article class="diary-post-panel" id="diary-post" aria-busy="true">
+      <p class="diary-loading">読み込み中…</p>
+    </article>
+  </main>
+
+  <footer class="site-footer site-footer--glass">
+    <p><small>&copy; <span id="year"></span> <span id="footer-name">SAYA YOSUI</span></small></p>
+  </footer>
+
+  <script src="js/site-config.js"></script>
+  <script src="js/nav.js?v=3"></script>
+  <script src="js/sns.js?v=2"></script>
+  <script src="js/main.js"></script>
+  <script src="js/diary-post.js?v=2"></script>
+</body>
+</html>

@@ -1,0 +1,70 @@
+# Instagram → Diary 自動同期（GitHub クラウド上・1日2回 + 手動実行）
+# 必要: Secrets … INSTAGRAM_ACCESS_TOKEN, INSTAGRAM_USER_ID
+# 延長（推奨）: INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET
+name: Sync Instagram Diary
+
+on:
+  schedule:
+    # cron は UTC。JST(UTC+9): 12:00 → 03:00 UTC / 24:00(0:00) → 15:00 UTC
+    - cron: "0 3 * * *"
+    - cron: "0 15 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r scripts/requirements-instagram-sync.txt
+
+      - name: Resolve Instagram token (extend if needed)
+        id: instagram_token
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          INSTAGRAM_APP_ID: ${{ secrets.INSTAGRAM_APP_ID }}
+          INSTAGRAM_APP_SECRET: ${{ secrets.INSTAGRAM_APP_SECRET }}
+        run: |
+          TOKEN="$INSTAGRAM_ACCESS_TOKEN"
+          if [[ -n "$INSTAGRAM_APP_ID" && -n "$INSTAGRAM_APP_SECRET" ]]; then
+            if NEW_LINE=$(python3 scripts/extend_instagram_token.py --if-needed --export-env 2>/dev/null | tail -1); then
+              if [[ "$NEW_LINE" == INSTAGRAM_ACCESS_TOKEN=* ]]; then
+                TOKEN="${NEW_LINE#INSTAGRAM_ACCESS_TOKEN=}"
+                echo "トークンを延長しました（このワークフロー実行内で使用）"
+              fi
+            fi
+          else
+            echo "INSTAGRAM_APP_ID / SECRET 未設定のため延長スキップ"
+          fi
+          echo "::add-mask::$TOKEN"
+          echo "value=$TOKEN" >> "$GITHUB_OUTPUT"
+
+      - name: Verify Instagram config
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ steps.instagram_token.outputs.value }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+        run: python3 scripts/verify_instagram_config.py
+
+      - name: Sync diary from Instagram
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ steps.instagram_token.outputs.value }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          INSTAGRAM_SYNC_LIMIT: ${{ vars.INSTAGRAM_SYNC_LIMIT || '50' }}
+        run: python3 scripts/sync_instagram_diary.py
+
+      - name: Commit and push if changed
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "chore(diary): sync from Instagram"
+          file_pattern: "data/diary.json images/diary/*.jpg"
