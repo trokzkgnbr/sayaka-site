@@ -809,7 +809,7 @@ a:hover {
   color: var(--bg);
 }
 
-/* ----- Diary ----- */
+/* ----- Blog (diary.html) ----- */
 
 .page-main--diary {
   max-width: 52rem;
@@ -901,6 +901,38 @@ a:hover {
   letter-spacing: 0.1em;
   color: var(--text-muted);
   margin: 2rem 0;
+}
+
+.diary-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(1rem, 4vw, 2rem);
+  margin: clamp(2rem, 5vw, 3rem) 0 1rem;
+  padding: 0;
+}
+
+.diary-pagination__link {
+  font-family: var(--font-serif);
+  font-size: clamp(0.78rem, 1.6vw, 0.9rem);
+  letter-spacing: 0.14em;
+  text-transform: lowercase;
+  color: var(--text);
+  text-decoration: none;
+  transition: opacity 0.2s var(--ease);
+}
+
+.diary-pagination__link:hover,
+.diary-pagination__link:focus-visible {
+  opacity: 0.55;
+  outline: none;
+}
+
+.diary-pagination__status {
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
 }
 
 .diary-back-wrap {

@@ -1,6 +1,9 @@
 (function () {
   const listEl = document.getElementById('diary-list');
+  const paginationEl = document.getElementById('diary-pagination');
   if (!listEl) return;
+
+  const PAGE_SIZE = 30;
 
   const dateFmt = new Intl.DateTimeFormat('ja-JP', {
     year: 'numeric',
@@ -24,6 +27,17 @@
 
   function postHref(id) {
     return 'diary-post.html?id=' + encodeURIComponent(id);
+  }
+
+  function getPageNumber() {
+    const raw = new URLSearchParams(window.location.search).get('page');
+    const n = parseInt(raw || '1', 10);
+    return Number.isFinite(n) && n > 0 ? n : 1;
+  }
+
+  function pageHref(page) {
+    if (page <= 1) return 'diary.html';
+    return 'diary.html?page=' + page;
   }
 
   function renderCard(post) {
@@ -61,6 +75,63 @@
   function showEmpty(message) {
     listEl.innerHTML =
       '<p class="diary-empty" role="status">' + escapeHtml(message) + '</p>';
+    if (paginationEl) {
+      paginationEl.hidden = true;
+      paginationEl.innerHTML = '';
+    }
+  }
+
+  function renderPagination(page, totalPages) {
+    if (!paginationEl) return;
+    if (totalPages <= 1) {
+      paginationEl.hidden = true;
+      paginationEl.innerHTML = '';
+      return;
+    }
+
+    paginationEl.hidden = false;
+    var parts = [];
+
+    if (page > 1) {
+      parts.push(
+        '<a class="diary-pagination__link diary-pagination__link--prev" href="' +
+          escapeHtml(pageHref(page - 1)) +
+          '">← prev</a>'
+      );
+    }
+
+    parts.push(
+      '<span class="diary-pagination__status">' +
+        page +
+        ' / ' +
+        totalPages +
+        '</span>'
+    );
+
+    if (page < totalPages) {
+      parts.push(
+        '<a class="diary-pagination__link diary-pagination__link--next" href="' +
+          escapeHtml(pageHref(page + 1)) +
+          '">next →</a>'
+      );
+    }
+
+    paginationEl.innerHTML = parts.join('');
+  }
+
+  function renderPage(posts, page) {
+    const totalPages = Math.max(1, Math.ceil(posts.length / PAGE_SIZE));
+    const safePage = Math.min(page, totalPages);
+    const start = (safePage - 1) * PAGE_SIZE;
+    const slice = posts.slice(start, start + PAGE_SIZE);
+
+    if (safePage !== page) {
+      window.location.replace(pageHref(safePage));
+      return;
+    }
+
+    listEl.innerHTML = slice.map(renderCard).join('');
+    renderPagination(safePage, totalPages);
   }
 
   fetch('data/diary.json')
@@ -76,9 +147,9 @@
         showEmpty('まだ投稿がありません。');
         return;
       }
-      listEl.innerHTML = posts.map(renderCard).join('');
+      renderPage(posts, getPageNumber());
     })
     .catch(function () {
-      showEmpty('日記を読み込めませんでした。');
+      showEmpty('ブログを読み込めませんでした。');
     });
 })();

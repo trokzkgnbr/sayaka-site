@@ -39,8 +39,8 @@
       '<p class="diary-empty" role="alert">' +
       escapeHtml(message) +
       '</p>' +
-      '<p class="diary-back-wrap"><a class="diary-back" href="diary.html">Diary 一覧へ</a></p>';
-    document.title = 'Diary | Portfolio';
+      '<p class="diary-back-wrap"><a class="diary-back" href="diary.html">Blog 一覧へ</a></p>';
+    document.title = 'Blog | Portfolio';
   }
 
   if (!postId) {
@@ -62,10 +62,10 @@
         return;
       }
 
-      document.title = post.title + ' | Diary';
+      document.title = post.title + ' | Blog';
 
       root.innerHTML =
-        '<p class="diary-back-wrap"><a class="diary-back" href="diary.html">← Diary 一覧</a></p>' +
+        '<p class="diary-back-wrap"><a class="diary-back" href="diary.html">← Blog 一覧</a></p>' +
         '<header class="diary-detail__head">' +
         '<h1 class="diary-detail__title">' +
         escapeHtml(post.title) +
@@ -86,6 +86,6 @@
         '</div>';
     })
     .catch(function () {
-      showError('日記を読み込めませんでした。');
+      showError('ブログを読み込めませんでした。');
     });
 })();

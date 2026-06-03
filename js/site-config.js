@@ -35,7 +35,7 @@ window.SITE = {
 
   homeVisual: 'images/home/main-visual.jpg',
 
-  /** ヘッダー右上 SNS（@pikinsaya）。Diary 同期元は @4mnion → config/instagram.env */
+  /** ヘッダー右上 SNS（@pikinsaya）。Blog 同期元は @4mnion → config/instagram.env */
   sns: {
     instagram: 'https://www.instagram.com/pikinsaya/',
     x: 'https://x.com/pikinsaya',
@@ -45,7 +45,7 @@ window.SITE = {
     { id: 'home', label: 'Home', href: 'index.html' },
     { id: 'gallery', label: 'Gallery', href: 'gallery-dawn.html' },
     { id: 'about', label: 'Profile', href: 'about.html' },
-    { id: 'diary', label: 'Diary', href: 'diary.html' },
+    { id: 'diary', label: 'Blog', href: 'diary.html' },
     { id: 'contact', label: 'Contact', href: 'contact.html' },
   ],
 

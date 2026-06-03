@@ -92,6 +92,61 @@ def build_posts(
     return posts, warnings
 
 
+def load_existing_posts(data_path: Path) -> list[dict]:
+    if not data_path.is_file():
+        return []
+    try:
+        data = json.loads(data_path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return []
+    posts = data.get("posts")
+    return posts if isinstance(posts, list) else []
+
+
+def merge_diary_posts(existing: list[dict], fresh_from_ig: list[dict]) -> list[dict]:
+    """
+    直近 sync 枠（Instagram から取得した件）だけ追加・更新・削除する。
+    それより古い投稿（51件目以降相当）は Instagram から消えても残す。
+    """
+    fresh_by_ig_id: dict[str, dict] = {}
+    for post in fresh_from_ig:
+        ig_id = post.get("instagramMediaId")
+        if ig_id:
+            fresh_by_ig_id[str(ig_id)] = post
+
+    fresh_ids = set(fresh_by_ig_id.keys())
+    oldest_sync_date = (
+        min(p["date"] for p in fresh_from_ig) if fresh_from_ig else None
+    )
+
+    legacy: list[dict] = []
+    for post in existing:
+        ig_id = post.get("instagramMediaId")
+        if not ig_id:
+            legacy.append(post)
+            continue
+        if str(ig_id) in fresh_ids:
+            continue
+        if oldest_sync_date and post.get("date", "") < oldest_sync_date:
+            legacy.append(post)
+
+    merged = list(fresh_from_ig) + legacy
+    merged.sort(
+        key=lambda p: (p.get("date", ""), p.get("instagramMediaId", "")),
+        reverse=True,
+    )
+
+    seen_ids: set[str] = set()
+    result: list[dict] = []
+    for post in merged:
+        post_id = post.get("id")
+        if not post_id or post_id in seen_ids:
+            continue
+        seen_ids.add(post_id)
+        result.append(post)
+    return result
+
+
 def prune_orphan_images(images_dir: Path, posts: list[dict], dry_run: bool) -> int:
     keep = {Path(p["image"]).name for p in posts}
     removed = 0
@@ -136,20 +191,49 @@ def main() -> int:
         print(f"API エラー: {exc}", file=sys.stderr)
         return 1
 
-    posts, warnings = build_posts(
+    fresh_posts, warnings = build_posts(
         media_items,
         images_dir,
         dry_run=args.dry_run,
         skip_video=not args.keep_video,
     )
 
-    payload = {"posts": posts, "syncedFrom": "instagram", "syncLimit": limit}
+    existing_posts = load_existing_posts(data_path)
+    merged_posts = merge_diary_posts(existing_posts, fresh_posts)
+
+    fresh_ids = {
+        str(p["instagramMediaId"])
+        for p in fresh_posts
+        if p.get("instagramMediaId")
+    }
+    deleted_recent = 0
+    oldest_sync_date = min((p["date"] for p in fresh_posts), default=None)
+    if oldest_sync_date:
+        for post in existing_posts:
+            ig_id = post.get("instagramMediaId")
+            if not ig_id:
+                continue
+            if str(ig_id) in fresh_ids:
+                continue
+            if post.get("date", "") >= oldest_sync_date:
+                deleted_recent += 1
+
+    payload = {
+        "posts": merged_posts,
+        "syncedFrom": "instagram",
+        "syncLimit": limit,
+        "syncRecentManaged": len(fresh_posts),
+    }
 
     if args.dry_run:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
         for w in warnings:
             print(f"注意: {w}", file=sys.stderr)
-        print(f"\n[dry-run] 取得 {len(media_items)} 件 → 反映 {len(posts)} 件", file=sys.stderr)
+        print(
+            f"\n[dry-run] Instagram {len(fresh_posts)} 件 → 合計 {len(merged_posts)} 件"
+            f"（{len(merged_posts) - len(fresh_posts)} 件は古い投稿として保持）",
+            file=sys.stderr,
+        )
         return 0
 
     data_path.parent.mkdir(parents=True, exist_ok=True)
@@ -157,9 +241,14 @@ def main() -> int:
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
-    removed = prune_orphan_images(images_dir, posts, dry_run=False)
+    removed = prune_orphan_images(images_dir, merged_posts, dry_run=False)
 
-    print(f"同期完了: {len(posts)} 件を {data_path.relative_to(root)} に保存")
+    print(
+        f"同期完了: 直近 {len(fresh_posts)} 件を反映、合計 {len(merged_posts)} 件"
+        f"（{data_path.relative_to(root)}）"
+    )
+    if deleted_recent:
+        print(f"直近枠から削除（Instagram 側で消えた投稿）: {deleted_recent} 件")
     if removed:
         print(f"不要画像を {removed} 件削除")
     for w in warnings:
