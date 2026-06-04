@@ -76,12 +76,26 @@ function initHeaderSegmentMelt() {
   segments.forEach(applyHeaderSegmentMelt);
 }
 
+/** Home で計算した作品幅を profile / blog 等でも使う */
+function initArtworkColumnWidth() {
+  if (
+    !document.body.classList.contains('page-inner') ||
+    document.body.classList.contains('page-home')
+  ) {
+    return;
+  }
+  if (window.ArtworkSize && typeof ArtworkSize.restoreStoredMetrics === 'function') {
+    ArtworkSize.restoreStoredMetrics();
+  }
+}
+
 function initMain() {
   initSiteBrand();
   initHeaderSegmentMelt();
   initHeaderOnScroll();
   initYear();
   initFooterName();
+  initArtworkColumnWidth();
 }
 
 function bootMain() {

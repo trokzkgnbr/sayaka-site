@@ -688,9 +688,10 @@ a:hover {
 }
 
 .gallery__series-title {
-  width: var(--home-image-w);
-  max-width: 100%;
-  margin: 0 auto;
+  width: var(--home-image-display-w);
+  max-width: calc(100% - 2 * var(--artwork-pad-x));
+  margin-left: auto;
+  margin-right: auto;
   padding: 0;
   font-family: var(--font-serif);
   font-size: clamp(0.95rem, 2vw, 1.1rem);
@@ -730,23 +731,24 @@ a:hover {
   object-position: center top;
 }
 
+/* Gallery キャプション — 画像左端に揃えて左寄せ（Home は右寄せのまま） */
 .gallery__meta {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   align-self: stretch;
   gap: 0;
   width: 100%;
   margin-top: 0.85rem;
   padding: 0;
-  text-align: right;
+  text-align: left;
   box-sizing: border-box;
 }
 
 .gallery__meta-group {
   display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: 0.15rem;
   max-width: 100%;
 }
@@ -758,7 +760,9 @@ a:hover {
 .gallery__meta-line {
   display: block;
   max-width: 100%;
-  text-align: right;
+  text-align: left;
+  font-family: var(--font-serif);
+  font-weight: 400;
   font-size: 0.78rem;
   letter-spacing: 0.04em;
   line-height: 1.65;
@@ -780,12 +784,15 @@ a:hover {
 .gallery__meta-size {
   font-family: var(--font-serif);
   font-size: 0.78rem;
+  font-weight: 400;
   letter-spacing: 0.08em;
   color: var(--text-muted);
 }
 
 .gallery__meta-poem {
+  font-family: var(--font-serif);
   font-size: 0.82rem;
+  font-weight: 400;
   letter-spacing: 0.06em;
   line-height: 1.75;
   color: var(--text-muted);
@@ -815,7 +822,7 @@ a:hover {
 .contact-form__textarea {
   width: 100%;
   font: inherit;
-  font-weight: 300;
+  font-weight: 400;
   padding: 0.75rem 1rem;
   border: 1px solid var(--line);
   background: #fff;
@@ -873,7 +880,7 @@ a:hover {
 /* ----- Blog (diary.html) ----- */
 
 .page-main--diary {
-  max-width: var(--max-w);
+  max-width: none;
 }
 
 .diary-list {
@@ -1499,43 +1506,71 @@ body {
   display: none;
 }
 
-.page-main:not(.page-main--gallery) {
-  padding-top: calc(var(--header-offset) + 1.25rem);
-}
-
-.page-inner .page-head {
+/* Home 以外 — 作品画像と同じ幅・上余白・左右センターにテキスト列を揃える */
+body.page-inner .page-main:not(.page-main--gallery) {
+  max-width: none;
   margin-left: 0;
   margin-right: 0;
-  width: 100%;
+  padding: var(--artwork-top-pad) var(--artwork-pad-x) 4rem;
+  box-sizing: border-box;
 }
 
-.page-inner .page-head__title {
+body.page-inner .page-main:not(.page-main--gallery) > * {
+  width: var(--home-image-display-w);
+  max-width: calc(100% - 2 * var(--artwork-pad-x));
+  margin-left: auto;
+  margin-right: auto;
+  box-sizing: border-box;
+}
+
+body.page-inner,
+body.page-inner .page-main,
+body.page-inner .page-head,
+body.page-inner .page-head__title,
+body.page-inner .page-head__name,
+body.page-inner .page-head__name-en,
+body.page-inner .page-head__role,
+body.page-inner .page-head__lead,
+body.page-inner .prose,
+body.page-inner .about-body,
+body.page-inner .profile-bio,
+body.page-inner .profile-section-title,
+body.page-inner .diary-card,
+body.page-inner .diary-detail,
+body.page-inner .diary-post-panel,
+body.page-inner .contact-form,
+body.page-inner .diary-pagination__link,
+body.page-inner .site-nav__link:not(.header-melt-segment),
+body.page-inner .site-nav__submenu-link,
+body.page-inner .gallery-category-nav__link {
+  font-family: var(--font-serif);
+  font-weight: 400;
+}
+
+body.page-inner .page-head {
+  margin-bottom: 2.5rem;
+  text-align: left;
+}
+
+body.page-inner .page-head__title {
   font-size: clamp(1.4rem, 3vw, 2.2rem);
   text-transform: none;
   letter-spacing: 0.08em;
   margin: 0 0 1rem;
   padding: 0;
-  display: block;
-  width: 100%;
+}
+
+body.page-inner .page-head__name,
+body.page-inner .page-head__name-en,
+body.page-inner .page-head__role,
+body.page-inner .page-head__lead {
+  letter-spacing: 0.08em;
   text-align: left;
 }
 
-.page-inner .page-head__name,
-.page-inner .page-head__name-en,
-.page-inner .page-head__role,
-.page-inner .page-head__lead {
-  margin-left: 0;
-  margin-right: 0;
-  padding-left: 0;
-  padding-right: 0;
-  letter-spacing: 0.08em;
-  text-align: left;
-  display: block;
-  width: 100%;
-}
-
-.page-inner .page-head__name {
-  letter-spacing: 0.08em;
+body.page-inner .diary-detail__figure,
+body.page-inner .diary-detail__body {
+  max-width: 100%;
 }
 
 .page-main--about .page-head__title,
@@ -1596,7 +1631,7 @@ body {
   display: none;
 }
 
-/* Home / Gallery 共通キャプション（画像幅に合わせて右揃え） */
+/* Home キャプション（画像幅に合わせて右揃え） */
 .page-home .home-caption.home-caption--fold,
 .page-home .home-caption.home-caption--rest {
   flex: 0 0 auto;
