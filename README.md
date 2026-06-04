@@ -24,7 +24,7 @@
 - **セットアップ（非エンジニア向け）:** [`docs/INSTAGRAM_DIARY_SETUP.md`](docs/INSTAGRAM_DIARY_SETUP.md)
 - **渡す前チェック:** [`docs/HANDOFF_WHEN_READY.md`](docs/HANDOFF_WHEN_READY.md)
 - 手動同期: `bash scripts/run_sync.sh`（`config/instagram.env` 要）
-- 自動同期: `.github/workflows/sync-instagram-diary.yml`（GitHub Secrets 設定後、**12:00・24:00 JST** にクラウド実行）
+- 自動同期: `.github/workflows/sync-instagram-diary.yml`（GitHub Secrets 設定後、**12:05・24:05 JST 頃** + 手動）
 
 ## ローカル表示
 
@@ -36,57 +36,14 @@ python3 -m http.server 8080
 
 `portfolio_site` フォルダだけ渡して相手が同じコマンドを実行してもよい（`file://` で開くと一部の挙動が不安定になりやすい）。
 
-## 他の人に URL で見せる（おすすめ順）
+## 本番公開（GitHub Pages）
 
-いずれも **HTML/CSS/JS だけ**の静的サイト向け。公開するのは `portfolio_site` フォルダ全体（`index.html` が直下にある状態）。
+リポジトリ `trokzkgnbr/sayaka-site` を **GitHub Actions** で公開します。
 
-### 1. Netlify Drop（いちばん手軽・GUI）
-
-**用意済み ZIP（ルートに `index.html` がある構成）:**
-
-`40_work/portfolio_site-netlify-drop.zip`
-
-**手順（約2分）**
-
-1. ブラウザで <https://app.netlify.com/drop> を開く
-2. 初回だけ **Netlify 無料アカウント**（メール / Google / GitHub のいずれか）でログイン
-3. 上記 ZIP をドロップ（または `portfolio_site` フォルダごとドロップでも可）
-4. 表示された `https://ランダム名.netlify.app` を共有
-
-**あとから:** Site configuration → Site name で `saya-yosui` などにすると `https://saya-yosui.netlify.app` に変更できる。
-
-**更新:** 同じ ZIP を再度 Drop するか、ダッシュボードの Deploys から再アップロード。
-
-**ZIP の再生成:**
-
-```bash
-cd ~/.openclaw/workspace/40_work/portfolio_site
-zip -r ../portfolio_site-netlify-drop.zip . -x "*.DS_Store" -x "README.md"
-```
-
-### 2. Surge（ターミナル1コマンド）
-
-```bash
-cd ~/.openclaw/workspace/40_work/portfolio_site
-npx surge . saya-yosui.surge.sh
-```
-
-初回はメール登録のみ。表示された URL をそのまま共有できる。
-
-### 3. Cloudflare Pages / Vercel（無料・Git 連携向け）
-
-GitHub に `portfolio_site` だけのリポジトリを置き、Cloudflare Pages または Vercel で「ルート = そのリポジトリ」を選ぶと、push のたびに自動更新される。
-
-いまのワークスペース全体（`terako`）のままだとパスが深いので、**ポートフォリオ専用リポジトリ**にするか、Deploy 時の公開ディレクトリを `40_work/portfolio_site` に指定する。
-
-### 4. GitHub Pages（本番・推奨）
-
-リポジトリ `trokzkgnbr/sayaka-site` では **Actions が自動デプロイ** します。
-
-- 手順・URL: [`docs/GITHUB_PAGES_SETUP.md`](docs/GITHUB_PAGES_SETUP.md)
-- 公開 URL: https://trokzkgnbr.github.io/sayaka-site/
-- `main` に push（Blog 同期のコミット含む）→ 数分で本番更新
-- Netlify 無料のデプロイクレジットを使わずに Git と本番を揃えやすい
+- 手順: [`docs/GITHUB_PAGES_SETUP.md`](docs/GITHUB_PAGES_SETUP.md)
+- URL: https://trokzkgnbr.github.io/sayaka-site/
+- サイト更新: `main` へ push → **Deploy GitHub Pages** が数分以内に反映
+- Blog データ: **Sync Instagram Diary**（毎日 12:05・24:05 JST 頃 + 手動）
 
 ---
 
@@ -100,7 +57,8 @@ GitHub に `portfolio_site` だけのリポジトリを置き、Cloudflare Pages
 
 - 作家名・役割・プロフィール短文/長文・送信先メール（`email`・画面には非表示）
 - Home 画像: `images/home/main-visual.jpg`（`homeVisual`）
-- ギャラリー: `images/gallery/` + `js/gallery.js` の `GALLERY_ITEMS`
+- ギャラリー: `images/gallery/` + `data/gallery-*.json`（表示は `js/gallery.js`）
+- キャッシュ更新: `js/site-config.js` の `assetVersion` と各 HTML の `?v=` を同じ番号に
 
 ## Contact の動き
 

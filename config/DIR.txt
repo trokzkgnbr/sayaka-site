@@ -1,1 +1,0 @@
-Instagram 同期用の設定。instagram.env.example をコピーして instagram.env（秘密・Git に入れない）。

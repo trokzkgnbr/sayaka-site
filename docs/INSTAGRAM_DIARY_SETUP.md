@@ -7,7 +7,7 @@
 
 ※ サイト右上の Instagram / X リンク（**@pikinsaya**）とは別アカウントです。
 
-**お金はかかりません**（Netlify 無料枠 + GitHub 無料 + Meta API 無料）。
+**お金はかかりません**（GitHub Pages + GitHub Actions + Meta API は無料枠で足ります）。
 
 ---
 
@@ -23,7 +23,7 @@
 - [ ] **F.** GitHub にトークンを登録（Secrets）
 - [ ] **G.** 同期を1回テストする
 
-初回が終われば **あとは自動** です（毎日 **12:05・24:05 JST** 頃に GitHub 上で同期 → Netlify 連携時はサイト反映）。
+初回が終われば **あとは自動** です（毎日 **12:05・24:05 JST** 頃に GitHub 上で同期 → Pages に反映）。
 
 ---
 
@@ -34,7 +34,7 @@
 | Instagram **@4mnion**（Diary 用・1つ） | 日記の元データ |
 | Facebook アカウント | Meta 開発者用 |
 | GitHub アカウント（無料） | 自動同期の実行場所 |
-| Netlify アカウント（無料） | サイト公開（すでに Drop で作った場合も連携可） |
+| （任意）独自ドメイン | GitHub Pages に向ける DNS |
 
 ---
 
@@ -216,8 +216,6 @@ git push
 - Blog 同期で `main` が更新される → 自動で再デプロイ
 - 初回 URL: https://trokzkgnbr.github.io/sayaka-site/
 
-**Netlify を使い続ける場合:** Drop だけだと Git の更新が反映されません。連携するか、都度再アップロードが必要です（無料枠では本番デプロイごとにクレジット消費あり）。
-
 ---
 
 ## あとから Instagram に投稿したら？
@@ -242,7 +240,7 @@ git push
 
 - **Blog の投稿本文・画像** … `Sync Instagram Diary` が `data/diary.json` と `images/diary/` を更新
 - **本番サイト** … `Deploy GitHub Pages` が HTML/CSS/JS/画像/data を公開
-- `main` への push のたびに Instagram 同期も走ります（加えて毎日 12:05・24:05 JST 頃）
+- Instagram 同期は **毎日 12:05・24:05 JST 頃** と **手動（Run workflow）** のみ（通常のサイト更新 push では走りません）
 - Blog が古いままなら、両方の Actions の成否と https://trokzkgnbr.github.io/sayaka-site/data/diary.json を確認
 
 急ぎで反映したいときだけ:

@@ -1,4 +1,0 @@
-portfolio_site（静的ポートフォリオ HP・マルチページ）
-更新日: 2026-06-01 JST
-
-index / about / gallery / diary / contact の 5 ページ。共通設定は js/site-config.js。Diary×Instagram は docs/INSTAGRAM_DIARY_SETUP.md。

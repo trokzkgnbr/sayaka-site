@@ -1,5 +1,0 @@
-# Blog データは GitHub Actions が更新する。ブラウザに古い JSON を残さない。
-[[headers]]
-  for = "/data/*"
-  [headers.values]
-    Cache-Control = "public, max-age=0, must-revalidate"

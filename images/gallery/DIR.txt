@@ -1,1 +1,0 @@
-ギャラリー用 JPEG。gallery.js の GALLERY_ITEMS に src を追加して拡張する。

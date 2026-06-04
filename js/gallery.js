@@ -1,6 +1,6 @@
 /**
- * ギャラリー（縦1列・カテゴリ別ページ）。
- * body[data-gallery-category] で表示するシリーズを指定する。
+ * ギャラリー（縦1列・カテゴリ別）。
+ * gallery.html?category=dawn または旧 URL（gallery-dawn.html 等）の data-gallery-category。
  */
 const GALLERY_DEFAULT_CAPTION = {
   year: '2022',
@@ -14,165 +14,20 @@ const GALLERY_DEFAULT_CAPTION = {
   ],
 };
 
-const GALLERY_BY_SLUG = {
-  dawn: {
-    title: 'そして夜明けを拒むでしょう',
-    works: [
-      {
-        src: 'images/gallery/dawn/01.jpg',
-        alt: 'そして夜明けを拒むでしょう',
-        title: 'そして夜明けを拒むでしょう',
-        year: '2021年度　卒業制作',
-        poem: [
-          '今日はいつもとは違う道',
-          '花束を抱えて鯨の後ろを追いかけた',
-          'タプタプのコップに浮かべて',
-          '黄金の中に縁がちらちら泳いでいる',
-          'まだ行かないよ',
-          'やがて丸く消えていく',
-          '結末を揺らして通り過ぎていく',
-          '空を見上げたら月を探すから',
-          '真っ暗な夜も埋め尽くすほど',
-          'あなたの光になってあげる',
-          '美しくて醜い魂が零れる滴のように',
-          'いつしか蝶と呼ばれて',
-          '天に還る',
-        ],
-      },
-      {
-        src: 'images/gallery/dawn/02.jpg',
-        alt: 'いつもあたたかく瞬く',
-        title: 'いつもあたたかく瞬く',
-        size: '455×606mm',
-        medium: 'oil, charcoal on canvas',
-        poem: [
-          '「何処に行くの」まだいかないよ',
-          '「此処に居ないの」まだいかないよ',
-          '「何処か行くの」まだいかないよ',
-          '「もう行くの」まだいかないよ',
-          '「何時行くの」まだいかないよ',
-          '「まだ行かないの」まだ行かないよ',
-        ],
-      },
-      {
-        src: 'images/gallery/dawn/03.jpg',
-        alt: '夜空を飛んであなたの夜の中へ',
-        title: '夜空を飛んであなたの夜の中へ',
-        size: '1303×1940mm',
-        medium: 'oil on canvas',
-        poem: [
-          '空を見上げたら月を探すから',
-          '真っ暗な夜もうめつくすほど',
-          'あなたの光になってあげる',
-        ],
-      },
-      {
-        src: 'images/gallery/dawn/04.jpg',
-        alt: '今日からあなたはわたしの夢だけをみる',
-        title: '今日からあなたはわたしの夢だけをみる',
-        size: '1303×1940mm',
-        medium: 'oil on canvas',
-        poem: [
-          '美しくて醜い魂が零れる滴のように',
-          'いつしか蝶に呼ばれて',
-          '天に還る',
-        ],
-      },
-      {
-        src: 'images/gallery/dawn/05.jpg',
-        alt: '星の数と同じだけ',
-        title: '星の数と同じだけ',
-        size: '410×318mm',
-        medium: 'oil, charcoal, pastel on canvas',
-        poem: [
-          'ちいちゃな星のかけらを',
-          'ちいちゃなおててで掬いあげた',
-          'ふらふらと揺れる魚と',
-          '銀の線に手を引かれて',
-          'こんもりとした銀の砂の山の上に着いた',
-          'タプタプのコップに浮かべて',
-          '空を泳いだら',
-          '紙飛行機に乗って',
-          'またねをした',
-        ],
-      },
-      {
-        src: 'images/gallery/dawn/06.jpg',
-        alt: '満ちる途中',
-        title: '満ちる途中',
-        size: '300×400mm',
-        medium: 'oil, charcoal on canvas',
-        poem: [
-          '風はいつも通り過ぎて',
-          '回り道をする',
-          '空っぽなお風呂はだんだんお湯が溢れて',
-          '緩いところから少しずつ',
-          '他のところに浸透していく',
-          'ひとつ階層が上がると',
-          '静かな蝋燭が',
-          '目前に脆さと強さを兼ね備えて待っている',
-          'そして',
-          'やがて丸く消えていく',
-          '結末を揺らして通り過ぎていく',
-        ],
-      },
-      {
-        src: 'images/gallery/dawn/07.jpg',
-        alt: 'walk in a dream',
-        title: 'walk in a dream',
-        size: '300×400mm',
-      },
-      {
-        src: 'images/gallery/dawn/08.jpg',
-        alt: 'あの遠くにある木の中の後ろ',
-        title: 'あの遠くにある木の中の後ろ',
-        size: '1303×1940mm',
-        medium: 'oil, charcoal on canvas',
-        poem: [
-          '毎日みる風景',
-          '今日はいつもとは違う道',
-          '大きな木を越えると',
-          'また次の木の根が這っている',
-          '小さなトロッコに乗って水の上を走って',
-          '雲の中を飛び越えて',
-          '花束を抱えて鯨の後を追いかけた',
-          '流れ星が落ちてきて手の上で居眠りしている',
-          '丘の上のグレーの中は',
-          'いつもよりちょっとだけ雪がまっていた',
-        ],
-      },
-    ],
-  },
-  dream: {
-    title: 'Walk in a dream',
-    works: [
-      {
-        src: 'images/gallery/sample-03.jpg',
-        alt: '作品 03',
-      },
-    ],
-  },
-  colors: {
-    title: '色彩の余白',
-    works: [
-      {
-        src: 'images/gallery/sample-02.jpg',
-        alt: '作品 04',
-      },
-      {
-        src: 'images/gallery/sample-03.jpg',
-        alt: '作品 05',
-      },
-    ],
-  },
-};
-
 function escapeHtml(str) {
   return String(str)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
+}
+
+function getGallerySlug() {
+  var fromBody = document.body.getAttribute('data-gallery-category');
+  if (fromBody) return fromBody;
+  var params = new URLSearchParams(window.location.search);
+  var fromQuery = params.get('category');
+  return fromQuery || 'dawn';
 }
 
 function resolveWorkCaption(work) {
@@ -218,7 +73,6 @@ function renderWorkMeta(work) {
 
 var galleryArtworkFitSchedule = null;
 
-/** Home の fold と同じく、PC ではタイトル分だけ・スマホでは全文を高さ計算に使う */
 function getGalleryLeadCaptionEl(leadWork) {
   if (!leadWork) return null;
   var mobile = window.matchMedia('(max-width: 760px)').matches;
@@ -264,7 +118,7 @@ function initGalleryCategoryNav() {
   var list = document.getElementById('gallery-category-nav');
   if (!list || !window.SITE || !SITE.galleryCategories) return;
 
-  var current = document.body.getAttribute('data-gallery-category') || '';
+  var current = getGallerySlug();
   list.replaceChildren();
 
   SITE.galleryCategories.forEach(function (cat) {
@@ -282,14 +136,11 @@ function initGalleryCategoryNav() {
   });
 }
 
-function renderGallery() {
+function renderGallery(series) {
   const root = document.getElementById('gallery');
   if (!root) return;
 
-  const slug = document.body.getAttribute('data-gallery-category') || 'dawn';
-  const series = GALLERY_BY_SLUG[slug];
-
-  if (!series) {
+  if (!series || !series.works || !series.works.length) {
     root.innerHTML =
       '<p class="gallery-empty" role="status">このカテゴリは見つかりませんでした。</p>';
     return;
@@ -327,9 +178,31 @@ function renderGallery() {
   applyGalleryImageSize();
 }
 
+function loadGallerySeries(slug) {
+  var root = document.getElementById('gallery');
+  if (!root) return Promise.resolve();
+
+  root.innerHTML = '<p class="gallery-empty" role="status">読み込み中…</p>';
+
+  return fetch('data/gallery-' + slug + '.json', { cache: 'no-store' })
+    .then(function (res) {
+      if (!res.ok) throw new Error('gallery data load failed');
+      return res.json();
+    })
+    .then(function (series) {
+      renderGallery(series);
+    })
+    .catch(function () {
+      root.innerHTML =
+        '<p class="gallery-empty" role="status">このカテゴリは見つかりませんでした。</p>';
+    });
+}
+
 function initGalleryPage() {
+  var slug = getGallerySlug();
+  document.body.setAttribute('data-gallery-category', slug);
   initGalleryCategoryNav();
-  renderGallery();
+  loadGallerySeries(slug);
   window.addEventListener('resize', applyGalleryImageSize);
 }
 

@@ -9,6 +9,7 @@
 - [ ] `js/site-config.js` — 作家名・メール（pikinsaya@gmail.com）・SNS（@pikinsaya）
 - [ ] Diary 同期が **@4mnion** の投稿になっているか
 - [ ] `images/home/main-visual.jpg` — トップの油彩画像
+- [ ] Gallery 作品データ — `data/gallery-*.json`
 - [ ] `images/gallery/` — ギャラリー作品
 - [ ] Contact 送信先メールが正しいかテスト
 

@@ -1,5 +1,7 @@
 /** サイト共通設定（文言・画像パスはここで差し替え） */
 window.SITE = {
+  /** CSS/JS の ?v= と揃える（更新時は HTML の ?v= も同じ番号に） */
+  assetVersion: '22',
   artistNameJa: '羊水サヤ',
   artistNameEn: 'Saya Yosui',
   role: '油絵作家 / 作詞家',
@@ -53,7 +55,7 @@ window.SITE = {
 
   nav: [
     { id: 'home', label: 'Home', href: 'index.html' },
-    { id: 'gallery', label: 'Gallery', href: 'gallery-dawn.html' },
+    { id: 'gallery', label: 'Gallery', href: 'gallery.html?category=dawn' },
     { id: 'about', label: 'profile', href: 'about.html' },
     { id: 'diary', label: 'blog', href: 'diary.html' },
     { id: 'contact', label: 'Contact', href: 'contact.html' },
@@ -64,17 +66,17 @@ window.SITE = {
     {
       slug: 'dawn',
       label: 'そして夜明けを拒むでしょう',
-      href: 'gallery-dawn.html',
+      href: 'gallery.html?category=dawn',
     },
     {
       slug: 'dream',
       label: 'Walk in a dream',
-      href: 'gallery-dream.html',
+      href: 'gallery.html?category=dream',
     },
     {
       slug: 'colors',
       label: '色彩の余白',
-      href: 'gallery-colors.html',
+      href: 'gallery.html?category=colors',
     },
   ],
 

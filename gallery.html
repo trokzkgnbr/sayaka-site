@@ -2,12 +2,36 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="refresh" content="0; url=gallery-dawn.html">
-  <link rel="canonical" href="gallery-dawn.html">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Gallery">
   <title>Gallery | Portfolio</title>
-  <script>location.replace('gallery-dawn.html');</script>
+  <link rel="stylesheet" href="css/styles.css?v=22">
 </head>
-<body>
-  <p><a href="gallery-dawn.html">Gallery へ</a></p>
+<body class="page-inner" data-page="gallery">
+  <header class="site-header site-header--overlay" id="site-header">
+    <nav class="site-nav" id="site-nav" aria-label="メインメニュー"></nav>
+    <div class="site-sns" id="site-sns" aria-label="SNS"></div>
+  </header>
+
+  <main class="page-main page-main--gallery">
+    <div class="gallery-layout">
+      <nav class="gallery-category-nav" aria-label="Gallery categories">
+        <ul class="gallery-category-nav__list" id="gallery-category-nav"></ul>
+      </nav>
+      <h1 class="visually-hidden" id="gallery-page-title">Gallery</h1>
+      <div class="gallery" id="gallery" role="list"></div>
+    </div>
+  </main>
+
+  <footer class="site-footer site-footer--glass">
+    <p><small>&copy; <span id="year"></span> <span id="footer-name">SAYA YOSUI</span></small></p>
+  </footer>
+
+  <script src="js/site-config.js"></script>
+  <script src="js/artwork-size.js?v=22"></script>
+  <script src="js/nav.js?v=22"></script>
+  <script src="js/sns.js?v=22"></script>
+  <script src="js/main.js?v=22"></script>
+  <script src="js/gallery.js?v=22"></script>
 </body>
 </html>

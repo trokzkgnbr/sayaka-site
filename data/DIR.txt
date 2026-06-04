@@ -1,1 +1,0 @@
-Diary 投稿データ（diary.json）。Instagram 同期（scripts/run_sync.sh または GitHub Actions）が更新する。

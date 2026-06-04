@@ -10,8 +10,6 @@ on:
     - cron: "5 3 * * *"
     - cron: "5 15 * * *"
   workflow_dispatch:
-  push:
-    branches: [main]
 
 concurrency:
   group: sync-instagram-diary
