@@ -375,6 +375,44 @@ a:hover {
   background: transparent;
 }
 
+.profile-bio p {
+  margin: 0 0 0.65rem;
+  line-height: 1.75;
+}
+
+.profile-bio p:last-child {
+  margin-bottom: 0;
+}
+
+.profile-section-title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(0.95rem, 2vw, 1.05rem);
+  letter-spacing: 0.08em;
+  text-transform: lowercase;
+  margin: 2.25rem 0 1rem;
+}
+
+.profile-section-title:first-child {
+  margin-top: 0;
+}
+
+.about-body .profile-cv {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.about-body .profile-cv li {
+  margin: 0 0 1rem;
+  line-height: 1.75;
+  letter-spacing: 0.02em;
+}
+
+.about-body .profile-cv li:last-child {
+  margin-bottom: 0;
+}
+
 /* ----- Home ----- */
 
 .page-home {
