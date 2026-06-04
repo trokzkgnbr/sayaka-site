@@ -2,7 +2,7 @@
 
 更新日: 2026-06-01 JST
 
-このサイトの **Blog** は、Instagram **@4mnion** に投稿した内容を **GitHub Actions（クラウド）で1日2回自動**で取り込みます（**12:00・24:00 日本時間**）。  
+このサイトの **Blog** は、Instagram **@4mnion** に投稿した内容を **GitHub Actions（クラウド）で1日2回自動**で取り込みます（**12:05・24:05 日本時間**・数分のずれあり）。  
 （画像1枚・正方形の投稿を想定。動画・リールは取り込みません。）
 
 ※ サイト右上の Instagram / X リンク（**@pikinsaya**）とは別アカウントです。
@@ -23,7 +23,7 @@
 - [ ] **F.** GitHub にトークンを登録（Secrets）
 - [ ] **G.** 同期を1回テストする
 
-初回が終われば **あとは自動** です（毎日 **12:00・24:00 JST** に GitHub 上で同期 → Netlify 連携時はサイト反映）。
+初回が終われば **あとは自動** です（毎日 **12:05・24:05 JST** 頃に GitHub 上で同期 → Netlify 連携時はサイト反映）。
 
 ---
 
@@ -223,7 +223,14 @@ Drop だけだと Git の更新がサイトに反映されません。**GitHub �
 ## あとから Instagram に投稿したら？
 
 **何もしなくて大丈夫です。**  
-毎日 **12:00・24:00（日本時間）** に GitHub Actions がクラウド上で自動実行され、Blog が更新されます（パソコン電源は不要）。
+毎日 **12:05・24:05（日本時間）頃** に GitHub Actions がクラウド上で自動実行され、Blog が更新されます（パソコン電源は不要）。
+
+### 定期実行が動かないとき（調査メモ）
+
+- **Actions タブ**でイベントが **`schedule`** の実行があるか確認（`push` だけなら定期はまだ来ていない）。
+- GitHub は **毎時 0 分（UTC の :00）** に cron が集中し、**遅延・スキップ**することがある（公式ドキュメント）。そのため本リポジトリは **:05（UTC）** にずらしている。
+- リポジトリ **Settings → Actions** に「Scheduled workflows are disabled」の表示がないか確認（60 日無操作などで止まる場合あり）。
+- 手動・push では動くのに schedule だけ動かない → 上記を確認後、**Run workflow** で即時同期可能。
 
 **同期のルール（重要）**
 
@@ -235,7 +242,7 @@ Drop だけだと Git の更新がサイトに反映されません。**GitHub �
 
 - Netlify への push は **HTML/CSS/JS** の見た目を更新します。
 - **Blog の投稿本文・画像** は `data/diary.json` と `images/diary/` で、**GitHub Actions「Sync Instagram Diary」** が更新します。
-- `main` に push するたびに Actions でも同期が走ります（加えて毎日 12:00・24:00 JST）。
+- `main` に push するたびに Actions でも同期が走ります（加えて毎日 12:05・24:05 JST 頃）。
 - Blog が古いままなら Actions の成否と `data/diary.json` の更新を確認してください。
 
 急ぎで反映したいときだけ:
@@ -264,7 +271,7 @@ Drop だけだと Git の更新がサイトに反映されません。**GitHub �
 | `data/diary.json` | サイトが読む日記データ（自動更新） |
 | `images/diary/*.jpg` | 投稿画像（自動ダウンロード） |
 | `config/instagram.env` | パソコンでのテスト用（Git に入れない） |
-| `.github/workflows/sync-instagram-diary.yml` | 毎日12:00・24:00 JST の自動同期 + 手動実行（GitHub クラウド） |
+| `.github/workflows/sync-instagram-diary.yml` | 毎日12:05・24:05 JST 頃の自動同期 + 手動実行（GitHub クラウド） |
 
 ---
 

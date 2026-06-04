@@ -5,9 +5,10 @@ name: Sync Instagram Diary
 
 on:
   schedule:
-    # cron は UTC。JST(UTC+9): 12:00 → 03:00 UTC / 24:00(0:00) → 15:00 UTC
-    - cron: "0 3 * * *"
-    - cron: "0 15 * * *"
+    # cron は UTC（POSIX 5 フィールド）。GitHub は毎時 :00 に負荷が集中し遅延・スキップされやすいため分をずらす
+    # JST(UTC+9): 12:05 → 03:05 UTC / 24:05(0:05) → 15:05 UTC
+    - cron: "5 3 * * *"
+    - cron: "5 15 * * *"
   workflow_dispatch:
   push:
     branches: [main]
