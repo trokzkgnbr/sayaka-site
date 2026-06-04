@@ -29,8 +29,12 @@
   --artwork-top-extra: clamp(1.75rem, 4.5vh, 3.5rem);
   --artwork-top-pad: calc(3.1rem + env(safe-area-inset-top, 0px) + var(--artwork-top-extra));
   --home-image-display-h: auto;
-  --font-serif: "Cormorant Garamond", "Noto Serif JP", serif;
-  --font-sans: "Noto Sans JP", "Helvetica Neue", Arial, sans-serif;
+  /* 英字 → Gurmukhi MT、日本語 → ヒラギノ明朝 ProN（システムフォント） */
+  --font-en: "Gurmukhi MT", "Times New Roman", serif;
+  --font-ja: "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Yu Mincho", "YuMincho", serif;
+  --font-serif: "Gurmukhi MT", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Yu Mincho",
+    "YuMincho", serif;
+  --font-sans: var(--font-serif);
   --ease: cubic-bezier(0.4, 0, 0.2, 1);
   --glass-bg: rgba(255, 255, 255, 0.46);
   --glass-bg-strong: rgba(255, 255, 255, 0.58);
@@ -76,8 +80,8 @@ html {
 
 body {
   margin: 0;
-  font-family: var(--font-sans);
-  font-weight: 300;
+  font-family: var(--font-serif);
+  font-weight: 400;
   font-size: 0.95rem;
   line-height: 1.85;
   color: var(--text);
@@ -93,6 +97,10 @@ a {
 
 a:hover {
   opacity: 0.55;
+}
+
+:lang(en) {
+  font-family: var(--font-en);
 }
 
 .site-nav__link:not(.header-melt-segment):hover {
