@@ -16,13 +16,12 @@ Blog 同期が `data/diary.json` を更新して push すると、続けて **De
 
 ## 初回だけ（リポジトリ管理者）
 
-1. `main` にこのリポジトリの最新を push する
+1. `main` に push する
 2. GitHub → **Settings** → **Pages**
-3. **Build and deployment** → **Source**: **GitHub Actions**（Deploy from a branch ではない）
-4. **Actions** → **Deploy GitHub Pages** が成功するまで待つ（初回 2〜5 分）
-5. 上記 URL で表示確認
-
-以前 **gh-pages ブランチ** で公開していた場合は、Pages の Source を **GitHub Actions** に切り替えてください（`gh-pages` ブランチは使いません）。
+3. **Source**: **Deploy from a branch** → Branch **`gh-pages`** / **/(root)** → Save  
+   （`gh-pages` がまだ無い場合は **Deploy GitHub Pages** Actions が成功してから再度開く）
+4. **Actions** → **Deploy GitHub Pages** が緑になるまで待つ
+5. https://trokzkgnbr.github.io/sayaka-site/ で確認
 
 ## 旧 URL
 
