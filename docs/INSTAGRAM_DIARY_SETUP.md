@@ -209,14 +209,14 @@ git push
 
 ---
 
-## Netlify とつなぐ（サイトを自動更新）
+## サイトを自動更新（GitHub Pages）
 
-Drop だけだと Git の更新がサイトに反映されません。**GitHub 連携**を推奨します。
+本番は **GitHub Pages**（ワークフロー `Deploy GitHub Pages`）を使います。詳細は [`GITHUB_PAGES_SETUP.md`](GITHUB_PAGES_SETUP.md)。
 
-1. <https://app.netlify.com/> → 対象サイト → **Site configuration** → **Build & deploy**  
-2. **Link repository** → さきほどの GitHub リポジトリを選択  
-3. Build command: **空**、Publish directory: **/**（リポジトリ直下が `index.html` の場合）  
-4. 保存後、Actions で同期 → push されるたびに Netlify が再公開されます  
+- Blog 同期で `main` が更新される → 自動で再デプロイ
+- 初回 URL: https://trokzkgnbr.github.io/sayaka-site/
+
+**Netlify を使い続ける場合:** Drop だけだと Git の更新が反映されません。連携するか、都度再アップロードが必要です（無料枠では本番デプロイごとにクレジット消費あり）。
 
 ---
 
@@ -238,12 +238,12 @@ Drop だけだと Git の更新がサイトに反映されません。**GitHub �
 - **51 件目より古い** 投稿は、Instagram の取得枠から外れても **サイトには残ります**（勝手には消しません）。
 - 一覧ページは **30 件ずつ** 表示し、31 件以上あるときは下部の **next →** で次のページへ進みます。
 
-**デプロイと投稿データは別です**
+**同期と公開**
 
-- Netlify への push は **HTML/CSS/JS** の見た目を更新します。
-- **Blog の投稿本文・画像** は `data/diary.json` と `images/diary/` で、**GitHub Actions「Sync Instagram Diary」** が更新します。
-- `main` に push するたびに Actions でも同期が走ります（加えて毎日 12:05・24:05 JST 頃）。
-- Blog が古いままなら Actions の成否と `data/diary.json` の更新を確認してください。
+- **Blog の投稿本文・画像** … `Sync Instagram Diary` が `data/diary.json` と `images/diary/` を更新
+- **本番サイト** … `Deploy GitHub Pages` が HTML/CSS/JS/画像/data を公開
+- `main` への push のたびに Instagram 同期も走ります（加えて毎日 12:05・24:05 JST 頃）
+- Blog が古いままなら、両方の Actions の成否と https://trokzkgnbr.github.io/sayaka-site/data/diary.json を確認
 
 急ぎで反映したいときだけ:
 

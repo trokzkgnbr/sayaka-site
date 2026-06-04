@@ -16,7 +16,8 @@
 
 - [ ] `docs/INSTAGRAM_DIARY_SETUP.md` のチェックリスト完了
 - [ ] GitHub Actions が成功している
-- [ ] Netlify が GitHub リポジトリと連携している
+- [ ] GitHub Pages が有効（Actions → Deploy GitHub Pages が成功）
+- [ ] 本番 URL https://trokzkgnbr.github.io/sayaka-site/ で Diary が表示される
 - [ ] Diary ページに実投稿が表示される
 
 ## 渡すもの

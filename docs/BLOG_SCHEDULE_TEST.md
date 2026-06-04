@@ -55,4 +55,4 @@ cron を **毎時 5 分（UTC）** に変更:
    - **Run workflow** で手動同期（同期自体は動くか切り分け）
    - 翌日 12:05 JST を再確認
 
-5. サイト反映: GitHub にコミットが付いてから Netlify が 1〜3 分で更新。
+5. サイト反映: GitHub にコミットが付いてから **Deploy GitHub Pages** が 1〜5 分で更新。

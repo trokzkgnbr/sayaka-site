@@ -79,9 +79,14 @@ GitHub に `portfolio_site` だけのリポジトリを置き、Cloudflare Pages
 
 いまのワークスペース全体（`terako`）のままだとパスが深いので、**ポートフォリオ専用リポジトリ**にするか、Deploy 時の公開ディレクトリを `40_work/portfolio_site` に指定する。
 
-### 4. GitHub Pages（GitHub 利用者向け）
+### 4. GitHub Pages（本番・推奨）
 
-専用リポジトリを作り、中身を `portfolio_site` のファイルだけにして push。Settings → Pages → Branch `main` / folder `/ (root)` で `https://ユーザー名.github.io/リポジトリ名/` が使える。
+リポジトリ `trokzkgnbr/sayaka-site` では **Actions が自動デプロイ** します。
+
+- 手順・URL: [`docs/GITHUB_PAGES_SETUP.md`](docs/GITHUB_PAGES_SETUP.md)
+- 公開 URL: https://trokzkgnbr.github.io/sayaka-site/
+- `main` に push（Blog 同期のコミット含む）→ 数分で本番更新
+- Netlify 無料のデプロイクレジットを使わずに Git と本番を揃えやすい
 
 ---
 
