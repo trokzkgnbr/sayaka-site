@@ -16,12 +16,13 @@ Blog 同期が `data/diary.json` を更新して push すると、続けて **De
 
 ## 初回だけ（リポジトリ管理者）
 
-1. このドキュメントとワークフローを `main` に push する
-2. GitHub → **Actions** → **Deploy GitHub Pages** が緑になるまで待つ（初回 2〜5 分）
-3. **Settings** → **Pages** を開く  
-   - **Source** が **GitHub Actions** になっていることを確認  
-   - 表示されたサイト URL を開いて表示確認
-4. （任意）独自ドメイン: **Pages** → **Custom domain** で設定し、DNS を向ける
+1. GitHub → **Settings** → **Pages**
+2. **Build and deployment** → **Source**: **Deploy from a branch**
+3. **Branch**: `gh-pages` / **/(root)** を選んで **Save**  
+   （まだ `gh-pages` が無い場合は、次の手順 4 の Actions 成功後にもう一度開く）
+4. GitHub → **Actions** → **Deploy GitHub Pages** が緑になるまで待つ（初回 2〜5 分）
+5. **https://trokzkgnbr.github.io/sayaka-site/** を開いて表示確認
+6. （任意）独自ドメイン: **Pages** → **Custom domain** で設定し、DNS を向ける
 
 ## Netlify から移す場合
 
