@@ -1,6 +1,14 @@
 {
   "posts": [
     {
+      "id": "ig-18120725728778883",
+      "date": "2026-06-04",
+      "title": "🌛",
+      "body": "🌛\npi\n𓈒𓈒.:¨",
+      "image": "images/diary/18120725728778883.jpg",
+      "instagramMediaId": "18120725728778883"
+    },
+    {
       "id": "ig-18220209157317589",
       "date": "2026-06-03",
       "title": "hajimemasite",
@@ -19,6 +27,6 @@
   ],
   "syncedFrom": "instagram",
   "syncLimit": 50,
-  "syncRecentManaged": 2,
-  "lastSyncedAt": "2026-06-03T16:42:59Z"
+  "syncRecentManaged": 3,
+  "lastSyncedAt": "2026-06-04T03:20:39Z"
 }
