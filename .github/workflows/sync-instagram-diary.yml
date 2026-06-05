@@ -1,6 +1,8 @@
-# Instagram → Blog データ自動同期（GitHub クラウド）
+# Instagram → Blog データ自動同期 + 変更時のみ GitHub Pages 公開
 # 必要: Secrets … INSTAGRAM_ACCESS_TOKEN, INSTAGRAM_USER_ID
 # 推奨: INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET（トークン自動再取得）
+#
+# Actions の push は別ワークフローを起動しないため、同期後の公開は本ファイル内の deploy ジョブで行う。
 name: Sync Instagram Diary
 
 on:
@@ -21,6 +23,8 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    outputs:
+      diary_changed: ${{ steps.commit.outputs.changes_detected }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -57,6 +61,7 @@ jobs:
           echo "Blog 投稿数: $POSTS"
 
       - name: Commit and push if changed
+        id: commit
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "chore(blog): sync from Instagram (${{ steps.sync.outputs.post_count }} posts)"
@@ -67,3 +72,27 @@ jobs:
         run: |
           echo "::error::Instagram 同期後の投稿が 0 件です。トークン・@4mnion の投稿を確認してください。"
           exit 1
+
+  deploy:
+    needs: sync
+    if: needs.sync.outputs.diary_changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Assemble public site
+        run: bash scripts/prepare-pages-site.sh _site
+
+      - name: Publish to gh-pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: _site
+          branch: gh-pages
+          single-commit: true
+          clean: true

@@ -240,9 +240,10 @@ git push
 **同期と公開**
 
 - **Blog の投稿本文・画像** … `Sync Instagram Diary` が `data/diary.json` と `images/diary/` を更新
-- **本番サイト** … `Deploy GitHub Pages` が HTML/CSS/JS/画像/data を公開
+- **本番サイト** … Instagram 同期で **データに変更があったときだけ**、同じワークフロー内で `gh-pages` へ公開（変更なしの日はデプロイしない）
+- HTML/CSS などサイト全体の更新は、従来どおり `Deploy GitHub Pages`（`main` への push 時）
 - Instagram 同期は **毎日 12:05・24:05 JST 頃** と **手動（Run workflow）** のみ（通常のサイト更新 push では走りません）
-- Blog が古いままなら、両方の Actions の成否と https://trokzkgnbr.github.io/sayaka-site/data/diary.json を確認
+- Blog が古いままなら、Actions の成否と https://trokzkgnbr.github.io/sayaka-site/data/diary.json を確認
 
 急ぎで反映したいときだけ:
 
