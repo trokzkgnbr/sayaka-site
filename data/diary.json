@@ -9,6 +9,14 @@
       "instagramMediaId": "18099409562124339"
     },
     {
+      "id": "ig-17885122677568221",
+      "date": "2026-06-05",
+      "title": "力",
+      "body": "力\no\n🐟ᐝ",
+      "image": "images/diary/17885122677568221.jpg",
+      "instagramMediaId": "17885122677568221"
+    },
+    {
       "id": "ig-18220209157317589",
       "date": "2026-06-03",
       "title": "hajimemasite",
@@ -20,5 +28,5 @@
   "syncedFrom": "instagram",
   "syncLimit": 50,
   "syncRecentManaged": 2,
-  "lastSyncedAt": "2026-06-05T11:18:22Z"
+  "lastSyncedAt": "2026-06-05T19:09:07Z"
 }
