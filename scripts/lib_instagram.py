@@ -54,8 +54,8 @@ def load_meta_app_credentials() -> tuple[str, str]:
 def load_config() -> dict[str, str]:
     root = site_root()
     load_env_file(root / "config" / "instagram.env")
-    token = os.environ.get("INSTAGRAM_ACCESS_TOKEN", "").strip()
-    user_id = os.environ.get("INSTAGRAM_USER_ID", "").strip()
+    token = os.environ.get("INSTAGRAM_ACCESS_TOKEN", "").strip().strip('"').strip("'")
+    user_id = os.environ.get("INSTAGRAM_USER_ID", "").strip().strip('"').strip("'")
     if not token:
         raise InstagramConfigError(
             "INSTAGRAM_ACCESS_TOKEN が未設定です。config/instagram.env を作成してください。"
@@ -162,10 +162,12 @@ def refresh_instagram_access_token(
     app_id: str,
     app_secret: str,
     instagram_user_id: str | None = None,
+    user_token: str | None = None,
 ) -> tuple[str, str]:
     """長期ユーザートークン経由でページトークンを更新する。"""
-    user_token, _ = exchange_long_lived_user_token(token, app_id, app_secret)
-    page_token, label = fetch_page_access_token(user_token, instagram_user_id)
+    base_user_token = (user_token or token).strip()
+    long_lived, _ = exchange_long_lived_user_token(base_user_token, app_id, app_secret)
+    page_token, label = fetch_page_access_token(long_lived, instagram_user_id)
     return page_token, label
 
 

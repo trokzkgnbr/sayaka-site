@@ -152,10 +152,11 @@ git push -u origin main
 
 | Name | Value |
 |------|--------|
-| `INSTAGRAM_ACCESS_TOKEN` | D-3 でコピーしたトークン |
+| `INSTAGRAM_ACCESS_TOKEN` | D-3 でコピーした **ページ** トークン（必須） |
 | `INSTAGRAM_USER_ID` | 下の「ID の調べ方」 |
-| `INSTAGRAM_APP_ID` | D-2.5（自動延長・任意だが推奨） |
-| `INSTAGRAM_APP_SECRET` | D-2.5（自動延長・任意だが推奨） |
+| `INSTAGRAM_APP_ID` | D-2.5（自動延長・推奨） |
+| `INSTAGRAM_APP_SECRET` | D-2.5（自動延長・推奨） |
+| `INSTAGRAM_USER_ACCESS_TOKEN` | （任意）D-1 の **ユーザー** トークン。ページトークン切れ時の自動再取得用 |
 
 ### Instagram ユーザー ID の調べ方（1回）
 
@@ -253,7 +254,8 @@ git push
 
 | 症状 | 対処 |
 |------|------|
-| Actions が赤い | ログの **Resolve Instagram token for sync** を確認。失敗時は `bash scripts/extend_instagram_token.sh --force` で新トークンを取得し、GitHub Secrets の `INSTAGRAM_ACCESS_TOKEN` を更新 |
+| Actions が赤い（190 / pages_show_list） | **ページトークン**の期限切れまたは権限不足。D-1〜D-3 をやり直し `INSTAGRAM_ACCESS_TOKEN` を更新。ローカル確認: `python3 scripts/check_instagram_token.py` |
+| Actions が赤い（その他） | ログの **Resolve Instagram token for sync** を確認 |
 | Blog が空・古い | Actions → **Sync Instagram Diary** を手動実行。`data/diary.json` のコミットがあるか確認 |
 | 見た目だけ新しい | 投稿データは Actions 同期。`git push` だけでは増えません |
 | 動画だけの投稿が出ない | 動画・リールはスキップされます（画像付き投稿を確認） |

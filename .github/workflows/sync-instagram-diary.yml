@@ -37,6 +37,7 @@ jobs:
         id: instagram_token
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_USER_ACCESS_TOKEN }}
           INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
           INSTAGRAM_APP_ID: ${{ secrets.INSTAGRAM_APP_ID }}
           INSTAGRAM_APP_SECRET: ${{ secrets.INSTAGRAM_APP_SECRET }}
