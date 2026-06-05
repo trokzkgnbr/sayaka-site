@@ -253,7 +253,7 @@ git push
 
 | 症状 | 対処 |
 |------|------|
-| Actions が赤い | Actions のログを開く。トークン期限切れなら `bash scripts/extend_instagram_token.sh --force` または D-2〜D-3 をやり直し Secrets を更新 |
+| Actions が赤い | ログの **Resolve Instagram token for sync** を確認。失敗時は `bash scripts/extend_instagram_token.sh --force` で新トークンを取得し、GitHub Secrets の `INSTAGRAM_ACCESS_TOKEN` を更新 |
 | Blog が空・古い | Actions → **Sync Instagram Diary** を手動実行。`data/diary.json` のコミットがあるか確認 |
 | 見た目だけ新しい | 投稿データは Actions 同期。`git push` だけでは増えません |
 | 動画だけの投稿が出ない | 動画・リールはスキップされます（画像付き投稿を確認） |
