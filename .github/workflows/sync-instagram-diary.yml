@@ -37,10 +37,37 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements-instagram-sync.txt
 
+      - name: Extend Instagram token if needed
+        id: extend_token
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
+          INSTAGRAM_APP_ID: ${{ secrets.INSTAGRAM_APP_ID }}
+          INSTAGRAM_APP_SECRET: ${{ secrets.INSTAGRAM_APP_SECRET }}
+        run: |
+          echo "extended=false" >> "$GITHUB_OUTPUT"
+          if [[ -z "${INSTAGRAM_APP_ID}" || -z "${INSTAGRAM_APP_SECRET}" ]]; then
+            echo "延長スキップ: INSTAGRAM_APP_ID / INSTAGRAM_APP_SECRET が未設定"
+            exit 0
+          fi
+          set +e
+          OUTPUT=$(python3 scripts/extend_instagram_token.py --if-needed --export-env 2>&1)
+          echo "$OUTPUT"
+          if echo "$OUTPUT" | grep -q '^INSTAGRAM_ACCESS_TOKEN='; then
+            NEW_TOKEN=$(echo "$OUTPUT" | grep '^INSTAGRAM_ACCESS_TOKEN=' | tail -1 | cut -d= -f2-)
+            echo "extended=true" >> "$GITHUB_OUTPUT"
+            {
+              echo "value<<TOKEN_EOF"
+              echo "$NEW_TOKEN"
+              echo "TOKEN_EOF"
+            } >> "$GITHUB_OUTPUT"
+            echo "::warning::トークンを延長しました。Secrets の INSTAGRAM_ACCESS_TOKEN をログの新トークンに更新してください。"
+          fi
+
       - name: Resolve Instagram token for sync
         id: instagram_token
         env:
-          INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_ACCESS_TOKEN: ${{ steps.extend_token.outputs.extended == 'true' && steps.extend_token.outputs.value || secrets.INSTAGRAM_ACCESS_TOKEN }}
           INSTAGRAM_USER_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_USER_ACCESS_TOKEN }}
           INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
           INSTAGRAM_APP_ID: ${{ secrets.INSTAGRAM_APP_ID }}

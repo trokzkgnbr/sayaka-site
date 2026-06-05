@@ -112,8 +112,11 @@ bash scripts/extend_instagram_token.sh
 
 5. GitHub を使う場合、Secrets にも同じく `INSTAGRAM_APP_ID` / `INSTAGRAM_APP_SECRET` を登録  
 
-`bash scripts/run_sync.sh` 実行時、有効期限が **14日以内** なら自動で延長します。GitHub Actions の日次同期でも同様です。  
-延長後は表示された新トークンを **GitHub Secret `INSTAGRAM_ACCESS_TOKEN` にも反映**してください（Actions 内だけの更新では次回以降の Secret は古いままです）。
+`bash scripts/run_sync.sh` 実行時、有効期限が **14日以内** なら自動で延長します。  
+GitHub Actions（`Sync Instagram Diary`）でも、同期の直前に同じ延長を試します（`INSTAGRAM_APP_ID` / `INSTAGRAM_APP_SECRET` が必要）。
+
+延長後は表示された新トークンを **GitHub Secret `INSTAGRAM_ACCESS_TOKEN` にも反映**してください（Actions 内だけの更新では次回以降の Secret は古いままです）。  
+**すでに切れたトークン**は延長できません。その場合は D-1〜D-3 で取り直し、`INSTAGRAM_USER_ACCESS_TOKEN`（延長済みユーザー トークン）を Secret に入れておくと、次回から自動再取得を試せます。
 
 手動で強制延長: `bash scripts/extend_instagram_token.sh --force`
 
@@ -255,7 +258,7 @@ git push
 
 | 症状 | 対処 |
 |------|------|
-| Actions が赤い（190 / pages_show_list） | **ページトークン**の期限切れまたは権限不足。D-1〜D-3 をやり直し `INSTAGRAM_ACCESS_TOKEN` を更新。ローカル確認: `python3 scripts/check_instagram_token.py` |
+| Actions が赤い（190 / pages_show_list） | **ページトークン**の期限切れまたは権限不足。D-1〜D-3 をやり直し `INSTAGRAM_ACCESS_TOKEN` を更新（`bash scripts/setup_github_secrets.sh` でも可）。ローカル確認: `python3 scripts/check_instagram_token.py` |
 | Actions が赤い（その他） | ログの **Resolve Instagram token for sync** を確認 |
 | Blog が空・古い | Actions → **Sync Instagram Diary** を手動実行。`data/diary.json` のコミットがあるか確認 |
 | 見た目だけ新しい | 投稿データは Actions 同期。`git push` だけでは増えません |
