@@ -77,11 +77,34 @@ def oldest_managed_date(managed_window: list[tuple[str, str]]) -> str | None:
 
 
 def is_outside_managed_window(post: dict, managed_window: list[tuple[str, str]]) -> bool:
-    """取得枠より古い日付の投稿だけ Blog に残す。"""
+    """取得枠より古い日付の投稿だけ Blog に残す（51件目以降のアーカイブ用）。"""
     oldest_date = oldest_managed_date(managed_window)
     if not oldest_date:
         return False
     return post_display_date(post) < oldest_date
+
+
+def sync_limit_reached(media_count: int, limit: int) -> bool:
+    """Instagram 取得件数が上限に達した = 51件目以降が API に含まれない可能性あり。"""
+    return media_count >= limit
+
+
+def should_keep_unmanaged_post(
+    post: dict,
+    managed_window: list[tuple[str, str]],
+    limit_reached: bool,
+) -> bool:
+    """
+    Instagram API に無い既存投稿を Blog に残すか。
+
+    - 取得件数 < limit … アカウント全投稿を取得済み。API に無い = 削除済み → 残さない
+    - 取得件数 = limit … 51件目以降は API 外のため、枠より古い日付だけ残す
+    """
+    if not post.get("instagramMediaId"):
+        return True
+    if not limit_reached:
+        return False
+    return is_outside_managed_window(post, managed_window)
 
 
 def build_posts(
@@ -163,6 +186,7 @@ def merge_diary_posts(
     existing: list[dict],
     fresh_posts: list[dict],
     managed_window: list[tuple[str, str]],
+    limit_reached: bool,
 ) -> list[dict]:
     """
     Instagram の取得順を保ちつつマージする。
@@ -170,7 +194,7 @@ def merge_diary_posts(
     - managed_window: API が返した直近 N 件（動画含む）の ID 順
     - 枠内で Instagram から消えた投稿は Blog からも削除
     - 枠内の動画など同期対象外は既存 Blog 投稿を維持
-    - 枠より古い投稿は Instagram から消えても Blog に残す
+    - 取得上限に達したときだけ、枠より古い投稿を Instagram から消えても Blog に残す
     """
     fresh_by_id = {
         str(p["instagramMediaId"]): p
@@ -193,7 +217,7 @@ def merge_diary_posts(
         ig_id = str(ig_id)
         if ig_id in seen_ids:
             continue
-        if is_outside_managed_window(post, managed_window):
+        if should_keep_unmanaged_post(post, managed_window, limit_reached):
             legacy.append(post)
 
     ordered: list[dict] = []
@@ -219,23 +243,91 @@ def merge_diary_posts(
     return ordered
 
 
-def count_deleted_in_managed_window(
+def count_deleted_posts(
     existing: list[dict],
+    merged: list[dict],
     managed_window: list[tuple[str, str]],
+    limit_reached: bool,
 ) -> int:
-    if not managed_window:
-        return 0
-    seen_ids = {ig_id for ig_id, _ in managed_window}
+    merged_ids = {
+        str(p.get("instagramMediaId"))
+        for p in merged
+        if p.get("instagramMediaId")
+    }
     deleted = 0
     for post in existing:
         ig_id = post.get("instagramMediaId")
         if not ig_id:
             continue
-        if str(ig_id) in seen_ids:
+        ig_id = str(ig_id)
+        if ig_id in merged_ids:
             continue
-        if not is_outside_managed_window(post, managed_window):
-            deleted += 1
+        if should_keep_unmanaged_post(post, managed_window, limit_reached):
+            continue
+        deleted += 1
     return deleted
+
+
+def find_undeleted_posts(
+    existing: list[dict],
+    merged: list[dict],
+    managed_window: list[tuple[str, str]],
+    limit_reached: bool,
+) -> list[dict]:
+    """削除されるべきなのにマージ結果に残っている投稿（同期バグ検知用）。"""
+    seen_ids = {ig_id for ig_id, _ in managed_window}
+    merged_ids = {
+        str(p.get("instagramMediaId"))
+        for p in merged
+        if p.get("instagramMediaId")
+    }
+    stale: list[dict] = []
+    for post in existing:
+        ig_id = post.get("instagramMediaId")
+        if not ig_id:
+            continue
+        ig_id = str(ig_id)
+        if ig_id in seen_ids:
+            continue
+        if should_keep_unmanaged_post(post, managed_window, limit_reached):
+            continue
+        if ig_id in merged_ids:
+            stale.append(post)
+    return stale
+
+
+def verify_merged_posts(
+    existing: list[dict],
+    merged: list[dict],
+    managed_window: list[tuple[str, str]],
+    limit_reached: bool,
+) -> list[str]:
+    """マージ後の整合性チェック。エラーメッセージのリストを返す。"""
+    errors: list[str] = []
+    seen_ids = {ig_id for ig_id, _ in managed_window}
+
+    for post in find_undeleted_posts(existing, merged, managed_window, limit_reached):
+        ig_id = post.get("instagramMediaId", "?")
+        title = post.get("title", post.get("id", "?"))
+        errors.append(
+            f"Instagram から消えた投稿が Blog に残っています: {title} (instagramMediaId={ig_id})"
+        )
+
+    for post in merged:
+        ig_id = post.get("instagramMediaId")
+        if not ig_id:
+            continue
+        ig_id = str(ig_id)
+        if ig_id in seen_ids:
+            continue
+        if should_keep_unmanaged_post(post, managed_window, limit_reached):
+            continue
+        title = post.get("title", post.get("id", "?"))
+        errors.append(
+            f"同期枠外の投稿が不正に残っています: {title} (instagramMediaId={ig_id})"
+        )
+
+    return errors
 
 
 def prune_orphan_images(images_dir: Path, posts: list[dict], dry_run: bool) -> int:
@@ -283,6 +375,7 @@ def main() -> int:
         return 1
 
     managed_window = extract_managed_window(media_items)
+    limit_reached = sync_limit_reached(len(media_items), limit)
     fresh_posts, warnings = build_posts(
         media_items,
         images_dir,
@@ -291,16 +384,30 @@ def main() -> int:
     )
 
     existing_posts, existing_meta = load_existing_data(data_path)
-    merged_posts = merge_diary_posts(existing_posts, fresh_posts, managed_window)
+    merged_posts = merge_diary_posts(
+        existing_posts, fresh_posts, managed_window, limit_reached
+    )
+    verify_errors = verify_merged_posts(
+        existing_posts, merged_posts, managed_window, limit_reached
+    )
+    if verify_errors:
+        for msg in verify_errors:
+            print(f"整合性エラー: {msg}", file=sys.stderr)
+        return 1
+
     content_changed = posts_signature(existing_posts) != posts_signature(merged_posts)
-    deleted_recent = count_deleted_in_managed_window(existing_posts, managed_window)
+    deleted_recent = count_deleted_posts(
+        existing_posts, merged_posts, managed_window, limit_reached
+    )
 
     payload = {
         "posts": merged_posts,
         "syncedFrom": "instagram",
         "syncLimit": limit,
+        "syncLimitReached": limit_reached,
         "syncWindowSize": len(managed_window),
         "syncRecentManaged": len(fresh_posts),
+        "managedInstagramIds": [ig_id for ig_id, _ in managed_window],
     }
     if content_changed or deleted_recent or not existing_meta.get("lastSyncedAt"):
         payload["lastSyncedAt"] = datetime.now(timezone.utc).strftime(
@@ -315,8 +422,9 @@ def main() -> int:
             print(f"注意: {w}", file=sys.stderr)
         print(
             f"\n[dry-run] Instagram 同期 {len(fresh_posts)} 件"
-            f"（取得枠 {len(managed_window)} 件）→ 合計 {len(merged_posts)} 件"
-            f"（{len(merged_posts) - len(fresh_posts)} 件は古い投稿として保持）",
+            f"（取得枠 {len(managed_window)} 件、上限到達={limit_reached}）"
+            f"→ 合計 {len(merged_posts)} 件"
+            f"（削除予定 {deleted_recent} 件）",
             file=sys.stderr,
         )
         return 0
@@ -334,7 +442,7 @@ def main() -> int:
         f"（{data_path.relative_to(root)}）"
     )
     if deleted_recent:
-        print(f"直近枠から削除（Instagram 側で消えた投稿）: {deleted_recent} 件")
+        print(f"Instagram から削除された投稿を Blog から除去: {deleted_recent} 件")
     if removed:
         print(f"不要画像を {removed} 件削除")
     for w in warnings:

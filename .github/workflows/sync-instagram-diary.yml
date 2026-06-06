@@ -37,6 +37,9 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements-instagram-sync.txt
 
+      - name: Test diary merge and deletion rules
+        run: python3 scripts/test_sync_instagram_diary.py
+
       - name: Extend Instagram token if needed
         id: extend_token
         env:
@@ -83,6 +86,7 @@ jobs:
         run: |
           set -euo pipefail
           python3 scripts/sync_instagram_diary.py | tee sync.log
+          python3 scripts/verify_diary_after_sync.py
           POSTS=$(python3 -c "import json; d=json.load(open('data/diary.json')); print(len(d.get('posts',[])))")
           echo "post_count=$POSTS" >> "$GITHUB_OUTPUT"
           echo "Blog 投稿数: $POSTS"

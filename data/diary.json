@@ -17,19 +17,16 @@
       "body": "deepen\n騒然としている場所と静かな場所どちらも自分に入りやすい気がする\nぽやぽや\nぽや",
       "image": "images/diary/18099409562124339.jpg",
       "instagramMediaId": "18099409562124339"
-    },
-    {
-      "id": "ig-18220209157317589",
-      "date": "2026-06-03",
-      "title": "hajimemasite",
-      "body": "hajimemasite\n他SNSでは発信しないようなことを共有したいのではじめてみました.\n\n写真の撮られ方は 同じ時間･同じ場所でも全然違うように映るので その人のみているものに近いと思いうのですが …\n\n次の更新もお楽しみに⋰",
-      "image": "images/diary/18220209157317589.jpg",
-      "instagramMediaId": "18220209157317589"
     }
   ],
   "syncedFrom": "instagram",
   "syncLimit": 50,
+  "syncLimitReached": false,
   "syncWindowSize": 2,
   "syncRecentManaged": 2,
-  "lastSyncedAt": "2026-06-06T13:58:30Z"
+  "managedInstagramIds": [
+    "17885122677568221",
+    "18099409562124339"
+  ],
+  "lastSyncedAt": "2026-06-06T14:10:39Z"
 }
