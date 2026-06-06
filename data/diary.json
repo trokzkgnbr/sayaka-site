@@ -1,6 +1,15 @@
 {
   "posts": [
     {
+      "id": "ig-17884710021578266",
+      "date": "2026-06-06",
+      "publishedAt": "2026-06-06T14:25:30Z",
+      "title": "ooo",
+      "body": "ooo\nlllllll\n走走",
+      "image": "images/diary/17884710021578266.jpg",
+      "instagramMediaId": "17884710021578266"
+    },
+    {
       "id": "ig-17885122677568221",
       "date": "2026-06-05",
       "publishedAt": "2026-06-05T15:01:13Z",
@@ -8,15 +17,6 @@
       "body": "力\no\n🐟ᐝ",
       "image": "images/diary/17885122677568221.jpg",
       "instagramMediaId": "17885122677568221"
-    },
-    {
-      "id": "ig-18099409562124339",
-      "date": "2026-06-05",
-      "publishedAt": "2026-06-05T04:43:33Z",
-      "title": "deepen",
-      "body": "deepen\n騒然としている場所と静かな場所どちらも自分に入りやすい気がする\nぽやぽや\nぽや",
-      "image": "images/diary/18099409562124339.jpg",
-      "instagramMediaId": "18099409562124339"
     }
   ],
   "syncedFrom": "instagram",
@@ -25,8 +25,8 @@
   "syncWindowSize": 2,
   "syncRecentManaged": 2,
   "managedInstagramIds": [
-    "17885122677568221",
-    "18099409562124339"
+    "17884710021578266",
+    "17885122677568221"
   ],
-  "lastSyncedAt": "2026-06-06T14:10:39Z"
+  "lastSyncedAt": "2026-06-06T16:14:50Z"
 }
