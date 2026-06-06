@@ -87,12 +87,22 @@ jobs:
             echo "::warning::トークンを延長しました。Secrets の INSTAGRAM_ACCESS_TOKEN をログの新トークンに更新してください。"
           fi
 
+      - name: Resolve Instagram user access token
+        if: steps.recent.outputs.skip != 'true'
+        id: instagram_user_token
+        env:
+          INSTAGRAM_ACCESS_TOKEN: ${{ steps.extend_token.outputs.extended == 'true' && steps.extend_token.outputs.value || secrets.INSTAGRAM_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_USER_ACCESS_TOKEN }}
+          INSTAGRAM_APP_ID: ${{ secrets.INSTAGRAM_APP_ID }}
+          INSTAGRAM_APP_SECRET: ${{ secrets.INSTAGRAM_APP_SECRET }}
+        run: python3 scripts/ci_resolve_instagram_user_access_token.py
+
       - name: Resolve Instagram token for sync
         if: steps.recent.outputs.skip != 'true'
         id: instagram_token
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ steps.extend_token.outputs.extended == 'true' && steps.extend_token.outputs.value || secrets.INSTAGRAM_ACCESS_TOKEN }}
-          INSTAGRAM_USER_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_USER_ACCESS_TOKEN }}
+          INSTAGRAM_USER_ACCESS_TOKEN: ${{ steps.instagram_user_token.outputs.value }}
           INSTAGRAM_USER_ID: ${{ secrets.INSTAGRAM_USER_ID }}
           INSTAGRAM_APP_ID: ${{ secrets.INSTAGRAM_APP_ID }}
           INSTAGRAM_APP_SECRET: ${{ secrets.INSTAGRAM_APP_SECRET }}

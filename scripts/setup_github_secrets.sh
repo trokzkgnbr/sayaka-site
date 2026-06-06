@@ -36,6 +36,20 @@ for key in INSTAGRAM_ACCESS_TOKEN INSTAGRAM_USER_ID INSTAGRAM_APP_ID INSTAGRAM_A
   fi
 done
 
+if [[ -z "${INSTAGRAM_USER_ACCESS_TOKEN:-}" ]]; then
+  echo "INSTAGRAM_USER_ACCESS_TOKEN を ACCESS_TOKEN から取得します..."
+  python3 "$ROOT/scripts/ensure_instagram_user_access_token.py"
+  set -a
+  # shellcheck disable=SC1090
+  source "$ENV_FILE"
+  set +a
+fi
+
+if [[ -z "${INSTAGRAM_USER_ACCESS_TOKEN:-}" ]]; then
+  echo "× INSTAGRAM_USER_ACCESS_TOKEN を取得できませんでした" >&2
+  exit 1
+fi
+
 if ! python3 -c "import nacl" 2>/dev/null; then
   python3 -m pip install --user PyNaCl
 fi
@@ -55,6 +69,7 @@ repo = os.environ["GITHUB_REPO"]
 gh = os.environ["GH_TOKEN"]
 secrets = {
     "INSTAGRAM_ACCESS_TOKEN": os.environ["INSTAGRAM_ACCESS_TOKEN"],
+    "INSTAGRAM_USER_ACCESS_TOKEN": os.environ["INSTAGRAM_USER_ACCESS_TOKEN"],
     "INSTAGRAM_USER_ID": os.environ["INSTAGRAM_USER_ID"],
     "INSTAGRAM_APP_ID": os.environ["INSTAGRAM_APP_ID"],
     "INSTAGRAM_APP_SECRET": os.environ["INSTAGRAM_APP_SECRET"],
