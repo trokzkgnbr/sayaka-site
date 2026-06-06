@@ -683,7 +683,7 @@ a:hover {
 }
 
 .gallery__intro {
-  width: var(--gallery-image-display-w, var(--home-image-display-w));
+  width: var(--gallery-image-display-w, min(42vw, 360px));
   max-width: calc(100vw - 2 * var(--artwork-pad-x));
   margin-inline: auto;
   padding: 0;
@@ -751,7 +751,7 @@ a:hover {
   align-items: flex-start;
   flex: 0 0 auto;
   box-sizing: border-box;
-  width: var(--gallery-image-display-w, var(--home-image-display-w));
+  width: var(--gallery-image-display-w, min(42vw, 360px));
   max-width: calc(100vw - 2 * var(--artwork-pad-x));
   margin-inline: auto;
   padding: 0;
@@ -773,12 +773,16 @@ a:hover {
   display: block;
   width: 100%;
   height: auto;
-  max-height: none;
+  max-height: calc(100dvh - var(--artwork-top-pad) - 24px);
   margin: 0 auto;
   border: none;
   object-fit: contain;
   object-position: center center;
   overflow: visible;
+}
+
+body.is-gallery-sized .page-main--gallery .gallery__img {
+  max-height: none;
 }
 
 /* Gallery キャプション — 画像左端に揃えて左寄せ（Home は右寄せのまま） */

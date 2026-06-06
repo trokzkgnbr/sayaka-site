@@ -252,6 +252,34 @@
     } catch (e) {}
   }
 
+  function restoreGalleryReferenceWidth() {
+    try {
+      var stored = sessionStorage.getItem(STORAGE_GALLERY_REF_W);
+      if (!stored) return null;
+      var width = parseInt(stored, 10);
+      if (!(width > 0)) return null;
+      document.documentElement.style.setProperty(
+        '--gallery-image-display-w',
+        width + 'px'
+      );
+      return width;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function markGallerySized() {
+    if (document.body) {
+      document.body.classList.add('is-gallery-sized');
+    }
+  }
+
+  function clearGallerySizedState() {
+    if (document.body) {
+      document.body.classList.remove('is-gallery-sized');
+    }
+  }
+
   function resolveGalleryReferenceWidth() {
     var availW = getGalleryAvailWidth();
     var availH = getGalleryViewportAvailHeight();
@@ -267,6 +295,7 @@
   }
 
   function applyGalleryUniformFit() {
+    restoreGalleryReferenceWidth();
     return resolveGalleryReferenceWidth().then(function (unified) {
       if (!unified) return false;
 
@@ -276,15 +305,22 @@
       );
 
       var works = document.querySelectorAll('.page-main--gallery .gallery__work');
-      if (!works.length) return true;
+      if (!works.length) {
+        markGallerySized();
+        return true;
+      }
 
       applyGalleryImageHeights(works, unified);
+      markGallerySized();
       return true;
     });
   }
 
   function bindGalleryUniformFit() {
+    restoreGalleryReferenceWidth();
+
     function schedule() {
+      restoreGalleryReferenceWidth();
       window.requestAnimationFrame(function () {
         applyGalleryUniformFit().then(function (applied) {
           if (applied) return;
@@ -415,6 +451,8 @@
     applyGalleryDisplayWidth: applyGalleryDisplayWidth,
     bindGalleryUniformFit: bindGalleryUniformFit,
     applyGalleryUniformFit: applyGalleryUniformFit,
+    restoreGalleryReferenceWidth: restoreGalleryReferenceWidth,
+    clearGallerySizedState: clearGallerySizedState,
     resolveGalleryReferenceWidth: resolveGalleryReferenceWidth,
     GALLERY_REFERENCE_SLUG: GALLERY_REFERENCE_SLUG,
     STANDARD_SCALE: STANDARD_SCALE,

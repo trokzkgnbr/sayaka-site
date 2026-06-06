@@ -163,9 +163,22 @@ function initGalleryCategoryNav() {
   });
 }
 
+function prepareGallerySizing() {
+  if (window.ArtworkSize) {
+    if (typeof ArtworkSize.clearGallerySizedState === 'function') {
+      ArtworkSize.clearGallerySizedState();
+    }
+    if (typeof ArtworkSize.restoreGalleryReferenceWidth === 'function') {
+      ArtworkSize.restoreGalleryReferenceWidth();
+    }
+  }
+}
+
 function renderGallery(series) {
   const root = document.getElementById('gallery');
   if (!root) return;
+
+  prepareGallerySizing();
 
   if (!series || !series.works || !series.works.length) {
     root.innerHTML =
@@ -239,6 +252,7 @@ function loadGallerySeries(slug) {
 }
 
 function initGalleryPage() {
+  prepareGallerySizing();
   var slug = getGallerySlug();
   document.body.setAttribute('data-gallery-category', slug);
   initGalleryCategoryNav();
