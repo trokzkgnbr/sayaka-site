@@ -61,7 +61,11 @@ function renderWorkMeta(work, series) {
 
   function flushGroup() {
     if (!current.length) return;
-    groups.push('<div class="gallery__meta-group">' + current.join('') + '</div>');
+    var isInfo = current.every(function (line) {
+      return line.indexOf('gallery__meta-poem') === -1;
+    });
+    var cls = 'gallery__meta-group' + (isInfo ? ' gallery__meta-group--info' : '');
+    groups.push('<div class="' + cls + '">' + current.join('') + '</div>');
     current = [];
   }
 
@@ -87,9 +91,7 @@ function renderWorkMeta(work, series) {
 
     var value = cap[key];
     if (!value) return;
-    flushGroup();
     pushLine(value, captionLineClass(key));
-    flushGroup();
   });
 
   flushGroup();

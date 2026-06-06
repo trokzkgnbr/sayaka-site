@@ -805,6 +805,10 @@ a:hover {
   max-width: 100%;
 }
 
+.gallery__meta-group--info {
+  gap: 0.2rem;
+}
+
 .gallery__meta-group + .gallery__meta-group {
   margin-top: 1.35rem;
 }
@@ -829,7 +833,11 @@ a:hover {
 .gallery__meta-title {
   font-size: 0.92rem;
   letter-spacing: 0.04em;
-  margin-top: 0.15rem;
+  margin-top: 0;
+}
+
+.gallery__meta-group--info .gallery__meta-line {
+  line-height: 1.45;
 }
 
 .gallery__meta-medium,
