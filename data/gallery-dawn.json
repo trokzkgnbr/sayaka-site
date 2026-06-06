@@ -6,6 +6,7 @@
       "alt": "そして夜明けを拒むでしょう",
       "title": "そして夜明けを拒むでしょう",
       "year": "2021年度　卒業制作",
+      "captionOrder": ["poem", "title", "year"],
       "poem": [
         "今日はいつもとは違う道",
         "花束を抱えて鯨の後ろを追いかけた",
@@ -18,7 +19,7 @@
         "真っ暗な夜も埋め尽くすほど",
         "あなたの光になってあげる",
         "美しくて醜い魂が零れる滴のように",
-        "いつしか蝶と呼ばれて",
+        "いつしか蝶に呼ばれて",
         "天に還る"
       ]
     },
@@ -28,6 +29,7 @@
       "title": "いつもあたたかく瞬く",
       "size": "455×606mm",
       "medium": "oil, charcoal on canvas",
+      "captionOrder": ["title", "size", "medium", "poem"],
       "poem": [
         "「何処に行くの」まだいかないよ",
         "「此処に居ないの」まだいかないよ",
@@ -43,6 +45,7 @@
       "title": "夜空を飛んであなたの夜の中へ",
       "size": "1303×1940mm",
       "medium": "oil on canvas",
+      "captionOrder": ["title", "size", "medium", "poem"],
       "poem": [
         "空を見上げたら月を探すから",
         "真っ暗な夜もうめつくすほど",
@@ -55,6 +58,7 @@
       "title": "今日からあなたはわたしの夢だけをみる",
       "size": "1303×1940mm",
       "medium": "oil on canvas",
+      "captionOrder": ["title", "size", "medium", "poem"],
       "poem": [
         "美しくて醜い魂が零れる滴のように",
         "いつしか蝶に呼ばれて",
@@ -67,6 +71,7 @@
       "title": "星の数と同じだけ",
       "size": "410×318mm",
       "medium": "oil, charcoal, pastel on canvas",
+      "captionOrder": ["title", "size", "medium", "poem"],
       "poem": [
         "ちいちゃな星のかけらを",
         "ちいちゃなおててで掬いあげた",
@@ -85,6 +90,7 @@
       "title": "満ちる途中",
       "size": "300×400mm",
       "medium": "oil, charcoal on canvas",
+      "captionOrder": ["title", "size", "medium", "poem"],
       "poem": [
         "風はいつも通り過ぎて",
         "回り道をする",
@@ -103,7 +109,8 @@
       "src": "images/gallery/dawn/07.jpg",
       "alt": "walk in a dream",
       "title": "walk in a dream",
-      "size": "300×400mm"
+      "size": "300×400mm",
+      "captionOrder": ["title", "size"]
     },
     {
       "src": "images/gallery/dawn/08.jpg",
@@ -111,6 +118,7 @@
       "title": "あの遠くにある木の中の後ろ",
       "size": "1303×1940mm",
       "medium": "oil, charcoal on canvas",
+      "captionOrder": ["title", "size", "medium", "poem"],
       "poem": [
         "毎日みる風景",
         "今日はいつもとは違う道",

@@ -2,17 +2,8 @@
  * ギャラリー（縦1列・カテゴリ別）。
  * gallery.html?category=dawn または旧 URL（gallery-dawn.html 等）の data-gallery-category。
  */
-const GALLERY_DEFAULT_CAPTION = {
-  year: '2022',
-  title: '今日からあなたは私だけの夢を見る',
-  medium: 'oil on canvas',
-  size: '1303 × 1940mm',
-  poem: [
-    '美しくて醜い魂が零れる滴のように',
-    'いつしか蝶と呼ばれて',
-    '天に還る',
-  ],
-};
+
+var GALLERY_DEFAULT_CAPTION_ORDER = ['title', 'year', 'size', 'medium', 'poem'];
 
 function escapeHtml(str) {
   return String(str)
@@ -31,44 +22,78 @@ function getGallerySlug() {
 }
 
 function resolveWorkCaption(work) {
-  const base =
-    (window.SITE && window.SITE.homeCaption) || GALLERY_DEFAULT_CAPTION;
   return {
-    year: work.year || base.year,
-    title: work.title || base.title,
-    medium: work.medium || base.medium,
-    size: work.size || base.size,
-    poem: work.poem && work.poem.length ? work.poem : base.poem || [],
+    title: work.title || '',
+    year: work.year || '',
+    size: work.size || '',
+    medium: work.medium || '',
+    poem: Array.isArray(work.poem) ? work.poem.slice() : [],
   };
 }
 
-function renderWorkMeta(work) {
-  const cap = resolveWorkCaption(work);
+function resolveCaptionOrder(work, series) {
+  if (Array.isArray(work.captionOrder) && work.captionOrder.length) {
+    return work.captionOrder;
+  }
+  if (Array.isArray(series.captionOrder) && series.captionOrder.length) {
+    return series.captionOrder;
+  }
+  return GALLERY_DEFAULT_CAPTION_ORDER;
+}
 
-  function lineHtml(text, cls) {
-    return (
+function captionLineClass(key) {
+  return (
+    {
+      title: 'gallery__meta-title',
+      year: 'gallery__meta-year',
+      size: 'gallery__meta-size',
+      medium: 'gallery__meta-medium',
+      poem: 'gallery__meta-poem',
+    }[key] || 'gallery__meta-line'
+  );
+}
+
+function renderWorkMeta(work, series) {
+  var cap = resolveWorkCaption(work);
+  var order = resolveCaptionOrder(work, series || {});
+  var groups = [];
+  var current = [];
+
+  function flushGroup() {
+    if (!current.length) return;
+    groups.push('<div class="gallery__meta-group">' + current.join('') + '</div>');
+    current = [];
+  }
+
+  function pushLine(text, cls) {
+    current.push(
       '<span class="gallery__meta-line ' + cls + '">' + escapeHtml(text) + '</span>'
     );
   }
 
-  function renderGroup(lines) {
-    if (!lines.length) return '';
-    return '<div class="gallery__meta-group">' + lines.join('') + '</div>';
-  }
+  order.forEach(function (key) {
+    if (key === 'poem') {
+      flushGroup();
+      cap.poem.forEach(function (line) {
+        if (line === '') {
+          flushGroup();
+          return;
+        }
+        pushLine(line, captionLineClass('poem'));
+      });
+      flushGroup();
+      return;
+    }
 
-  const titleLines = [];
-  if (cap.year) titleLines.push(lineHtml(cap.year, 'gallery__meta-year'));
-  if (cap.title) titleLines.push(lineHtml(cap.title, 'gallery__meta-title'));
-
-  const metaLines = [];
-  if (cap.medium) metaLines.push(lineHtml(cap.medium, 'gallery__meta-medium'));
-  if (cap.size) metaLines.push(lineHtml(cap.size, 'gallery__meta-size'));
-
-  const poemLines = cap.poem.filter(Boolean).map(function (line) {
-    return lineHtml(line, 'gallery__meta-poem');
+    var value = cap[key];
+    if (!value) return;
+    flushGroup();
+    pushLine(value, captionLineClass(key));
+    flushGroup();
   });
 
-  return renderGroup(titleLines) + renderGroup(metaLines) + renderGroup(poemLines);
+  flushGroup();
+  return groups.join('');
 }
 
 var galleryUniformFitSchedule = null;
@@ -141,14 +166,14 @@ function renderGallery(series) {
     const img = document.createElement('img');
     img.className = 'gallery__img';
     img.src = work.src;
-    img.alt = work.alt || '';
+    img.alt = work.alt || work.title || '';
     img.loading = imageIndex < 2 ? 'eager' : 'lazy';
     img.decoding = 'async';
     article.appendChild(img);
 
     const meta = document.createElement('div');
     meta.className = 'gallery__meta';
-    meta.innerHTML = renderWorkMeta(work);
+    meta.innerHTML = renderWorkMeta(work, series);
     article.appendChild(meta);
 
     fragment.appendChild(article);

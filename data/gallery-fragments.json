@@ -1,5 +1,6 @@
 {
   "title": "fragments",
+  "captionOrder": ["title", "year", "size", "medium"],
   "works": [
     {
       "src": "images/gallery/fragments/01.jpg",
@@ -24,12 +25,14 @@
       "year": "2020",
       "size": "1303×1620mm",
       "medium": "oil on canvas",
+      "captionOrder": ["title", "year", "size", "medium", "poem"],
       "poem": [
         "言葉は道具に近いようで凶器でもある。",
         "物事の本質から遠ざけてしまう。",
         "それでもわたしは言葉が好きだ。",
         "道具であることとか、概念とか、",
         "暴力的なものを包み込んで溶かしてしまえばいい。",
+        "",
         "眼を凝らしてみてもずっと続く深海のように",
         "そうやって言葉も紡いで織っていけばいい。",
         "そうしたら不思議と魂の宿る巣となる。"
@@ -42,6 +45,7 @@
       "year": "2017",
       "size": "803×1000mm",
       "medium": "oil on canvas",
+      "captionOrder": ["title", "poem", "year", "size", "medium"],
       "poem": [
         "それがいまみえているわたしの世界"
       ]
