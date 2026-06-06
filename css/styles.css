@@ -582,12 +582,16 @@ a:hover {
 
 .page-main.page-main--gallery {
   max-width: none;
-  padding: var(--artwork-top-pad) var(--artwork-pad-x) 4rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--artwork-top-pad) 0 4rem;
+  overflow-x: clip;
 }
 
 .gallery-layout {
   position: relative;
   width: 100%;
+  margin: 0;
 }
 
 .gallery-layout > .visually-hidden {
@@ -672,18 +676,16 @@ a:hover {
   flex-wrap: nowrap;
   align-items: center;
   gap: clamp(3rem, 8vh, 5rem);
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  max-width: none;
-  padding-bottom: 3rem;
+  width: 100%;
+  margin: 0;
+  padding: 0 0 3rem;
   box-sizing: border-box;
 }
 
 .gallery__intro {
   width: var(--gallery-image-display-w, var(--home-image-display-w));
   max-width: calc(100vw - 2 * var(--artwork-pad-x));
-  margin-left: auto;
-  margin-right: auto;
+  margin-inline: auto;
   padding: 0;
   text-align: left;
 }
@@ -751,8 +753,7 @@ a:hover {
   box-sizing: border-box;
   width: var(--gallery-image-display-w, var(--home-image-display-w));
   max-width: calc(100vw - 2 * var(--artwork-pad-x));
-  margin-left: auto;
-  margin-right: auto;
+  margin-inline: auto;
   padding: 0;
 }
 
