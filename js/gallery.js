@@ -71,60 +71,18 @@ function renderWorkMeta(work) {
   return renderGroup(titleLines) + renderGroup(metaLines) + renderGroup(poemLines);
 }
 
-/** 全カテゴリ共通の横幅基準（dawn の2枚目） */
-var GALLERY_WIDTH_REF_SRC = 'images/gallery/dawn/02.jpg';
-var galleryWidthRefImage = null;
+var galleryDisplayWidthSchedule = null;
 
-function applyGalleryUniformWidth() {
-  if (!window.ArtworkSize) return;
-
-  var container = document.querySelector('.page-main--gallery');
-  if (!container) return;
-
-  function setWidthFromRef(img) {
-    var metrics = ArtworkSize.computeArtworkMetrics(
-      container,
-      img,
-      null,
-      ArtworkSize.STANDARD_SCALE,
-      {
-        useUniformPageWidth: true,
-        useViewportHeight: false,
-      }
-    );
-    if (!metrics) return;
-    document.documentElement.style.setProperty(
-      '--gallery-image-display-w',
-      Math.round(metrics.width) + 'px'
-    );
-  }
-
-  function ensureRefImage(callback) {
-    if (galleryWidthRefImage && galleryWidthRefImage.naturalWidth) {
-      callback(galleryWidthRefImage);
-      return;
-    }
-    var ref = new Image();
-    ref.addEventListener(
-      'load',
-      function () {
-        galleryWidthRefImage = ref;
-        callback(ref);
-      },
-      { once: true }
-    );
-    ref.src = GALLERY_WIDTH_REF_SRC;
-  }
-
-  function runFit() {
-    ensureRefImage(setWidthFromRef);
-  }
-
-  runFit();
-}
-
+/** Gallery 横幅 = Home 表示画像の 90% */
 function applyGalleryImageSize() {
-  applyGalleryUniformWidth();
+  if (!window.ArtworkSize) return;
+  if (galleryDisplayWidthSchedule) {
+    galleryDisplayWidthSchedule();
+    return;
+  }
+  galleryDisplayWidthSchedule = ArtworkSize.resolveGalleryDisplayWidth({
+    homeSrc: window.SITE && SITE.homeVisual,
+  });
 }
 
 function initGalleryCategoryNav() {

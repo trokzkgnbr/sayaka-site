@@ -128,10 +128,89 @@
   }
 
   var STANDARD_SCALE = 0.9;
+  /** Gallery 作品幅 = Home 表示幅 × この比率 */
+  var GALLERY_HOME_WIDTH_RATIO = 0.9;
   var STANDARD_FIT_OPTIONS = {
     useViewportHeight: true,
     useUniformPageWidth: true,
   };
+
+  function getHomeDisplayWidthPx() {
+    restoreStoredMetrics();
+    var w = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue('--home-image-display-w')
+    );
+    return w > 0 ? w : null;
+  }
+
+  function applyGalleryDisplayWidth(homeWidthPx) {
+    var w = Math.max(1, Math.round(homeWidthPx * GALLERY_HOME_WIDTH_RATIO));
+    document.documentElement.style.setProperty('--gallery-image-display-w', w + 'px');
+    return w;
+  }
+
+  function measureHomeCaptionMinReserve() {
+    var fromCss = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue('--home-caption-fold-min-h')
+    );
+    return fromCss > 0 ? fromCss : 80;
+  }
+
+  function resolveGalleryDisplayWidth(options) {
+    options = options || {};
+    var homeSrc = options.homeSrc || '';
+    var preload = options.preloadImage || null;
+
+    function finish(homeW) {
+      if (homeW > 0) applyGalleryDisplayWidth(homeW);
+      if (typeof options.onMetrics === 'function') options.onMetrics(homeW);
+    }
+
+    function computeFromImage(img) {
+      var metrics = computeArtworkMetrics(
+        document.documentElement,
+        img,
+        null,
+        STANDARD_SCALE,
+        {
+          useUniformPageWidth: true,
+          useViewportHeight: true,
+          captionMinReserve: measureHomeCaptionMinReserve(),
+        }
+      );
+      if (metrics && metrics.width > 0) finish(metrics.width);
+    }
+
+    function run() {
+      var stored = getHomeDisplayWidthPx();
+      if (stored) {
+        finish(stored);
+        return;
+      }
+      if (preload && preload.naturalWidth) {
+        computeFromImage(preload);
+        return;
+      }
+      if (!homeSrc) return;
+      if (!options._loader) {
+        options._loader = new Image();
+        options._loader.addEventListener(
+          'load',
+          function () {
+            computeFromImage(options._loader);
+          },
+          { once: false }
+        );
+        options._loader.src = homeSrc;
+      } else if (options._loader.complete && options._loader.naturalWidth) {
+        computeFromImage(options._loader);
+      }
+    }
+
+    run();
+    window.addEventListener('resize', run);
+    return run;
+  }
 
   function bindStandardPageArtworkFit(options) {
     var fitOptions = Object.assign({}, STANDARD_FIT_OPTIONS, options.fitOptions || {});
@@ -151,6 +230,9 @@
     computeArtworkMetrics: computeArtworkMetrics,
     bindArtworkFit: bindArtworkFit,
     bindStandardPageArtworkFit: bindStandardPageArtworkFit,
+    resolveGalleryDisplayWidth: resolveGalleryDisplayWidth,
+    applyGalleryDisplayWidth: applyGalleryDisplayWidth,
     STANDARD_SCALE: STANDARD_SCALE,
+    GALLERY_HOME_WIDTH_RATIO: GALLERY_HOME_WIDTH_RATIO,
   };
 })();
