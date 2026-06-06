@@ -274,8 +274,22 @@ def media_image_url(item: dict[str, Any]) -> str | None:
 
 
 def parse_timestamp(ts: str) -> str:
-    # 2026-05-28T12:34:56+0000
-    return ts[:10] if ts and len(ts) >= 10 else ""
+    """表示用の日付（YYYY-MM-DD）。"""
+    published = normalize_published_at(ts)
+    return published[:10] if published else ""
+
+
+def normalize_published_at(ts: str) -> str:
+    """Instagram timestamp を UTC ISO（…Z）に正規化。並び順用。"""
+    raw = (ts or "").strip()
+    if not raw:
+        return ""
+    if raw.endswith("Z"):
+        return raw
+    if len(raw) >= 5 and raw[-5] in "+-" and raw[-3] != ":":
+        # 2026-05-28T12:34:56+0000
+        return raw[:-5] + "Z"
+    return raw
 
 
 def caption_title_body(caption: str | None) -> tuple[str, str]:

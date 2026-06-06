@@ -71,47 +71,60 @@ function renderWorkMeta(work) {
   return renderGroup(titleLines) + renderGroup(metaLines) + renderGroup(poemLines);
 }
 
-var galleryArtworkFitSchedule = null;
+/** 全カテゴリ共通の横幅基準（dawn の2枚目） */
+var GALLERY_WIDTH_REF_SRC = 'images/gallery/dawn/02.jpg';
+var galleryWidthRefImage = null;
 
-function getGalleryLeadCaptionEl(leadWork) {
-  if (!leadWork) return null;
-  var mobile = window.matchMedia('(max-width: 760px)').matches;
-  if (mobile) return leadWork.querySelector('.gallery__meta');
-  return (
-    leadWork.querySelector('.gallery__meta-group') ||
-    leadWork.querySelector('.gallery__meta')
-  );
-}
-
-function applyGalleryImageSize() {
-  if (window.ArtworkSize) {
-    ArtworkSize.restoreStoredMetrics();
-  }
-  fitGalleryLeadImage();
-}
-
-function fitGalleryLeadImage() {
+function applyGalleryUniformWidth() {
   if (!window.ArtworkSize) return;
 
   var container = document.querySelector('.page-main--gallery');
-  var leadWork = document.querySelector('.gallery__work');
-  var leadImg = leadWork && leadWork.querySelector('.gallery__img');
-  if (!container || !leadImg) return;
+  if (!container) return;
 
-  function runFit() {
-    if (galleryArtworkFitSchedule) {
-      galleryArtworkFitSchedule();
-      return;
-    }
-    galleryArtworkFitSchedule = ArtworkSize.bindStandardPageArtworkFit({
-      container: container,
-      img: leadImg,
-      captionEl: getGalleryLeadCaptionEl(leadWork),
-    });
+  function setWidthFromRef(img) {
+    var metrics = ArtworkSize.computeArtworkMetrics(
+      container,
+      img,
+      null,
+      ArtworkSize.STANDARD_SCALE,
+      {
+        useUniformPageWidth: true,
+        useViewportHeight: false,
+      }
+    );
+    if (!metrics) return;
+    document.documentElement.style.setProperty(
+      '--gallery-image-display-w',
+      Math.round(metrics.width) + 'px'
+    );
   }
 
-  if (leadImg.complete) runFit();
-  else leadImg.addEventListener('load', runFit, { once: true });
+  function ensureRefImage(callback) {
+    if (galleryWidthRefImage && galleryWidthRefImage.naturalWidth) {
+      callback(galleryWidthRefImage);
+      return;
+    }
+    var ref = new Image();
+    ref.addEventListener(
+      'load',
+      function () {
+        galleryWidthRefImage = ref;
+        callback(ref);
+      },
+      { once: true }
+    );
+    ref.src = GALLERY_WIDTH_REF_SRC;
+  }
+
+  function runFit() {
+    ensureRefImage(setWidthFromRef);
+  }
+
+  runFit();
+}
+
+function applyGalleryImageSize() {
+  applyGalleryUniformWidth();
 }
 
 function initGalleryCategoryNav() {
@@ -152,6 +165,20 @@ function renderGallery(series) {
 
   const fragment = document.createDocumentFragment();
 
+  if (series.intro && series.intro.length) {
+    const introEl = document.createElement('div');
+    introEl.className = 'gallery__intro';
+    introEl.setAttribute('role', 'doc-foreword');
+    series.intro.forEach(function (paragraph) {
+      if (!paragraph) return;
+      const p = document.createElement('p');
+      p.className = 'gallery__intro-paragraph';
+      p.textContent = paragraph;
+      introEl.appendChild(p);
+    });
+    fragment.appendChild(introEl);
+  }
+
   series.works.forEach(function (work, imageIndex) {
     const article = document.createElement('article');
     article.className = 'gallery__work';
@@ -173,7 +200,6 @@ function renderGallery(series) {
     fragment.appendChild(article);
   });
 
-  galleryArtworkFitSchedule = null;
   root.replaceChildren(fragment);
   applyGalleryImageSize();
 }

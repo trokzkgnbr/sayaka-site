@@ -1,20 +1,22 @@
 {
   "posts": [
     {
-      "id": "ig-18099409562124339",
-      "date": "2026-06-05",
-      "title": "deepen",
-      "body": "deepen\n騒然としている場所と静かな場所どちらも自分に入りやすい気がする\nぽやぽや\nぽや",
-      "image": "images/diary/18099409562124339.jpg",
-      "instagramMediaId": "18099409562124339"
-    },
-    {
       "id": "ig-17885122677568221",
       "date": "2026-06-05",
+      "publishedAt": "2026-06-05T15:01:13Z",
       "title": "力",
       "body": "力\no\n🐟ᐝ",
       "image": "images/diary/17885122677568221.jpg",
       "instagramMediaId": "17885122677568221"
+    },
+    {
+      "id": "ig-18099409562124339",
+      "date": "2026-06-05",
+      "publishedAt": "2026-06-05T04:43:33Z",
+      "title": "deepen",
+      "body": "deepen\n騒然としている場所と静かな場所どちらも自分に入りやすい気がする\nぽやぽや\nぽや",
+      "image": "images/diary/18099409562124339.jpg",
+      "instagramMediaId": "18099409562124339"
     },
     {
       "id": "ig-18220209157317589",
@@ -27,6 +29,7 @@
   ],
   "syncedFrom": "instagram",
   "syncLimit": 50,
+  "syncWindowSize": 2,
   "syncRecentManaged": 2,
-  "lastSyncedAt": "2026-06-05T19:09:07Z"
+  "lastSyncedAt": "2026-06-06T13:58:30Z"
 }

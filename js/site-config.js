@@ -69,14 +69,14 @@ window.SITE = {
       href: 'gallery.html?category=dawn',
     },
     {
-      slug: 'dream',
-      label: 'Walk in a dream',
-      href: 'gallery.html?category=dream',
+      slug: 'fragments',
+      label: 'fragments',
+      href: 'gallery.html?category=fragments',
     },
     {
-      slug: 'colors',
-      label: '色彩の余白',
-      href: 'gallery.html?category=colors',
+      slug: 'dream',
+      label: 'walk in a dream',
+      href: 'gallery.html?category=dream',
     },
   ],
 

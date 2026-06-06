@@ -140,9 +140,8 @@
       return res.json();
     })
     .then(function (data) {
-      const posts = (data.posts || []).slice().sort(function (a, b) {
-        return b.date.localeCompare(a.date);
-      });
+      // diary.json の配列順（= Instagram 新しい順）をそのまま使う
+      const posts = (data.posts || []).slice();
       if (!posts.length) {
         showEmpty('まだ投稿がありません。');
         return;

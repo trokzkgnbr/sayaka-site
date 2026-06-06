@@ -677,6 +677,29 @@ a:hover {
   padding-bottom: 3rem;
 }
 
+.gallery__intro {
+  width: var(--gallery-image-display-w, var(--home-image-display-w));
+  max-width: calc(100% - 2 * var(--artwork-pad-x));
+  margin-left: var(--artwork-pad-x);
+  margin-right: auto;
+  padding: 0;
+  text-align: left;
+}
+
+.gallery__intro-paragraph {
+  margin: 0;
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  line-height: 1.85;
+  color: var(--text-muted);
+}
+
+.gallery__intro-paragraph + .gallery__intro-paragraph {
+  margin-top: 1.35rem;
+}
+
 .gallery__series {
   display: flex;
   flex-direction: column;
@@ -703,8 +726,7 @@ a:hover {
 
 /* Home / Gallery 共通の作品画像スロット */
 .artwork-slot,
-.page-home .home-visual,
-.gallery__work {
+.page-home .home-visual {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -718,8 +740,21 @@ a:hover {
   padding: 0;
 }
 
+.page-main--gallery .gallery__work {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: var(--gallery-image-display-w, var(--home-image-display-w));
+  max-width: calc(100% - 2 * var(--artwork-pad-x));
+  margin-left: var(--artwork-pad-x);
+  margin-right: auto;
+  padding: 0;
+}
+
 .artwork-slot__img,
-.gallery__img,
 .page-home #home-visual {
   display: block;
   width: 100%;
@@ -731,6 +766,17 @@ a:hover {
   object-position: center top;
 }
 
+.page-main--gallery .gallery__img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  margin: 0;
+  border: none;
+  object-fit: contain;
+  object-position: left top;
+}
+
 /* Gallery キャプション — 画像左端に揃えて左寄せ（Home は右寄せのまま） */
 .gallery__meta {
   display: flex;
@@ -740,6 +786,8 @@ a:hover {
   gap: 0;
   width: 100%;
   margin-top: 0.85rem;
+  margin-left: 0;
+  margin-right: 0;
   padding: 0;
   text-align: left;
   box-sizing: border-box;
