@@ -128,12 +128,125 @@
   }
 
   var STANDARD_SCALE = 0.9;
-  /** Gallery 作品幅 = Home 表示幅 × この比率 */
+  /** @deprecated Gallery は bindGalleryUniformFit を使用 */
   var GALLERY_HOME_WIDTH_RATIO = 0.9;
   var STANDARD_FIT_OPTIONS = {
     useViewportHeight: true,
     useUniformPageWidth: true,
   };
+
+  var galleryUniformFitResizeBound = false;
+  var galleryUniformFitGalleryObserver = null;
+
+  function readRootPxVar(name, fallback) {
+    var value = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue(name)
+    );
+    return value > 0 ? value : fallback;
+  }
+
+  function getGalleryColumnWidth() {
+    var gallery = document.getElementById('gallery');
+    if (gallery && gallery.clientWidth > 0) {
+      return gallery.clientWidth;
+    }
+    var padX = readRootPxVar('--artwork-pad-x', 12);
+    return Math.max(0, window.innerWidth - 2 * padX);
+  }
+
+  function getGalleryViewportAvailHeight() {
+    var topPad = readRootPxVar('--artwork-top-pad', 80);
+    var bottomReserve = 20;
+    return Math.max(0, window.innerHeight - topPad - bottomReserve);
+  }
+
+  /** 画像だけが一画面（高さ）に収まる最大横幅 */
+  function maxGalleryWidthForWork(img, availW, availH) {
+    if (!img || !img.naturalWidth || !img.naturalHeight) return 0;
+    var aspect = img.naturalWidth / img.naturalHeight;
+    var maxW = Math.floor(availW);
+    var maxFromHeight = Math.floor(availH * aspect);
+    if (maxW < 1 || maxFromHeight < 1) return 0;
+    return Math.min(maxW, maxFromHeight);
+  }
+
+  function applyGalleryImageHeights(works, unifiedWidth) {
+    for (var i = 0; i < works.length; i++) {
+      var img = works[i].querySelector('.gallery__img');
+      if (!img || !img.naturalWidth || !img.naturalHeight) continue;
+      var height = Math.floor(unifiedWidth * (img.naturalHeight / img.naturalWidth));
+      var heightPx = Math.max(1, height) + 'px';
+      img.style.width = '100%';
+      img.style.height = heightPx;
+      img.style.maxHeight = heightPx;
+    }
+  }
+
+  function computeGalleryUniformWidth(works, availW, availH) {
+    var widths = [];
+    for (var i = 0; i < works.length; i++) {
+      var img = works[i].querySelector('.gallery__img');
+      if (!img || !img.naturalWidth) return null;
+      widths.push(maxGalleryWidthForWork(img, availW, availH));
+    }
+    if (!widths.length) return null;
+    return Math.max(1, Math.min.apply(null, widths));
+  }
+
+  function applyGalleryUniformFit() {
+    var works = document.querySelectorAll('.page-main--gallery .gallery__work');
+    if (!works.length) return false;
+
+    for (var i = 0; i < works.length; i++) {
+      var probe = works[i].querySelector('.gallery__img');
+      if (!probe || !probe.naturalWidth) return false;
+    }
+
+    var availW = getGalleryColumnWidth();
+    var availH = getGalleryViewportAvailHeight();
+    if (availW <= 0 || availH <= 0) return false;
+
+    var unified = computeGalleryUniformWidth(works, availW, availH);
+    if (!unified) return false;
+
+    document.documentElement.style.setProperty(
+      '--gallery-image-display-w',
+      unified + 'px'
+    );
+    applyGalleryImageHeights(works, unified);
+    return true;
+  }
+
+  function bindGalleryUniformFit() {
+    function schedule() {
+      window.requestAnimationFrame(function () {
+        if (applyGalleryUniformFit()) return;
+        var pending = document.querySelectorAll('.page-main--gallery .gallery__img');
+        for (var i = 0; i < pending.length; i++) {
+          var img = pending[i];
+          if (img.complete && img.naturalWidth) continue;
+          img.addEventListener('load', schedule, { once: true });
+        }
+      });
+    }
+
+    if (!galleryUniformFitResizeBound) {
+      galleryUniformFitResizeBound = true;
+      window.addEventListener('resize', schedule);
+    }
+
+    var gallery = document.getElementById('gallery');
+    if (gallery && typeof ResizeObserver !== 'undefined') {
+      if (!galleryUniformFitGalleryObserver) {
+        galleryUniformFitGalleryObserver = new ResizeObserver(schedule);
+      }
+      galleryUniformFitGalleryObserver.disconnect();
+      galleryUniformFitGalleryObserver.observe(gallery);
+    }
+
+    schedule();
+    return schedule;
+  }
 
   function getHomeDisplayWidthPx() {
     restoreStoredMetrics();
@@ -232,6 +345,8 @@
     bindStandardPageArtworkFit: bindStandardPageArtworkFit,
     resolveGalleryDisplayWidth: resolveGalleryDisplayWidth,
     applyGalleryDisplayWidth: applyGalleryDisplayWidth,
+    bindGalleryUniformFit: bindGalleryUniformFit,
+    applyGalleryUniformFit: applyGalleryUniformFit,
     STANDARD_SCALE: STANDARD_SCALE,
     GALLERY_HOME_WIDTH_RATIO: GALLERY_HOME_WIDTH_RATIO,
   };

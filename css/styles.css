@@ -586,20 +586,27 @@ a:hover {
 }
 
 .gallery-layout {
-  position: relative;
+  display: grid;
+  grid-template-columns: min(16rem, 28vw) minmax(0, 1fr);
+  column-gap: clamp(1.25rem, 3vw, 2.5rem);
+  align-items: start;
   width: 100%;
 }
 
 .gallery-layout > .visually-hidden {
+  grid-column: 2;
+  grid-row: 1;
   margin: 0;
 }
 
 .gallery-category-nav {
-  position: fixed;
-  left: var(--artwork-pad-x);
+  grid-column: 1;
+  grid-row: 1;
+  position: sticky;
   top: calc(var(--header-offset) + 0.5rem);
   z-index: 5;
-  width: min(16rem, 32vw);
+  width: 100%;
+  max-width: 16rem;
   text-align: left;
   pointer-events: auto;
 }
@@ -641,7 +648,7 @@ a:hover {
   flex-direction: column;
   align-items: flex-start;
   gap: 0.35rem;
-  width: var(--home-image-w);
+  width: var(--gallery-image-display-w, var(--home-image-display-w));
   max-width: 100%;
   margin: 0 auto clamp(2rem, 5vh, 3rem);
   padding: 0;
@@ -666,10 +673,12 @@ a:hover {
 }
 
 .gallery {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  align-items: stretch;
+  align-items: center;
   gap: clamp(3rem, 8vh, 5rem);
   width: 100%;
   max-width: 100%;
@@ -679,8 +688,8 @@ a:hover {
 
 .gallery__intro {
   width: var(--gallery-image-display-w, var(--home-image-display-w));
-  max-width: calc(100% - 2 * var(--artwork-pad-x));
-  margin-left: var(--artwork-pad-x);
+  max-width: 100%;
+  margin-left: auto;
   margin-right: auto;
   padding: 0;
   text-align: left;
@@ -704,15 +713,15 @@ a:hover {
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  align-items: stretch;
+  align-items: center;
   gap: clamp(2.5rem, 6vh, 4rem);
   width: 100%;
   max-width: 100%;
 }
 
 .gallery__series-title {
-  width: var(--home-image-display-w);
-  max-width: calc(100% - 2 * var(--artwork-pad-x));
+  width: var(--gallery-image-display-w, var(--home-image-display-w));
+  max-width: 100%;
   margin-left: auto;
   margin-right: auto;
   padding: 0;
@@ -748,8 +757,8 @@ a:hover {
   flex: 0 0 auto;
   box-sizing: border-box;
   width: var(--gallery-image-display-w, var(--home-image-display-w));
-  max-width: calc(100% - 2 * var(--artwork-pad-x));
-  margin-left: var(--artwork-pad-x);
+  max-width: 100%;
+  margin-left: auto;
   margin-right: auto;
   padding: 0;
 }
@@ -771,10 +780,11 @@ a:hover {
   width: 100%;
   height: auto;
   max-height: none;
-  margin: 0;
+  margin: 0 auto;
   border: none;
   object-fit: contain;
-  object-position: left top;
+  object-position: center center;
+  overflow: visible;
 }
 
 /* Gallery キャプション — 画像左端に揃えて左寄せ（Home は右寄せのまま） */
@@ -1898,7 +1908,17 @@ body.page-inner .diary-detail__body {
   }
 
   /* Gallery: サブカテゴリのサイドバーはスマホでは非表示（ヘッダーの Gallery から遷移） */
+  .gallery-layout {
+    grid-template-columns: 1fr;
+    column-gap: 0;
+  }
+
   .gallery-category-nav {
     display: none;
+  }
+
+  .gallery,
+  .gallery-layout > .visually-hidden {
+    grid-column: 1;
   }
 }

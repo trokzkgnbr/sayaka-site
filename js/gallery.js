@@ -71,18 +71,14 @@ function renderWorkMeta(work) {
   return renderGroup(titleLines) + renderGroup(metaLines) + renderGroup(poemLines);
 }
 
-var galleryDisplayWidthSchedule = null;
+var galleryUniformFitSchedule = null;
 
-/** Gallery 横幅 = Home 表示画像の 90% */
+/** 各作品を一画面に収め、最小の安全横幅に全画像を揃える */
 function applyGalleryImageSize() {
-  if (!window.ArtworkSize) return;
-  if (galleryDisplayWidthSchedule) {
-    galleryDisplayWidthSchedule();
+  if (!window.ArtworkSize || typeof ArtworkSize.bindGalleryUniformFit !== 'function') {
     return;
   }
-  galleryDisplayWidthSchedule = ArtworkSize.resolveGalleryDisplayWidth({
-    homeSrc: window.SITE && SITE.homeVisual,
-  });
+  galleryUniformFitSchedule = ArtworkSize.bindGalleryUniformFit();
 }
 
 function initGalleryCategoryNav() {
