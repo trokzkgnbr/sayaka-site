@@ -1,16 +1,24 @@
 # Instagram → Blog データ自動同期 + 変更時のみ GitHub Pages 公開
 # 必要: Secrets … INSTAGRAM_ACCESS_TOKEN, INSTAGRAM_USER_ID
-# 推奨: INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET（トークン自動再取得）
+# 推奨: INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET, INSTAGRAM_USER_ACCESS_TOKEN
 #
 # Actions の push は別ワークフローを起動しないため、同期後の公開は本ファイル内の deploy ジョブで行う。
 name: Sync Instagram Diary
 
 on:
   schedule:
-    # cron は UTC。GitHub の :00 集中を避けて :05 にずらす
-    # JST: 12:05 → 03:05 UTC / 24:05 → 15:05 UTC
+    # cron は UTC。GitHub は毎時 :00 付近で schedule が遅延・欠落しやすいため、
+    # 複数スロット + :05/:17/:35 に分散する（JST = UTC+9）。
+    # お昼帯: 12:05 / 12:17 / 12:35 / 13:05 JST
     - cron: "5 3 * * *"
+    - cron: "17 3 * * *"
+    - cron: "35 3 * * *"
+    - cron: "5 4 * * *"
+    # 深夜帯: 24:05 / 24:17 / 24:35 / 25:05 JST（翌1:05）
     - cron: "5 15 * * *"
+    - cron: "17 15 * * *"
+    - cron: "35 15 * * *"
+    - cron: "5 16 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -29,18 +37,30 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Skip if recently synced (schedule only)
+        id: recent
+        run: python3 scripts/should_skip_instagram_sync.py
+
+      - name: Skipped (recent sync)
+        if: steps.recent.outputs.skip == 'true'
+        run: echo "直近 90 分以内に同期済みのためスキップしました。"
+
       - name: Set up Python
+        if: steps.recent.outputs.skip != 'true'
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
       - name: Install dependencies
+        if: steps.recent.outputs.skip != 'true'
         run: pip install -r scripts/requirements-instagram-sync.txt
 
       - name: Test diary merge and deletion rules
+        if: steps.recent.outputs.skip != 'true'
         run: python3 scripts/test_sync_instagram_diary.py
 
       - name: Extend Instagram token if needed
+        if: steps.recent.outputs.skip != 'true'
         id: extend_token
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ secrets.INSTAGRAM_ACCESS_TOKEN }}
@@ -68,6 +88,7 @@ jobs:
           fi
 
       - name: Resolve Instagram token for sync
+        if: steps.recent.outputs.skip != 'true'
         id: instagram_token
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ steps.extend_token.outputs.extended == 'true' && steps.extend_token.outputs.value || secrets.INSTAGRAM_ACCESS_TOKEN }}
@@ -78,6 +99,7 @@ jobs:
         run: python3 scripts/ci_resolve_instagram_token.py
 
       - name: Sync diary from Instagram
+        if: steps.recent.outputs.skip != 'true'
         id: sync
         env:
           INSTAGRAM_ACCESS_TOKEN: ${{ steps.instagram_token.outputs.value }}
@@ -92,6 +114,7 @@ jobs:
           echo "Blog 投稿数: $POSTS"
 
       - name: Commit and push if changed
+        if: steps.recent.outputs.skip != 'true'
         id: commit
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
@@ -99,7 +122,7 @@ jobs:
           file_pattern: "data/diary.json images/diary/*.jpg"
 
       - name: Sync produced no data (fail)
-        if: steps.sync.outputs.post_count == '0'
+        if: steps.recent.outputs.skip != 'true' && steps.sync.outputs.post_count == '0'
         run: |
           echo "::error::Instagram 同期後の投稿が 0 件です。トークン・@4mnion の投稿を確認してください。"
           exit 1

@@ -229,10 +229,26 @@ git push
 
 ### 定期実行が動かないとき（調査メモ）
 
-- **Actions タブ**でイベントが **`schedule`** の実行があるか確認（`push` だけなら定期はまだ来ていない）。
-- GitHub は **毎時 0 分（UTC の :00）** に cron が集中し、**遅延・スキップ**することがある（公式ドキュメント）。そのため本リポジトリは **:05（UTC）** にずらしている。
-- リポジトリ **Settings → Actions** に「Scheduled workflows are disabled」の表示がないか確認（60 日無操作などで止まる場合あり）。
-- 手動・push では動くのに schedule だけ動かない → 上記を確認後、**Run workflow** で即時同期可能。
+**2026-06-06 時点の調査結果**
+
+| 現象 | 原因 |
+|------|------|
+| 12:05 JST に来ない | GitHub `schedule` が **数時間遅れる・欠落** する（公式: 毎時 :00 付近は特に混雑） |
+| 来ても赤い | 過去ログでは **Instagram トークン失敗**（`Resolve Instagram token for sync`）が主因 |
+| 手動は成功する | Secrets は有効。schedule 単体の遅延・失敗と切り分け可能 |
+
+**実施済み対策（workflow）**
+
+- お昼 **12:05 / 12:17 / 12:35 / 13:05 JST**、深夜 **24:05 / 24:17 / 24:35 / 翌1:05 JST** の **8 スロット**（遅延・欠落の冗長化）
+- 直近 **90 分以内** に同期済みなら schedule 実行をスキップ（重複 API 呼び出し防止）
+- 同期前にトークン延長 → 失敗時は `INSTAGRAM_USER_ACCESS_TOKEN` でページトークン再取得
+
+**確認手順**
+
+1. **Actions** でイベント **`schedule`** の実行があるか（`push` だけなら定期はまだ来ていない）
+2. **Settings → Actions** に「Scheduled workflows are disabled」がないか（60 日無操作で止まる場合あり）
+3. 失敗時はログの **Resolve Instagram token for sync** を確認 → D-1〜D-3 でトークン更新、`INSTAGRAM_USER_ACCESS_TOKEN` も登録
+4. 急ぎは **Run workflow** で手動同期
 
 **同期のルール（重要）**
 
