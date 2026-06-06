@@ -23,12 +23,19 @@ function getGallerySlug() {
 
 function normalizeTitleLines(title) {
   if (Array.isArray(title)) {
-    return title.map(function (line) {
-      return String(line).trim();
-    }).filter(Boolean);
+    return title
+      .map(function (line) {
+        return String(line).trim();
+      })
+      .filter(Boolean);
   }
-  if (title) return [String(title)];
-  return [];
+  if (!title) return [];
+  return String(title)
+    .split('\n')
+    .map(function (line) {
+      return line.trim();
+    })
+    .filter(Boolean);
 }
 
 function resolveWorkCaption(work) {
@@ -100,9 +107,18 @@ function renderWorkMeta(work, series) {
     }
 
     if (key === 'title') {
-      cap.title.forEach(function (line) {
-        pushLine(line, captionLineClass('title'));
-      });
+      if (!cap.title.length) return;
+      if (cap.title.length === 1) {
+        pushLine(cap.title[0], captionLineClass('title'));
+        return;
+      }
+      current.push(
+        '<span class="gallery__meta-line ' +
+          captionLineClass('title') +
+          ' gallery__meta-title--multiline">' +
+          cap.title.map(escapeHtml).join('<br>') +
+          '</span>'
+      );
       return;
     }
 

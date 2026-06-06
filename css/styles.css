@@ -836,9 +836,8 @@ a:hover {
   margin-top: 0;
 }
 
-.gallery__meta-group--info .gallery__meta-title + .gallery__meta-title {
-  margin-top: -0.1rem;
-  line-height: 1.3;
+.gallery__meta-title--multiline {
+  line-height: 1.35;
 }
 
 .gallery__meta-group--info .gallery__meta-line {
