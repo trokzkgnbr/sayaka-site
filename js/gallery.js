@@ -21,9 +21,19 @@ function getGallerySlug() {
   return fromQuery || 'dawn';
 }
 
+function normalizeTitleLines(title) {
+  if (Array.isArray(title)) {
+    return title.map(function (line) {
+      return String(line).trim();
+    }).filter(Boolean);
+  }
+  if (title) return [String(title)];
+  return [];
+}
+
 function resolveWorkCaption(work) {
   return {
-    title: work.title || '',
+    title: normalizeTitleLines(work.title),
     year: work.year || '',
     size: work.size || '',
     medium: work.medium || '',
@@ -86,6 +96,13 @@ function renderWorkMeta(work, series) {
         pushLine(line, captionLineClass('poem'));
       });
       flushGroup();
+      return;
+    }
+
+    if (key === 'title') {
+      cap.title.forEach(function (line) {
+        pushLine(line, captionLineClass('title'));
+      });
       return;
     }
 

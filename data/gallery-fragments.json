@@ -40,15 +40,14 @@
     },
     {
       "src": "images/gallery/fragments/04.jpg",
-      "alt": "海が青くて空が青くて",
-      "title": "海が青くて空が青くて",
+      "alt": "海が青くて空が青くて それがいまみえているわたしの世界",
+      "title": [
+        "海が青くて空が青くて",
+        "それがいまみえているわたしの世界"
+      ],
       "year": "2017",
       "size": "803×1000mm",
-      "medium": "oil on canvas",
-      "captionOrder": ["title", "poem", "year", "size", "medium"],
-      "poem": [
-        "それがいまみえているわたしの世界"
-      ]
+      "medium": "oil on canvas"
     }
   ]
 }
