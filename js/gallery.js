@@ -73,7 +73,7 @@ function renderWorkMeta(work) {
 
 var galleryUniformFitSchedule = null;
 
-/** 各作品を一画面に収め、最小の安全横幅に全画像を揃える */
+/** dawn 基準の共通横幅を全カテゴリに適用し、ディスプレイ中央に配置 */
 function applyGalleryImageSize() {
   if (!window.ArtworkSize || typeof ArtworkSize.bindGalleryUniformFit !== 'function') {
     return;
