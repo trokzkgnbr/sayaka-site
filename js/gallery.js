@@ -188,7 +188,11 @@ function renderGallery(series) {
 
   const titleEl = document.getElementById('gallery-page-title');
   if (titleEl) titleEl.textContent = series.title;
-  document.title = series.title + ' | Gallery';
+  if (window.SITE && typeof SITE.pageTitle === 'function') {
+    document.title = SITE.pageTitle('gallery');
+  } else {
+    document.title = 'SAYAYOSUI｜gallery';
+  }
 
   const fragment = document.createDocumentFragment();
 

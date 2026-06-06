@@ -34,13 +34,21 @@
       .join('');
   }
 
+  function setPageTitle() {
+    if (window.SITE && typeof SITE.pageTitle === 'function') {
+      document.title = SITE.pageTitle('blog');
+      return;
+    }
+    document.title = 'SAYAYOSUI｜blog';
+  }
+
   function showError(message) {
     root.innerHTML =
       '<p class="diary-empty" role="alert">' +
       escapeHtml(message) +
       '</p>' +
       '<p class="diary-back-wrap"><a class="diary-back" href="diary.html">blog 一覧へ</a></p>';
-    document.title = 'blog | Portfolio';
+    setPageTitle();
   }
 
   if (!postId) {
@@ -62,7 +70,7 @@
         return;
       }
 
-      document.title = post.title + ' | blog';
+      setPageTitle();
 
       root.innerHTML =
         '<p class="diary-back-wrap"><a class="diary-back" href="diary.html">← blog 一覧</a></p>' +

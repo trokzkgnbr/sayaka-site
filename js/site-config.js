@@ -1,5 +1,11 @@
 /** サイト共通設定（文言・画像パスはここで差し替え） */
 window.SITE = {
+  /** ブラウザタブタイトル（SAYAYOSUI｜home 形式） */
+  siteBrand: 'SAYAYOSUI',
+  pageTitle: function (pageName) {
+    return this.siteBrand + '｜' + pageName;
+  },
+
   /** CSS/JS の ?v= と揃える（更新時は HTML の ?v= も同じ番号に） */
   assetVersion: '37',
   artistNameJa: '羊水サヤ',
