@@ -215,6 +215,10 @@ function renderGallery(series) {
     img.className = 'gallery__img';
     img.src = work.src;
     img.alt = work.alt || work.title || '';
+    if (work.width > 0 && work.height > 0) {
+      img.width = work.width;
+      img.height = work.height;
+    }
     img.loading = imageIndex < 2 ? 'eager' : 'lazy';
     img.decoding = 'async';
     article.appendChild(img);
@@ -237,7 +241,7 @@ function loadGallerySeries(slug) {
 
   root.innerHTML = '<p class="gallery-empty" role="status">読み込み中…</p>';
 
-  return fetch('data/gallery-' + slug + '.json', { cache: 'no-store' })
+  return fetch('data/gallery-' + slug + '.json')
     .then(function (res) {
       if (!res.ok) throw new Error('gallery data load failed');
       return res.json();

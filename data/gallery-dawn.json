@@ -6,7 +6,11 @@
       "alt": "そして夜明けを拒むでしょう",
       "title": "そして夜明けを拒むでしょう",
       "year": "2021年度　卒業制作",
-      "captionOrder": ["poem", "title", "year"],
+      "captionOrder": [
+        "poem",
+        "title",
+        "year"
+      ],
       "poem": [
         "今日はいつもとは違う道",
         "花束を抱えて鯨の後ろを追いかけた",
@@ -21,7 +25,9 @@
         "美しくて醜い魂が零れる滴のように",
         "いつしか蝶に呼ばれて",
         "天に還る"
-      ]
+      ],
+      "width": 2400,
+      "height": 1607
     },
     {
       "src": "images/gallery/dawn/02.jpg",
@@ -29,7 +35,12 @@
       "title": "いつもあたたかく瞬く",
       "size": "455×606mm",
       "medium": "oil, charcoal on canvas",
-      "captionOrder": ["title", "size", "medium", "poem"],
+      "captionOrder": [
+        "title",
+        "size",
+        "medium",
+        "poem"
+      ],
       "poem": [
         "「何処に行くの」まだいかないよ",
         "「此処に居ないの」まだいかないよ",
@@ -37,7 +48,9 @@
         "「もう行くの」まだいかないよ",
         "「何時行くの」まだいかないよ",
         "「まだ行かないの」まだ行かないよ"
-      ]
+      ],
+      "width": 2400,
+      "height": 1803
     },
     {
       "src": "images/gallery/dawn/03.jpg",
@@ -45,12 +58,19 @@
       "title": "夜空を飛んであなたの夜の中へ",
       "size": "1303×1940mm",
       "medium": "oil on canvas",
-      "captionOrder": ["title", "size", "medium", "poem"],
+      "captionOrder": [
+        "title",
+        "size",
+        "medium",
+        "poem"
+      ],
       "poem": [
         "空を見上げたら月を探すから",
         "真っ暗な夜もうめつくすほど",
         "あなたの光になってあげる"
-      ]
+      ],
+      "width": 2400,
+      "height": 1607
     },
     {
       "src": "images/gallery/dawn/04.jpg",
@@ -58,12 +78,19 @@
       "title": "今日からあなたはわたしの夢だけをみる",
       "size": "1303×1940mm",
       "medium": "oil on canvas",
-      "captionOrder": ["title", "size", "medium", "poem"],
+      "captionOrder": [
+        "title",
+        "size",
+        "medium",
+        "poem"
+      ],
       "poem": [
         "美しくて醜い魂が零れる滴のように",
         "いつしか蝶に呼ばれて",
         "天に還る"
-      ]
+      ],
+      "width": 2400,
+      "height": 1607
     },
     {
       "src": "images/gallery/dawn/05.jpg",
@@ -71,7 +98,12 @@
       "title": "星の数と同じだけ",
       "size": "410×318mm",
       "medium": "oil, charcoal, pastel on canvas",
-      "captionOrder": ["title", "size", "medium", "poem"],
+      "captionOrder": [
+        "title",
+        "size",
+        "medium",
+        "poem"
+      ],
       "poem": [
         "ちいちゃな星のかけらを",
         "ちいちゃなおててで掬いあげた",
@@ -82,7 +114,9 @@
         "空を泳いだら",
         "紙飛行機に乗って",
         "またねをした"
-      ]
+      ],
+      "width": 1856,
+      "height": 2400
     },
     {
       "src": "images/gallery/dawn/06.jpg",
@@ -90,7 +124,12 @@
       "title": "満ちる途中",
       "size": "300×400mm",
       "medium": "oil, charcoal on canvas",
-      "captionOrder": ["title", "size", "medium", "poem"],
+      "captionOrder": [
+        "title",
+        "size",
+        "medium",
+        "poem"
+      ],
       "poem": [
         "風はいつも通り過ぎて",
         "回り道をする",
@@ -103,14 +142,21 @@
         "そして",
         "やがて丸く消えていく",
         "結末を揺らして通り過ぎていく"
-      ]
+      ],
+      "width": 2400,
+      "height": 1777
     },
     {
       "src": "images/gallery/dawn/07.jpg",
       "alt": "walk in a dream",
       "title": "walk in a dream",
       "size": "300×400mm",
-      "captionOrder": ["title", "size"]
+      "captionOrder": [
+        "title",
+        "size"
+      ],
+      "width": 2400,
+      "height": 1777
     },
     {
       "src": "images/gallery/dawn/08.jpg",
@@ -118,7 +164,12 @@
       "title": "あの遠くにある木の中の後ろ",
       "size": "1303×1940mm",
       "medium": "oil, charcoal on canvas",
-      "captionOrder": ["title", "size", "medium", "poem"],
+      "captionOrder": [
+        "title",
+        "size",
+        "medium",
+        "poem"
+      ],
       "poem": [
         "毎日みる風景",
         "今日はいつもとは違う道",
@@ -130,7 +181,9 @@
         "流れ星が落ちてきて手の上で居眠りしている",
         "丘の上のグレーの中は",
         "いつもよりちょっとだけ雪がまっていた"
-      ]
+      ],
+      "width": 2400,
+      "height": 1607
     }
   ]
 }

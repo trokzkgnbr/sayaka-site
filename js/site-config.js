@@ -1,7 +1,7 @@
 /** サイト共通設定（文言・画像パスはここで差し替え） */
 window.SITE = {
   /** CSS/JS の ?v= と揃える（更新時は HTML の ?v= も同じ番号に） */
-  assetVersion: '22',
+  assetVersion: '37',
   artistNameJa: '羊水サヤ',
   artistNameEn: 'Saya Yosui',
   role: '油絵作家 / 作詞家',
