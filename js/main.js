@@ -34,11 +34,11 @@ function initSiteBrand() {
   const logoSrc = SITE.logo || '';
   const logo2x = SITE.logo2x || '';
   const logoAlt = SITE.artistNameEn || SITE.siteBrand || '';
-  const logoW = SITE.logoWidth || 115;
-  const logoH = SITE.logoHeight || 30;
-  const srcset = logo2x
-    ? ` srcset="${logoSrc}${v} 1x, ${logo2x}${v} 2x"`
-    : '';
+  const logoW = SITE.logoWidth || 1024;
+  const logoH = SITE.logoHeight || 267;
+  const isSvg = logoSrc.endsWith('.svg');
+  const srcset =
+    logo2x && !isSvg ? ` srcset="${logoSrc}${v} 1x, ${logo2x}${v} 2x"` : '';
   brand.innerHTML = logoSrc
     ? `<img class="site-brand__img" src="${logoSrc}${v}"${srcset} alt="${logoAlt}" width="${logoW}" height="${logoH}">`
     : `<span class="site-brand__en">${SITE.artistNameEn}</span>`;

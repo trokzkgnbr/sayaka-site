@@ -4,3 +4,6 @@ __pycache__/
 scripts/.venv/
 .DS_Store
 _site/
+images/logo-source.tmp
+images/logo-transparent*.png
+images/logo-procreate-thumb.png
