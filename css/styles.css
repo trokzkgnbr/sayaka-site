@@ -12,7 +12,7 @@
   --header-shell-pad-top: 1rem;
   --header-shell-pad-x: clamp(1rem, 4vw, 3rem);
   --header-shell-pad-bottom: 0.85rem;
-  --header-brand-col: clamp(7.5rem, 16vw, 10.5rem);
+  --header-brand-col: clamp(8rem, 18vw, 12rem);
   --header-nav-pad-top: 0.15rem;
   --header-sns-pad-top: 0.2rem;
   --header-nav-gap: clamp(0.75rem, 2.4vw, 1.8rem);
@@ -1253,6 +1253,14 @@ body {
   color: var(--text);
 }
 
+.site-brand__img {
+  display: block;
+  height: clamp(1.25rem, 2.4vw, 1.85rem);
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
 /* バナー・メニュー各項目 — JS で delay を付与（20秒でにじんで消える。visibility は切らない） */
 .header-melt-segment {
   animation: header-segment-melt var(--header-segment-melt-duration) linear forwards;
@@ -1408,6 +1416,7 @@ body {
   }
 
   .site-brand__en,
+  .site-brand__img,
   .gallery-category-nav__link {
     animation: none;
     opacity: 1;

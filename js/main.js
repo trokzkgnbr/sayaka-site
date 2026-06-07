@@ -30,7 +30,12 @@ function initSiteBrand() {
   const brand = document.createElement('a');
   brand.className = 'site-brand';
   brand.href = 'index.html';
-  brand.innerHTML = `<span class="site-brand__en">${SITE.artistNameEn}</span>`;
+  const v = SITE.assetVersion ? `?v=${SITE.assetVersion}` : '';
+  const logoSrc = SITE.logo || '';
+  const logoAlt = SITE.artistNameEn || SITE.siteBrand || '';
+  brand.innerHTML = logoSrc
+    ? `<img class="site-brand__img" src="${logoSrc}${v}" alt="${logoAlt}" width="2339" height="611">`
+    : `<span class="site-brand__en">${SITE.artistNameEn}</span>`;
   brand.setAttribute('aria-label', `${SITE.artistNameJa} ${SITE.artistNameEn}`);
   header.prepend(brand);
 }
