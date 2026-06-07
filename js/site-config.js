@@ -7,7 +7,7 @@ window.SITE = {
   },
 
   /** CSS/JS の ?v= と揃える（更新時は HTML の ?v= も同じ番号に） */
-  assetVersion: '42',
+  assetVersion: '43',
   artistNameJa: '羊水サヤ',
   artistNameEn: 'Saya Yosui',
   /** ヘッダーロゴ（SVG。logo.png / logo-header*.png は原稿・フォールバック用） */
