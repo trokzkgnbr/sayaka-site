@@ -32,9 +32,15 @@ function initSiteBrand() {
   brand.href = 'index.html';
   const v = SITE.assetVersion ? `?v=${SITE.assetVersion}` : '';
   const logoSrc = SITE.logo || '';
+  const logo2x = SITE.logo2x || '';
   const logoAlt = SITE.artistNameEn || SITE.siteBrand || '';
+  const logoW = SITE.logoWidth || 115;
+  const logoH = SITE.logoHeight || 30;
+  const srcset = logo2x
+    ? ` srcset="${logoSrc}${v} 1x, ${logo2x}${v} 2x"`
+    : '';
   brand.innerHTML = logoSrc
-    ? `<img class="site-brand__img" src="${logoSrc}${v}" alt="${logoAlt}" width="2339" height="611">`
+    ? `<img class="site-brand__img" src="${logoSrc}${v}"${srcset} alt="${logoAlt}" width="${logoW}" height="${logoH}">`
     : `<span class="site-brand__en">${SITE.artistNameEn}</span>`;
   brand.setAttribute('aria-label', `${SITE.artistNameJa} ${SITE.artistNameEn}`);
   header.prepend(brand);

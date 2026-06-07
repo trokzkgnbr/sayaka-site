@@ -7,10 +7,14 @@ window.SITE = {
   },
 
   /** CSS/JS の ?v= と揃える（更新時は HTML の ?v= も同じ番号に） */
-  assetVersion: '38',
+  assetVersion: '39',
   artistNameJa: '羊水サヤ',
   artistNameEn: 'Saya Yosui',
-  logo: 'images/logo.png',
+  /** ヘッダーロゴ（表示サイズに合わせた PNG。logo.png は原稿用） */
+  logo: 'images/logo-header.png',
+  logo2x: 'images/logo-header@2x.png',
+  logoWidth: 115,
+  logoHeight: 30,
   role: '油絵作家 / 作詞家',
   email: 'pikinsaya@gmail.com',
   mailSubject: 'Portfolio サイトからのお問い合わせ',

@@ -1259,6 +1259,9 @@ body {
   width: auto;
   max-width: 100%;
   object-fit: contain;
+  image-rendering: auto;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
 }
 
 /* バナー・メニュー各項目 — JS で delay を付与（20秒でにじんで消える。visibility は切らない） */
