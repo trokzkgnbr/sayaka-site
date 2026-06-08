@@ -20,9 +20,9 @@
   --header-melt-duration: 22s;
   --header-segment-melt-duration: 20s;
   --header-segment-melt-max-delay: 10s;
-  --header-melt-offset: 1s;
-  --header-melt-initial-opacity: 0.973;
-  --header-melt-initial-blur: 0.17px;
+  --header-melt-offset: 3s;
+  --header-melt-initial-opacity: 0.92;
+  --header-melt-initial-blur: 0.5px;
   --page-pad: clamp(1.25rem, 5vw, 2.5rem);
   --max-w: 720px;
   --max-w-wide: 1100px;
@@ -1330,8 +1330,8 @@ body {
 
 @keyframes header-segment-melt {
   0% {
-    opacity: 0.973;
-    filter: blur(0.17px);
+    opacity: 0.92;
+    filter: blur(0.5px);
   }
   15% {
     opacity: 0.92;
