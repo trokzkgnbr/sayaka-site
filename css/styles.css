@@ -20,9 +20,9 @@
   --header-melt-duration: 22s;
   --header-segment-melt-duration: 20s;
   --header-segment-melt-max-delay: 10s;
-  --header-melt-offset: 3s;
-  --header-melt-initial-opacity: 0.92;
-  --header-melt-initial-blur: 0.5px;
+  --header-melt-offset: 5s;
+  --header-melt-initial-opacity: 0.827;
+  --header-melt-initial-blur: 1.17px;
   --page-pad: clamp(1.25rem, 5vw, 2.5rem);
   --max-w: 720px;
   --max-w-wide: 1100px;
@@ -216,7 +216,6 @@ a:hover {
   color: var(--text);
   background: transparent;
   opacity: 0.88;
-  filter: none;
   transition: opacity 0.2s var(--ease);
 }
 
@@ -235,7 +234,6 @@ a:hover {
 .page-home .site-header--ethereal .site-sns__link {
   color: rgba(255, 255, 255, 0.94);
   background: transparent;
-  filter: none;
 }
 
 .page-home .site-header--ethereal .site-sns__link:hover {
@@ -246,13 +244,11 @@ a:hover {
 .page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-sns__link {
   color: rgba(255, 255, 255, 0.93);
   background: transparent;
-  filter: none;
 }
 
 .page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-sns__link {
   color: var(--text);
   background: transparent;
-  filter: none;
 }
 
 /* .site-nav__link typography — unified below with .site-header scope */
@@ -1305,7 +1301,7 @@ body {
   backface-visibility: hidden;
 }
 
-/* ロゴ・メニュー・SNS — にじみ開始直後（約1秒）の状態から表示 */
+/* ロゴ・メニュー・SNS — にじみ開始直後（約5秒）の状態から表示 */
 .site-brand,
 .site-header .site-nav__link,
 .site-header .site-nav__submenu-link,
@@ -1330,8 +1326,8 @@ body {
 
 @keyframes header-segment-melt {
   0% {
-    opacity: 0.92;
-    filter: blur(0.5px);
+    opacity: 0.827;
+    filter: blur(1.17px);
   }
   15% {
     opacity: 0.92;
@@ -1615,7 +1611,6 @@ body {
   height: auto;
   padding: 0.15rem;
   background: transparent;
-  filter: none;
 }
 
 .site-header .site-sns__link:not(.header-melt-segment):hover {
@@ -1634,7 +1629,6 @@ body {
   -webkit-text-fill-color: var(--text) !important;
   text-shadow: none !important;
   background: transparent !important;
-  filter: none !important;
 }
 
 .page-inner .site-bg {
