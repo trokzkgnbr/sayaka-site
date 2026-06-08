@@ -1071,7 +1071,7 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
 .diary-back {
   font-size: 0.75rem;
   letter-spacing: 0.16em;
-  text-transform: uppercase;
+  text-transform: lowercase;
   color: var(--text-muted);
   text-decoration: none;
   transition: color 0.25s var(--ease);
@@ -1108,10 +1108,18 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
   margin: 0;
 }
 
+.diary-detail__content {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(1rem, 3vw, 1.75rem);
+}
+
 .diary-detail__figure {
-  margin: 0 auto 1.5rem;
+  flex: 0 0 9rem;
+  width: 9rem;
+  height: 9rem;
+  margin: 0;
   padding: 0;
-  max-width: min(100%, 28rem);
   aspect-ratio: 1;
   background: #fff;
   overflow: hidden;
@@ -1126,7 +1134,9 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
 }
 
 .diary-detail__body {
-  max-width: 38rem;
+  flex: 1;
+  min-width: 0;
+  max-width: none;
 }
 
 .diary-detail__body p {
@@ -1147,6 +1157,10 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
   .diary-card__thumb {
     width: min(100%, 12rem);
     flex-basis: auto;
+  }
+
+  .diary-detail__content {
+    flex-direction: column;
   }
 }
 
@@ -1932,5 +1946,21 @@ body.page-inner .diary-detail__body {
   /* Gallery: サブカテゴリのサイドバーはスマホでは非表示（ヘッダーの Gallery から遷移） */
   .gallery-category-nav {
     display: none;
+  }
+
+  /* Profile: スマホは左端揃え・ギャラリー詩と同じ文字サイズ */
+  body.page-inner .page-main--about > * {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  body.page-inner .page-main--about .about-body p,
+  body.page-inner .page-main--about .profile-bio p,
+  body.page-inner .page-main--about .profile-cv li {
+    font-size: 0.82rem;
+    letter-spacing: 0.06em;
+    line-height: 1.75;
   }
 }

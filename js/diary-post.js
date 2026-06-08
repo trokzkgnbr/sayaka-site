@@ -84,13 +84,15 @@
         escapeHtml(formatDate(post.date)) +
         '</time>' +
         '</header>' +
+        '<div class="diary-detail__content">' +
         '<figure class="diary-detail__figure">' +
         '<img src="' +
         escapeHtml(post.image) +
-        '" alt="" width="960" height="960" loading="eager" decoding="async">' +
+        '" alt="" width="360" height="360" loading="eager" decoding="async">' +
         '</figure>' +
         '<div class="diary-detail__body prose">' +
         renderBody(post.body) +
+        '</div>' +
         '</div>';
     })
     .catch(function () {
