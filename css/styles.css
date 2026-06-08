@@ -20,6 +20,9 @@
   --header-melt-duration: 22s;
   --header-segment-melt-duration: 20s;
   --header-segment-melt-max-delay: 10s;
+  --header-melt-offset: 1s;
+  --header-melt-initial-opacity: 0.973;
+  --header-melt-initial-blur: 0.17px;
   --page-pad: clamp(1.25rem, 5vw, 2.5rem);
   --max-w: 720px;
   --max-w-wide: 1100px;
@@ -383,12 +386,37 @@ a:hover {
   background: transparent;
 }
 
-.profile-bio p {
-  margin: 0 0 0.65rem;
+.profile-line {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5em;
+  margin: 0;
   line-height: 1.75;
 }
 
-.profile-bio p:last-child {
+.profile-year {
+  flex: 0 0 2.75em;
+  width: 2.75em;
+}
+
+.profile-line__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.profile-line__sub {
+  display: block;
+}
+
+.profile-line__sub--deep {
+  padding-left: 1.25em;
+}
+
+.profile-bio .profile-line {
+  margin-bottom: 0.65rem;
+}
+
+.profile-bio .profile-line:last-child {
   margin-bottom: 0;
 }
 
@@ -411,13 +439,12 @@ a:hover {
   margin: 0;
 }
 
-.about-body .profile-cv li {
-  margin: 0 0 1rem;
-  line-height: 1.75;
+.about-body .profile-cv .profile-line {
+  margin-bottom: 1rem;
   letter-spacing: 0.02em;
 }
 
-.about-body .profile-cv li:last-child {
+.about-body .profile-cv .profile-line:last-child {
   margin-bottom: 0;
 }
 
@@ -1278,10 +1305,20 @@ body {
   backface-visibility: hidden;
 }
 
+/* ロゴ・メニュー・SNS — にじみ開始直後（約1秒）の状態から表示 */
+.site-brand,
+.site-header .site-nav__link,
+.site-header .site-nav__submenu-link,
+.site-header .site-sns__link,
+.gallery-category-nav__link {
+  opacity: var(--header-melt-initial-opacity);
+  filter: blur(var(--header-melt-initial-blur));
+}
+
 /* バナー・メニュー各項目 — JS で delay を付与（20秒でにじんで消える。visibility は切らない） */
 .header-melt-segment {
-  animation: header-segment-melt var(--header-segment-melt-duration) linear forwards;
-  animation-delay: var(--header-melt-delay, 0s);
+  animation: header-segment-melt var(--header-segment-melt-duration) linear both;
+  animation-delay: calc(var(--header-melt-delay, 0s) - var(--header-melt-offset));
   will-change: opacity, filter;
   transition: none !important;
 }
@@ -1293,8 +1330,8 @@ body {
 
 @keyframes header-segment-melt {
   0% {
-    opacity: 1;
-    filter: blur(0);
+    opacity: 0.973;
+    filter: blur(0.17px);
   }
   15% {
     opacity: 0.92;
@@ -1432,8 +1469,12 @@ body {
     visibility: visible;
   }
 
+  .site-brand,
   .site-brand__en,
   .site-brand__img,
+  .site-header .site-nav__link,
+  .site-header .site-nav__submenu-link,
+  .site-header .site-sns__link,
   .gallery-category-nav__link {
     animation: none;
     opacity: 1;

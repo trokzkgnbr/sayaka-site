@@ -33,25 +33,32 @@ window.SITE = {
 
   profileLong: `
     <div class="profile-bio">
-      <p>1999　愛知県に生まれる</p>
-      <p>2022　武蔵野美術大学 卒業</p>
-      <p>2025　公益財団法人かすがい市民文化財団<br>　　　みんなの美術部　美術部サポーター</p>
+      <p class="profile-line"><span class="profile-year">1999</span><span class="profile-line__text">愛知県に生まれる</span></p>
+      <p class="profile-line"><span class="profile-year">2022</span><span class="profile-line__text">武蔵野美術大学 卒業</span></p>
+      <p class="profile-line"><span class="profile-year">2025</span><span class="profile-line__text">公益財団法人かすがい市民文化財団</span></p>
+      <p class="profile-line"><span class="profile-year" aria-hidden="true"></span><span class="profile-line__text">みんなの美術部　美術部サポーター</span></p>
     </div>
 
     <h2 class="profile-section-title">statement</h2>
     <p>小さな幸せ 小さな愛を届ける<br>わたしの役目です.</p>
-    <p>わたしにとって絵を描くということは<br>人が神に祈りを捧げるということと似ているのかもしれません.</p>
-    <p>ひとは本能的に1番大事にしてしまっているものがそれぞれありますが<br>わたしは圧倒的に美しさを1番大事に思っています.<br>美しいということも人それぞれのカタチがあるでしょう.</p>
-    <p>自分が持つ美しさを常に探求し<br>息ができない程の美しさを産み出すために絵を描き<br>また 絵を描くという表現以外でも創造し<br>太陽の光に幸せを感じながら 水が流れるように愛を与えながら<br>日々を過ごしています.</p>
+    <p>わたしにとって絵を描くということは<br>人が神に祈りを捧げるということと<br>似ているのかもしれません.</p>
+    <p>ひとは本能的に<br>1番大事にしてしまっているものがそれぞれありますが<br>わたしは圧倒的に美しさを1番大事に思っています.<br>美しいということも人それぞれのカタチがあるでしょう.</p>
+    <p>自分が持つ美しさを常に探求し<br>息ができない程の美しさを産み出すために絵を描き<br>また 絵を描くという表現以外でも創造し<br>太陽の光に幸せを感じながら<br>水が流れるように愛を与えながら<br>日々を過ごしています.</p>
 
     <h2 class="profile-section-title">Selected group exhibitions / Prize</h2>
     <ul class="profile-cv">
-      <li>2017　第41回 全国高等学校総合文化祭みやぎ総文 2017美術･工芸部門 愛知県代表</li>
-      <li>2018　jica独立行政法人 国際協力機構 CM作画協力</li>
-      <li>2019　武蔵野美術大学 2年進級制作展 遠藤彰子賞<br>　　　グループ展「無添加」(Space WAIZE / Tokyo)<br>　　　グループ展「ふゆやすみ」(alt_medium / Tokyo)</li>
-      <li>2020　武蔵野美術大学 コンクール 竹内一賞</li>
-      <li>2021　武蔵野美術大学 卒業制作 優秀賞<br>　　　グループ展「Path展」(Gallery Art Point / Tokyo)</li>
-      <li>2025　世界絵画大賞展 ミューズ賞</li>
+      <li class="profile-line"><span class="profile-year">2017</span><span class="profile-line__text">第41回 全国高等学校総合文化祭みやぎ総文 2017美術･工芸部門 愛知県代表</span></li>
+      <li class="profile-line"><span class="profile-year">2018</span><span class="profile-line__text">jica独立行政法人 国際協力機構 CM作画協力</span></li>
+      <li class="profile-line">
+        <span class="profile-year">2019</span>
+        <span class="profile-line__text">武蔵野美術大学 2年進級制作展 遠藤彰子賞<br><span class="profile-line__sub">グループ展「無添加」(Space WAIZE / Tokyo)</span><br><span class="profile-line__sub profile-line__sub--deep">グループ展「ふゆやすみ」(alt_medium / Tokyo)</span></span>
+      </li>
+      <li class="profile-line"><span class="profile-year">2020</span><span class="profile-line__text">武蔵野美術大学 コンクール 竹内一賞</span></li>
+      <li class="profile-line">
+        <span class="profile-year">2021</span>
+        <span class="profile-line__text">武蔵野美術大学 卒業制作 優秀賞<br><span class="profile-line__sub">グループ展「Path展」(Gallery Art Point / Tokyo)</span></span>
+      </li>
+      <li class="profile-line"><span class="profile-year">2025</span><span class="profile-line__text">世界絵画大賞展 ミューズ賞</span></li>
     </ul>
   `.trim(),
 
