@@ -1300,8 +1300,17 @@ body {
   backface-visibility: hidden;
 }
 
+/* ロゴ枠は常に不透明 — エフェクトは画像／テキスト側だけ（他ページと同じ見え方） */
+.site-brand {
+  opacity: 1 !important;
+  filter: none !important;
+  animation: none !important;
+}
+
 /* バナー・メニュー各項目 — くっきり表示 → ぼかし → delay 後ににじんで消える */
-.header-melt-segment {
+.header-melt-segment,
+.site-brand__img.header-melt-segment,
+.site-brand__en.header-melt-segment {
   opacity: 1;
   filter: none;
   animation:
@@ -1469,7 +1478,6 @@ body {
     visibility: visible;
   }
 
-  .site-brand,
   .site-brand__en,
   .site-brand__img,
   .site-header .site-nav__link,
@@ -1633,16 +1641,6 @@ body {
   -webkit-text-fill-color: var(--text) !important;
   text-shadow: none !important;
   background: transparent !important;
-}
-
-/* Home: melt 中のメニュー・SNS は絵の上で白文字＋影（ロゴは画像のまま） */
-.page-home .site-header--ethereal .site-nav__link.header-melt-segment,
-.page-home .site-header--ethereal .site-nav__submenu-link.header-melt-segment,
-.page-home .site-header--ethereal .site-sns__link.header-melt-segment,
-.page-home .site-nav__submenu-link.header-melt-segment {
-  color: rgba(255, 255, 255, 0.94) !important;
-  -webkit-text-fill-color: rgba(255, 255, 255, 0.94) !important;
-  text-shadow: var(--shadow-text-on-dark) !important;
 }
 
 .page-inner .site-bg {

@@ -2,7 +2,7 @@
   const HEADER_SEGMENT_MELT_MAX_DELAY_MS = 10000;
   const HEADER_SEGMENT_MELT_MS = 20000;
   const HEADER_MELT_SELECTOR =
-    '.site-brand, .site-header .site-nav__link, .site-header .site-nav__submenu-link, .site-header .site-sns__link, .gallery-category-nav__link';
+    '.site-brand__img, .site-brand__en, .site-header .site-nav__link, .site-header .site-nav__submenu-link, .site-header .site-sns__link, .gallery-category-nav__link';
 
   function prefersReducedMotion() {
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;

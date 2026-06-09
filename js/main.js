@@ -46,7 +46,8 @@ function initSiteBrand() {
   header.prepend(brand);
 
   if (typeof window.applyHeaderSegmentMelt === 'function') {
-    window.applyHeaderSegmentMelt(brand);
+    const meltTarget = brand.querySelector('.site-brand__img, .site-brand__en');
+    if (meltTarget) window.applyHeaderSegmentMelt(meltTarget);
   }
 }
 
