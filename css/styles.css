@@ -230,26 +230,6 @@ a:hover {
   display: block;
 }
 
-.page-home .site-header--ethereal .site-sns__link {
-  color: rgba(255, 255, 255, 0.94);
-  background: transparent;
-}
-
-.page-home .site-header--ethereal .site-sns__link:hover {
-  background: transparent;
-}
-
-.page-has-bg .site-header--overlay:not(.site-header--ethereal) .site-sns__link,
-.page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-sns__link {
-  color: rgba(255, 255, 255, 0.93);
-  background: transparent;
-}
-
-.page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-sns__link {
-  color: var(--text);
-  background: transparent;
-}
-
 /* .site-nav__link typography — unified below with .site-header scope */
 
 .site-nav__link::after {
@@ -1301,7 +1281,8 @@ body {
 }
 
 /* ロゴ枠は常に不透明 — エフェクトは画像／テキスト側だけ（他ページと同じ見え方） */
-.site-brand {
+.site-brand,
+.site-sns__link {
   opacity: 1 !important;
   filter: none !important;
   animation: none !important;
@@ -1310,7 +1291,8 @@ body {
 /* バナー・メニュー各項目 — くっきり表示 → ぼかし → delay 後ににじんで消える */
 .header-melt-segment,
 .site-brand__img.header-melt-segment,
-.site-brand__en.header-melt-segment {
+.site-brand__en.header-melt-segment,
+.site-sns__icon.header-melt-segment {
   opacity: 1;
   filter: none;
   animation:
@@ -1623,20 +1605,20 @@ body {
   height: auto;
   padding: 0.15rem;
   background: transparent;
+  color: var(--text);
+  opacity: 1;
 }
 
-.site-header .site-sns__link:not(.header-melt-segment):hover {
+.site-header .site-sns__link:hover,
+.site-header .site-sns__link:focus-visible {
   opacity: 0.5 !important;
   transform: none;
 }
 
 .page-home .site-nav__submenu-link:not(.header-melt-segment),
 .page-home .site-header--ethereal .site-nav__link:not(.header-melt-segment),
-.page-home .site-header--ethereal .site-sns__link:not(.header-melt-segment),
 .page-has-bg .site-header--overlay:not(.site-header--ethereal) .site-nav__link:not(.header-melt-segment),
-.page-has-bg .site-header--overlay:not(.site-header--ethereal) .site-sns__link:not(.header-melt-segment),
-.page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-nav__link:not(.header-melt-segment),
-.page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-sns__link:not(.header-melt-segment) {
+.page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-nav__link:not(.header-melt-segment) {
   color: var(--text) !important;
   -webkit-text-fill-color: var(--text) !important;
   text-shadow: none !important;
