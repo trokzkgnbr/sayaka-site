@@ -11,7 +11,7 @@
   function headerMeltIntroMs() {
     const root = getComputedStyle(document.documentElement);
     const sec = parseFloat(root.getPropertyValue('--header-melt-intro-duration'));
-    return Number.isFinite(sec) && sec > 0 ? sec * 1000 : 1800;
+    return Number.isFinite(sec) && sec > 0 ? sec * 1000 : 1500;
   }
 
   function headerMeltSelector() {
