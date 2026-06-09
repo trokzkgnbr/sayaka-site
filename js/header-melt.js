@@ -17,8 +17,8 @@
 
   function primeHeaderMeltLook(el) {
     const root = getComputedStyle(document.documentElement);
-    const opacity = root.getPropertyValue('--header-melt-initial-opacity').trim() || '0.827';
-    const blur = root.getPropertyValue('--header-melt-initial-blur').trim() || '1.17px';
+    const opacity = root.getPropertyValue('--header-melt-initial-opacity').trim() || '0.92';
+    const blur = root.getPropertyValue('--header-melt-initial-blur').trim() || '0.5px';
     el.style.setProperty('opacity', opacity);
     el.style.setProperty('filter', 'blur(' + blur + ')');
   }
