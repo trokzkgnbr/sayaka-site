@@ -8,6 +8,12 @@
     return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   }
 
+  function headerMeltIntroMs() {
+    const root = getComputedStyle(document.documentElement);
+    const sec = parseFloat(root.getPropertyValue('--header-melt-intro-duration'));
+    return Number.isFinite(sec) && sec > 0 ? sec * 1000 : 1800;
+  }
+
   function headerMeltSelector() {
     if (window.matchMedia('(max-width: 760px)').matches) {
       return HEADER_MELT_SELECTOR.replace(', .gallery-category-nav__link', '');
@@ -15,22 +21,10 @@
     return HEADER_MELT_SELECTOR;
   }
 
-  function primeHeaderMeltLook(el) {
-    const root = getComputedStyle(document.documentElement);
-    const opacity = root.getPropertyValue('--header-melt-initial-opacity').trim() || '0.92';
-    const blur = root.getPropertyValue('--header-melt-initial-blur').trim() || '0.5px';
-    el.style.setProperty('opacity', opacity);
-    el.style.setProperty('filter', 'blur(' + blur + ')');
-  }
-
-  function clearHeaderMeltInline(el) {
-    el.style.removeProperty('opacity');
-    el.style.removeProperty('filter');
-  }
-
   function finishHeaderMeltSegment(el) {
     el.classList.add('header-melt-segment--done');
-    clearHeaderMeltInline(el);
+    el.style.removeProperty('opacity');
+    el.style.removeProperty('filter');
   }
 
   function randomSegmentMeltDelayMs() {
@@ -45,41 +39,21 @@
       if (e.animationName === 'header-segment-melt') finishHeaderMeltSegment(el);
     });
 
-    window.setTimeout(function () {
-      if (!el.classList.contains('header-melt-segment--done')) finishHeaderMeltSegment(el);
-    }, delayMs + HEADER_SEGMENT_MELT_MS + 100);
-  }
-
-  function handoffHeaderMeltAnimation(el) {
-    el.addEventListener(
-      'animationstart',
-      function onAnimationStart(e) {
-        if (e.animationName !== 'header-segment-melt') return;
-        el.removeEventListener('animationstart', onAnimationStart);
-        clearHeaderMeltInline(el);
-      }
+    window.setTimeout(
+      function () {
+        if (!el.classList.contains('header-melt-segment--done')) finishHeaderMeltSegment(el);
+      },
+      headerMeltIntroMs() + delayMs + HEADER_SEGMENT_MELT_MS + 100
     );
-
-    window.requestAnimationFrame(function () {
-      window.requestAnimationFrame(function () {
-        const styles = getComputedStyle(el);
-        if (styles.animationName !== 'header-segment-melt') {
-          primeHeaderMeltLook(el);
-        }
-      });
-    });
   }
 
   function applyHeaderSegmentMelt(el) {
     if (!el || el.classList.contains('header-melt-segment')) return;
     if (prefersReducedMotion()) return;
 
-    primeHeaderMeltLook(el);
-
     const delayMs = randomSegmentMeltDelayMs();
     el.style.setProperty('--header-melt-delay', delayMs / 1000 + 's');
     el.classList.add('header-melt-segment');
-    handoffHeaderMeltAnimation(el);
     bindHeaderMeltSegment(el, delayMs);
   }
 

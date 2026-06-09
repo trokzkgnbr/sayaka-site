@@ -21,6 +21,7 @@
   --header-segment-melt-duration: 20s;
   --header-segment-melt-max-delay: 10s;
   --header-melt-offset: 3s;
+  --header-melt-intro-duration: 1.8s;
   --header-melt-initial-opacity: 0.92;
   --header-melt-initial-blur: 0.5px;
   --page-pad: clamp(1.25rem, 5vw, 2.5rem);
@@ -1301,24 +1302,35 @@ body {
   backface-visibility: hidden;
 }
 
-/* ロゴ・メニュー・SNS — にじみ開始直後（約3秒）の状態から表示 */
-.site-brand,
-.site-header .site-nav__link,
-.site-header .site-nav__submenu-link,
-.site-header .site-sns__link,
-.gallery-category-nav__link {
-  opacity: var(--header-melt-initial-opacity);
-  filter: blur(var(--header-melt-initial-blur));
-}
-
-/* バナー・メニュー各項目 — JS で delay を付与（20秒でにじんで消える。visibility は切らない） */
+/* バナー・メニュー各項目 — 導入でぼかしへ、JS で delay 後ににじんで消える */
 .header-melt-segment {
-  opacity: var(--header-melt-initial-opacity);
-  filter: blur(var(--header-melt-initial-blur));
-  animation: header-segment-melt var(--header-segment-melt-duration) linear both;
-  animation-delay: calc(var(--header-melt-delay, 0s) - var(--header-melt-offset));
+  animation:
+    header-segment-melt-intro var(--header-melt-intro-duration) var(--ease) forwards,
+    header-segment-melt var(--header-segment-melt-duration) linear forwards;
+  animation-delay:
+    0s,
+    calc(var(--header-melt-intro-duration) + var(--header-melt-delay, 0s));
   will-change: opacity, filter;
   transition: none !important;
+}
+
+@keyframes header-segment-melt-intro {
+  0% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  40% {
+    opacity: 0.97;
+    filter: blur(0.15px);
+  }
+  75% {
+    opacity: 0.94;
+    filter: blur(0.35px);
+  }
+  100% {
+    opacity: 0.92;
+    filter: blur(0.5px);
+  }
 }
 
 /* 消えたあともタップ領域は残す（opacity:0 のまま pointer-events は有効） */
@@ -1642,10 +1654,12 @@ body {
   color: rgba(255, 255, 255, 0.94) !important;
   -webkit-text-fill-color: rgba(255, 255, 255, 0.94) !important;
   text-shadow: var(--shadow-text-on-dark) !important;
-  opacity: var(--header-melt-initial-opacity) !important;
-  filter: blur(var(--header-melt-initial-blur)) !important;
-  animation: header-segment-melt var(--header-segment-melt-duration) linear both;
-  animation-delay: calc(var(--header-melt-delay, 0s) - var(--header-melt-offset));
+  animation:
+    header-segment-melt-intro var(--header-melt-intro-duration) var(--ease) forwards,
+    header-segment-melt var(--header-segment-melt-duration) linear forwards;
+  animation-delay:
+    0s,
+    calc(var(--header-melt-intro-duration) + var(--header-melt-delay, 0s));
   transition: none !important;
 }
 
