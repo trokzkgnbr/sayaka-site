@@ -158,6 +158,9 @@ function initGalleryCategoryNav() {
       link.classList.add('is-active');
       link.setAttribute('aria-current', 'page');
     }
+    if (typeof window.applyHeaderSegmentMelt === 'function') {
+      window.applyHeaderSegmentMelt(link);
+    }
     li.appendChild(link);
     list.appendChild(li);
   });

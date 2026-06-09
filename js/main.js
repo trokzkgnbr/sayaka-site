@@ -44,47 +44,10 @@ function initSiteBrand() {
     : `<span class="site-brand__en">${SITE.artistNameEn}</span>`;
   brand.setAttribute('aria-label', `${SITE.artistNameJa} ${SITE.artistNameEn}`);
   header.prepend(brand);
-}
 
-const HEADER_SEGMENT_MELT_MAX_DELAY_MS = 10000;
-const HEADER_SEGMENT_MELT_MS = 20000;
-
-function finishHeaderMeltSegment(el) {
-  el.classList.add('header-melt-segment--done');
-}
-
-function randomSegmentMeltDelayMs() {
-  return Math.floor(Math.random() * (HEADER_SEGMENT_MELT_MAX_DELAY_MS + 1));
-}
-
-function applyHeaderSegmentMelt(el) {
-  if (el.classList.contains('header-melt-segment')) return;
-
-  const delayMs = randomSegmentMeltDelayMs();
-  el.style.setProperty('--header-melt-delay', delayMs / 1000 + 's');
-  el.classList.add('header-melt-segment');
-
-  el.addEventListener('animationend', function (e) {
-    if (e.animationName === 'header-segment-melt') finishHeaderMeltSegment(el);
-  });
-
-  window.setTimeout(function () {
-    if (!el.classList.contains('header-melt-segment--done')) finishHeaderMeltSegment(el);
-  }, delayMs + HEADER_SEGMENT_MELT_MS + 100);
-}
-
-/** バナー・メニュー・SNS を個別タイミングで消す（アニメーション終了までにじんで消える） */
-function initHeaderSegmentMelt() {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-  const segmentSelector =
-    '.site-brand, .site-header .site-nav__link, .site-header .site-nav__submenu-link, .site-header .site-sns__link';
-  const segments = document.querySelectorAll(
-    window.matchMedia('(max-width: 760px)').matches
-      ? segmentSelector
-      : segmentSelector + ', .gallery-category-nav__link'
-  );
-  segments.forEach(applyHeaderSegmentMelt);
+  if (typeof window.applyHeaderSegmentMelt === 'function') {
+    window.applyHeaderSegmentMelt(brand);
+  }
 }
 
 /** Home で計算した作品幅を profile / blog 等でも使う */
@@ -102,7 +65,9 @@ function initArtworkColumnWidth() {
 
 function initMain() {
   initSiteBrand();
-  initHeaderSegmentMelt();
+  if (typeof window.initHeaderSegmentMelt === 'function') {
+    window.initHeaderSegmentMelt();
+  }
   initHeaderOnScroll();
   initYear();
   initFooterName();
@@ -111,9 +76,6 @@ function initMain() {
 
 function bootMain() {
   initMain();
-  window.addEventListener('load', function () {
-    window.setTimeout(initHeaderSegmentMelt, 0);
-  });
 }
 
 if (document.readyState === 'loading') {

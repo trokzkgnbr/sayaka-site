@@ -24,6 +24,9 @@ function renderSns() {
     a.setAttribute('data-sns', key);
     a.setAttribute('aria-label', SNS_LABELS[key] || key);
     a.innerHTML = SNS_SVG[key] || '';
+    if (typeof window.applyHeaderSegmentMelt === 'function') {
+      window.applyHeaderSegmentMelt(a);
+    }
     fragment.appendChild(a);
   }
 

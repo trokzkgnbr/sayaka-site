@@ -1313,6 +1313,8 @@ body {
 
 /* バナー・メニュー各項目 — JS で delay を付与（20秒でにじんで消える。visibility は切らない） */
 .header-melt-segment {
+  opacity: var(--header-melt-initial-opacity);
+  filter: blur(var(--header-melt-initial-blur));
   animation: header-segment-melt var(--header-segment-melt-duration) linear both;
   animation-delay: calc(var(--header-melt-delay, 0s) - var(--header-melt-offset));
   will-change: opacity, filter;

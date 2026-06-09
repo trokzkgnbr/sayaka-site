@@ -41,6 +41,9 @@
         }
         mainLink.href = mainHref;
         mainLink.textContent = item.label;
+        if (typeof window.applyHeaderSegmentMelt === 'function') {
+          window.applyHeaderSegmentMelt(mainLink);
+        }
         wrap.appendChild(mainLink);
 
         var sub = document.createElement('ul');
@@ -56,6 +59,9 @@
           subLink.href = cat.href;
           subLink.textContent = cat.label;
           subLink.setAttribute('role', 'menuitem');
+          if (typeof window.applyHeaderSegmentMelt === 'function') {
+            window.applyHeaderSegmentMelt(subLink);
+          }
           if (galleryCategory === cat.slug) {
             subLink.classList.add('is-active');
             subLink.setAttribute('aria-current', 'page');
@@ -76,6 +82,9 @@
       link.className = 'site-nav__link';
       link.href = item.href;
       link.textContent = item.label;
+      if (typeof window.applyHeaderSegmentMelt === 'function') {
+        window.applyHeaderSegmentMelt(link);
+      }
 
       var isActive =
         (item.id === 'home' && page === 'home') ||
