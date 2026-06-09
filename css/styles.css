@@ -1271,7 +1271,7 @@ body {
 
 .site-brand__img {
   display: block;
-  height: clamp(1.625rem, 3.1vw, 2.4rem);
+  height: clamp(1.22rem, 2.325vw, 1.8rem);
   width: auto;
   max-width: 100%;
   object-fit: contain;
