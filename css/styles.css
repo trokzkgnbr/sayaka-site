@@ -1620,17 +1620,33 @@ body {
   transform: none;
 }
 
-.page-home .site-nav__submenu-link,
-.page-home .site-header--ethereal .site-nav__link,
-.page-home .site-header--ethereal .site-sns__link,
-.page-has-bg .site-header--overlay:not(.site-header--ethereal) .site-nav__link,
-.page-has-bg .site-header--overlay:not(.site-header--ethereal) .site-sns__link,
-.page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-nav__link,
-.page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-sns__link {
+.page-home .site-nav__submenu-link:not(.header-melt-segment),
+.page-home .site-header--ethereal .site-nav__link:not(.header-melt-segment),
+.page-home .site-header--ethereal .site-sns__link:not(.header-melt-segment),
+.page-has-bg .site-header--overlay:not(.site-header--ethereal) .site-nav__link:not(.header-melt-segment),
+.page-has-bg .site-header--overlay:not(.site-header--ethereal) .site-sns__link:not(.header-melt-segment),
+.page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-nav__link:not(.header-melt-segment),
+.page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) .site-sns__link:not(.header-melt-segment) {
   color: var(--text) !important;
   -webkit-text-fill-color: var(--text) !important;
   text-shadow: none !important;
   background: transparent !important;
+}
+
+/* Home: melt 適用時もぼかしを維持（絵の上は白文字＋影） */
+.page-home .site-header--ethereal .site-brand.header-melt-segment,
+.page-home .site-header--ethereal .site-nav__link.header-melt-segment,
+.page-home .site-header--ethereal .site-nav__submenu-link.header-melt-segment,
+.page-home .site-header--ethereal .site-sns__link.header-melt-segment,
+.page-home .site-nav__submenu-link.header-melt-segment {
+  color: rgba(255, 255, 255, 0.94) !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0.94) !important;
+  text-shadow: var(--shadow-text-on-dark) !important;
+  opacity: var(--header-melt-initial-opacity) !important;
+  filter: blur(var(--header-melt-initial-blur)) !important;
+  animation: header-segment-melt var(--header-segment-melt-duration) linear both;
+  animation-delay: calc(var(--header-melt-delay, 0s) - var(--header-melt-offset));
+  transition: none !important;
 }
 
 .page-inner .site-bg {
