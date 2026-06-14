@@ -14,6 +14,10 @@ else
   : >"$OUT/.nojekyll"
 fi
 
+if [[ -f "$ROOT/CNAME" ]]; then
+  cp "$ROOT/CNAME" "$OUT/"
+fi
+
 shopt -s nullglob
 for html in "$ROOT"/*.html; do
   cp "$html" "$OUT/"
