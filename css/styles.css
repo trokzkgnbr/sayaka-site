@@ -22,6 +22,7 @@
   --header-segment-melt-max-delay: 10s;
   --header-melt-intro-duration: 1.5s;
   --header-melt-blur: 0.5px;
+  --header-melt-ease: cubic-bezier(0.33, 0, 0.15, 1);
   --page-pad: clamp(1.25rem, 5vw, 2.5rem);
   --max-w: 720px;
   --max-w-wide: 1100px;
@@ -1296,8 +1297,8 @@ body {
   opacity: 1;
   filter: none;
   animation:
-    header-melt-blur-in var(--header-melt-intro-duration) var(--ease) forwards,
-    header-segment-melt var(--header-segment-melt-duration) linear forwards;
+    header-melt-blur-in var(--header-melt-intro-duration) var(--header-melt-ease) forwards,
+    header-segment-melt var(--header-segment-melt-duration) var(--header-melt-ease) forwards;
   animation-delay:
     0s,
     calc(var(--header-melt-intro-duration) + var(--header-melt-delay, 0s));
@@ -1308,9 +1309,6 @@ body {
 @keyframes header-melt-blur-in {
   0% {
     filter: blur(0);
-  }
-  45% {
-    filter: blur(0.15px);
   }
   100% {
     filter: blur(0.5px);
@@ -1327,50 +1325,6 @@ body {
   18% {
     opacity: 1;
     filter: blur(0.5px);
-  }
-  32% {
-    opacity: 0.82;
-    filter: blur(1.5px);
-  }
-  46% {
-    opacity: 0.62;
-    filter: blur(3px);
-  }
-  58% {
-    opacity: 0.46;
-    filter: blur(5px);
-  }
-  68% {
-    opacity: 0.34;
-    filter: blur(7px);
-  }
-  76% {
-    opacity: 0.26;
-    filter: blur(9px);
-  }
-  83% {
-    opacity: 0.19;
-    filter: blur(11px);
-  }
-  88% {
-    opacity: 0.14;
-    filter: blur(13px);
-  }
-  92% {
-    opacity: 0.1;
-    filter: blur(15px);
-  }
-  95% {
-    opacity: 0.07;
-    filter: blur(17px);
-  }
-  97% {
-    opacity: 0.045;
-    filter: blur(19px);
-  }
-  98.5% {
-    opacity: 0.025;
-    filter: blur(21px);
   }
   100% {
     opacity: 0;
