@@ -51,7 +51,7 @@ window.SITE = {
       <li class="profile-line"><span class="profile-year">2018</span><span class="profile-line__text">jica独立行政法人 国際協力機構 CM作画協力</span></li>
       <li class="profile-line">
         <span class="profile-year">2019</span>
-        <span class="profile-line__text">武蔵野美術大学 2年進級制作展 遠藤彰子賞<br><span class="profile-line__sub">グループ展「無添加」(Space WAIZE / Tokyo)</span><br><span class="profile-line__sub">グループ展「ふゆやすみ」(alt_medium / Tokyo)</span></span>
+        <span class="profile-line__text">武蔵野美術大学 2年進級制作展 遠藤彰子賞<br><span class="profile-line__sub">グループ展「無添加」(Space WAIZE / Tokyo)</span><span class="profile-line__sub">グループ展「ふゆやすみ」(alt_medium / Tokyo)</span></span>
       </li>
       <li class="profile-line"><span class="profile-year">2020</span><span class="profile-line__text">武蔵野美術大学 コンクール 竹内一賞</span></li>
       <li class="profile-line">
