@@ -3,6 +3,7 @@
  * Route: /<ADMIN_PATH>/api/*
  */
 
+const PAGES_BRANCH = "gh-pages";
 const SESSION_COOKIE = "diary_admin_session";
 const SESSION_TTL = 60 * 60 * 12;
 /** Cloudflare Workers Web Crypto は PBKDF2 を最大 100000 回まで */
@@ -236,9 +237,10 @@ function githubSettings(env) {
   return { token, repo, branch };
 }
 
-async function ghRequest(env, path, { method = "GET", body = null } = {}) {
-  const { token, repo, branch } = githubSettings(env);
-  const url = `https://api.github.com/repos/${repo}/contents/${path}?ref=${encodeURIComponent(branch)}`;
+async function ghRequest(env, path, { method = "GET", body = null, branch = null } = {}) {
+  const { token, repo, branch: defaultBranch } = githubSettings(env);
+  const ref = branch || defaultBranch;
+  const url = `https://api.github.com/repos/${repo}/contents/${path}?ref=${encodeURIComponent(ref)}`;
   const headers = {
     Accept: "application/vnd.github+json",
     Authorization: `Bearer ${token}`,
@@ -259,8 +261,8 @@ async function ghRequest(env, path, { method = "GET", body = null } = {}) {
   return res.json();
 }
 
-async function getFileMeta(env, path) {
-  return ghRequest(env, path, { method: "GET" });
+async function getFileMeta(env, path, branch = null) {
+  return ghRequest(env, path, { method: "GET", branch });
 }
 
 async function loadDiary(env) {
@@ -271,12 +273,13 @@ async function loadDiary(env) {
   return { posts: Array.isArray(data.posts) ? data.posts : [] };
 }
 
-async function putFile(env, path, bytes, message, sha) {
-  const { repo, branch } = githubSettings(env);
+async function putFile(env, path, bytes, message, sha, branch = null) {
+  const { repo, branch: defaultBranch } = githubSettings(env);
+  const targetBranch = branch || defaultBranch;
   const payload = {
     message,
     content: bytesToBase64(bytes instanceof Uint8Array ? bytes : new Uint8Array(bytes)),
-    branch,
+    branch: targetBranch,
   };
   if (sha) payload.sha = sha;
   const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
@@ -301,8 +304,9 @@ function bytesToBase64(bytes) {
   return btoa(binary);
 }
 
-async function deleteFile(env, path, sha, message) {
-  const { repo, branch } = githubSettings(env);
+async function deleteFile(env, path, sha, message, branch = null) {
+  const { repo, branch: defaultBranch } = githubSettings(env);
+  const targetBranch = branch || defaultBranch;
   const res = await fetch(`https://api.github.com/repos/${repo}/contents/${path}`, {
     method: "DELETE",
     headers: {
@@ -311,31 +315,37 @@ async function deleteFile(env, path, sha, message) {
       "Content-Type": "application/json",
       "User-Agent": "sayaka-blog-admin-worker",
     },
-    body: JSON.stringify({ message, sha, branch }),
+    body: JSON.stringify({ message, sha, branch: targetBranch }),
   });
   if (!res.ok) throw new Error(`GitHub DELETE ${path}: ${await res.text()}`);
+}
+
+async function publishBranchFiles(env, diaryData, message, branch, { newImages = {}, deletedImages = [] } = {}) {
+  const enc = new TextEncoder();
+  const diaryJson = JSON.stringify(diaryData, null, 2) + "\n";
+  const diaryMeta = await getFileMeta(env, "data/diary.json", branch);
+  await putFile(env, "data/diary.json", enc.encode(diaryJson), message, diaryMeta?.sha, branch);
+
+  for (const [rel, bytes] of Object.entries(newImages)) {
+    const repoPath = rel.replace(/^\//, "");
+    const meta = await getFileMeta(env, repoPath, branch);
+    await putFile(env, repoPath, bytes, message, meta?.sha, branch);
+  }
+  for (const rel of deletedImages) {
+    const repoPath = rel.replace(/^\//, "");
+    const meta = await getFileMeta(env, repoPath, branch);
+    if (meta?.sha) await deleteFile(env, repoPath, meta.sha, message, branch);
+  }
 }
 
 async function publishDiary(env, diaryData, { newImages = {}, deletedImages = [] } = {}) {
   if (Array.isArray(diaryData.posts)) {
     diaryData.posts = sortPostsByDate(diaryData.posts);
   }
-  const message = "Update blog posts.";
-  const diaryJson = JSON.stringify(diaryData, null, 2) + "\n";
-  const enc = new TextEncoder();
-  const diaryMeta = await getFileMeta(env, "data/diary.json");
-  await putFile(env, "data/diary.json", enc.encode(diaryJson), message, diaryMeta?.sha);
-
-  for (const [rel, bytes] of Object.entries(newImages)) {
-    const repoPath = rel.replace(/^\//, "");
-    const meta = await getFileMeta(env, repoPath);
-    await putFile(env, repoPath, bytes, message, meta?.sha);
-  }
-  for (const rel of deletedImages) {
-    const repoPath = rel.replace(/^\//, "");
-    const meta = await getFileMeta(env, repoPath);
-    if (meta?.sha) await deleteFile(env, repoPath, meta.sha, message);
-  }
+  const options = { newImages, deletedImages };
+  await publishBranchFiles(env, diaryData, "Update blog posts.", githubSettings(env).branch, options);
+  // 公開 Blog（GitHub Pages）は gh-pages を参照するため、こちらも同期する
+  await publishBranchFiles(env, diaryData, "Sync public blog.", PAGES_BRANCH, options);
 }
 
 function sortPostsByDate(posts) {
