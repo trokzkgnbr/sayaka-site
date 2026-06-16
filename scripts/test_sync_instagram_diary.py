@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from sync_instagram_diary import (
     find_undeleted_posts,
     merge_diary_posts,
+    refuse_empty_api_sync,
     verify_merged_posts,
 )
 
@@ -26,6 +27,19 @@ def post(ig_id: str, title: str, date: str, published_at: str) -> dict:
         "body": title,
         "image": f"images/diary/{ig_id}.jpg",
     }
+
+
+class RefuseEmptyApiSyncTests(unittest.TestCase):
+    def test_refuses_when_api_empty_but_blog_has_posts(self) -> None:
+        msg = refuse_empty_api_sync(0, 2)
+        self.assertIsNotNone(msg)
+        self.assertIn("0 件", msg)
+
+    def test_allows_empty_when_blog_also_empty(self) -> None:
+        self.assertIsNone(refuse_empty_api_sync(0, 0))
+
+    def test_allows_when_api_returns_posts(self) -> None:
+        self.assertIsNone(refuse_empty_api_sync(3, 2))
 
 
 class MergeDiaryPostsTests(unittest.TestCase):

@@ -1,10 +1,32 @@
 {
-  "posts": [],
+  "posts": [
+    {
+      "id": "ig-18066617900410340",
+      "date": "2026-06-11",
+      "publishedAt": "2026-06-11T10:25:16Z",
+      "title": "混",
+      "body": "混\nいつかは忘れたことを思い出せるのかな\n˖|𓏪̣̣𓐇݁𓈒ֺּ ᱸ  𓈒𑁃֯⸝⸝⸝",
+      "image": "images/diary/18066617900410340.jpg",
+      "instagramMediaId": "18066617900410340"
+    },
+    {
+      "id": "ig-17885122677568221",
+      "date": "2026-06-05",
+      "publishedAt": "2026-06-05T15:01:13Z",
+      "title": "力",
+      "body": "力\no\n🐟ᐝ",
+      "image": "images/diary/17885122677568221.jpg",
+      "instagramMediaId": "17885122677568221"
+    }
+  ],
   "syncedFrom": "instagram",
   "syncLimit": 50,
   "syncLimitReached": false,
-  "syncWindowSize": 0,
-  "syncRecentManaged": 0,
-  "managedInstagramIds": [],
-  "lastSyncedAt": "2026-06-15T19:06:53Z"
+  "syncWindowSize": 2,
+  "syncRecentManaged": 2,
+  "managedInstagramIds": [
+    "18066617900410340",
+    "17885122677568221"
+  ],
+  "lastSyncedAt": "2026-06-11T18:23:34Z"
 }

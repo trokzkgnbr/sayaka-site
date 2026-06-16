@@ -89,6 +89,21 @@ def sync_limit_reached(media_count: int, limit: int) -> bool:
     return media_count >= limit
 
 
+def refuse_empty_api_sync(media_count: int, existing_post_count: int) -> str | None:
+    """
+    API が 0 件を返したのに Blog に既存投稿があるときは中止する。
+
+    期限切れトークン等で空配列だけ返るケースから、既存データを消さないため。
+    """
+    if media_count == 0 and existing_post_count > 0:
+        return (
+            f"Instagram API が投稿 0 件を返したため中止しました"
+            f"（Blog の既存 {existing_post_count} 件は変更しません）。"
+            " INSTAGRAM_ACCESS_TOKEN・INSTAGRAM_USER_ID・@4mnion の投稿を確認してください。"
+        )
+    return None
+
+
 def should_keep_unmanaged_post(
     post: dict,
     managed_window: list[tuple[str, str]],
@@ -368,11 +383,22 @@ def main() -> int:
         print(f"設定エラー: {exc}", file=sys.stderr)
         return 1
 
+    existing_posts, existing_meta = load_existing_data(data_path)
+
     try:
         media_items = iter_media(cfg["token"], cfg["user_id"], limit)
     except InstagramAPIError as exc:
         print(f"API エラー: {exc}", file=sys.stderr)
         return 1
+
+    refuse_msg = refuse_empty_api_sync(len(media_items), len(existing_posts))
+    if refuse_msg:
+        print(f"同期中止: {refuse_msg}", file=sys.stderr)
+        print(
+            f"既存 Blog {len(existing_posts)} 件は維持します（Instagram API が 0 件を返しました）。",
+            file=sys.stderr,
+        )
+        return 0
 
     managed_window = extract_managed_window(media_items)
     limit_reached = sync_limit_reached(len(media_items), limit)
@@ -383,7 +409,6 @@ def main() -> int:
         skip_video=not args.keep_video,
     )
 
-    existing_posts, existing_meta = load_existing_data(data_path)
     merged_posts = merge_diary_posts(
         existing_posts, fresh_posts, managed_window, limit_reached
     )

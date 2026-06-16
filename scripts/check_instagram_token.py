@@ -3,12 +3,18 @@
 
 from __future__ import annotations
 
+import os
 import sys
 
-from ci_resolve_instagram_token import probe_token, try_refresh
-from lib_instagram import InstagramConfigError, load_config, load_meta_app_credentials
-
-import os
+from lib_instagram import (
+    InstagramConfigError,
+    debug_token_info,
+    format_token_expiry,
+    load_config,
+    load_meta_app_credentials,
+    probe_media_access,
+)
+from maintain_instagram_tokens import maintain_from_env, print_result
 
 
 def main() -> int:
@@ -20,29 +26,49 @@ def main() -> int:
 
     token = cfg["token"]
     user_id = cfg["user_id"]
-    err = probe_token(token, user_id)
+    err = probe_media_access(token, user_id)
     if err is None:
         print("OK: このトークンで Instagram 投稿を取得できます。")
         print(f"   INSTAGRAM_USER_ID={user_id}")
+        try:
+            app_id, app_secret = load_meta_app_credentials()
+            page_info = debug_token_info(token, app_id, app_secret)
+            print(
+                f"   ページトークン: 種別={page_info.get('type', '?')}"
+                f" / 期限={format_token_expiry(page_info)}"
+            )
+            user_access = os.environ.get("INSTAGRAM_USER_ACCESS_TOKEN", "").strip()
+            if user_access:
+                user_info = debug_token_info(user_access, app_id, app_secret)
+                print(
+                    f"   ユーザートークン: 種別={user_info.get('type', '?')}"
+                    f" / 期限={format_token_expiry(user_info)}"
+                )
+        except InstagramConfigError:
+            pass
         return 0
 
-    print(f"× 現在のトークンでは取得できません:\n  {err}")
+    print(f"× 現在の INSTAGRAM_ACCESS_TOKEN では取得できません:\n  {err}")
+
     app_id = os.environ.get("INSTAGRAM_APP_ID", "").strip()
     app_secret = os.environ.get("INSTAGRAM_APP_SECRET", "").strip()
     if app_id and app_secret:
         try:
-            app_id, app_secret = load_meta_app_credentials()
-            new_token, label = try_refresh(token, app_id, app_secret, user_id)
-            if new_token:
-                print(f"OK: 再取得したページトークンは有効です（{label}）。")
-                print("   次: 表示されたトークンを GitHub Secrets の INSTAGRAM_ACCESS_TOKEN に保存")
-                print(f"\nINSTAGRAM_ACCESS_TOKEN={new_token}")
+            result = maintain_from_env(force_user_refresh=False, if_needed=False)
+            err2 = probe_media_access(result.page_token, user_id)
+            if err2 is None:
+                print_result(result)
+                print("OK: ページトークンを再取得すれば使えます。")
+                print("   次: GitHub Secrets の INSTAGRAM_ACCESS_TOKEN を更新")
+                print(f"\nINSTAGRAM_ACCESS_TOKEN={result.page_token}")
                 return 0
-        except InstagramConfigError:
-            pass
+            print(f"× 再取得後も取得できません:\n  {err2}")
+        except Exception as exc:  # noqa: BLE001
+            print(f"× 再取得に失敗: {exc}")
 
     print("\n対処: docs/INSTAGRAM_DIARY_SETUP.md の D-1〜D-3 をやり直し、")
-    print("      ページのアクセストークンを Secrets に登録してください。")
+    print("      ページトークンと INSTAGRAM_USER_ACCESS_TOKEN を Secrets に登録。")
+    print("      @4mnion に画像付き投稿があるかも確認してください。")
     return 1
 
 

@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 """
-GitHub Actions 用: Blog 同期に使える Instagram トークンを決める。
+GitHub Actions 用: Blog 同期に使える Instagram ページトークンを決める。
 
-1. INSTAGRAM_ACCESS_TOKEN（ページトークン想定）でメディア取得を試す
-2. 失敗時、INSTAGRAM_USER_ACCESS_TOKEN があればそれでページトークンを再取得
-3. なければ ACCESS_TOKEN をユーザートークンとして再取得を試す
-4. 成功したトークンを GITHUB_OUTPUT に書く
+半永久運用: INSTAGRAM_USER_ACCESS_TOKEN + APP_ID/SECRET からページトークンを再取得。
+フォールバック: 既存 INSTAGRAM_ACCESS_TOKEN が使えるならそれを使う。
 """
 
 from __future__ import annotations
@@ -16,18 +14,18 @@ import sys
 from lib_instagram import (
     InstagramAPIError,
     InstagramConfigError,
-    iter_media,
     load_config,
-    load_meta_app_credentials,
-    refresh_instagram_access_token,
+    probe_media_access,
+)
+from maintain_instagram_tokens import (
+    export_github_outputs,
+    maintain_from_env,
+    print_result,
 )
 
 TOKEN_HELP = (
-    "Graph API エクスプローラでユーザートークンを取得 "
-    "（pages_show_list, pages_read_engagement, instagram_basic）→ "
-    "Facebook ページを選びページトークンをコピー → "
-    "GitHub Secrets の INSTAGRAM_ACCESS_TOKEN を更新。"
-    " 手順: docs/INSTAGRAM_DIARY_SETUP.md の D-1〜D-3"
+    "docs/INSTAGRAM_DIARY_SETUP.md の D-2.6（半永久トークン）を実行し、"
+    " INSTAGRAM_USER_ACCESS_TOKEN / INSTAGRAM_APP_ID / INSTAGRAM_APP_SECRET を Secrets に登録。"
 )
 
 
@@ -40,39 +38,6 @@ def write_github_output(name: str, value: str) -> None:
         fh.write(f"{name}<<{delimiter}\n{value}\n{delimiter}\n")
 
 
-def probe_token(token: str, user_id: str) -> str | None:
-    """成功なら None、失敗ならエラーメッセージ。"""
-    if not token:
-        return "トークンが空です"
-    try:
-        iter_media(token, user_id, 1)
-        return None
-    except InstagramAPIError as exc:
-        return str(exc)
-
-
-def try_refresh(
-    user_token: str,
-    app_id: str,
-    app_secret: str,
-    instagram_user_id: str,
-) -> tuple[str | None, str | None]:
-    try:
-        page_token, label = refresh_instagram_access_token(
-            user_token,
-            app_id,
-            app_secret,
-            instagram_user_id,
-            user_token=user_token,
-        )
-    except (InstagramConfigError, InstagramAPIError) as exc:
-        return None, str(exc)
-    err = probe_token(page_token, instagram_user_id)
-    if err is not None:
-        return None, f"再取得トークンでも接続不可: {err}"
-    return page_token, label
-
-
 def main() -> int:
     try:
         cfg = load_config()
@@ -82,50 +47,36 @@ def main() -> int:
 
     token = cfg["token"]
     user_id = cfg["user_id"]
-
-    err = probe_token(token, user_id)
-    if err is None:
-        print("既存トークンで Instagram API に接続できました。")
-        write_github_output("value", token)
-        return 0
-
-    print(f"::warning::既存トークンで接続できません: {err}", file=sys.stderr)
-
     app_id = os.environ.get("INSTAGRAM_APP_ID", "").strip()
     app_secret = os.environ.get("INSTAGRAM_APP_SECRET", "").strip()
-    if not app_id or not app_secret:
-        print(f"::error::{TOKEN_HELP}", file=sys.stderr)
-        return 1
+    user_access = os.environ.get("INSTAGRAM_USER_ACCESS_TOKEN", "").strip()
 
-    try:
-        app_id, app_secret = load_meta_app_credentials()
-    except InstagramConfigError as exc:
-        print(f"::error::{exc}", file=sys.stderr)
-        return 1
+    if app_id and app_secret and (user_access or token):
+        try:
+            result = maintain_from_env(if_needed=True)
+            err = probe_media_access(result.page_token, user_id)
+            if err is None:
+                print_result(result)
+                export_github_outputs(result)
+                if result.secrets_update_needed:
+                    print(
+                        "::notice::トークンを更新しました。"
+                        " INSTAGRAM_SECRETS_PAT が設定されていれば Secrets も自動更新されます。",
+                        file=sys.stderr,
+                    )
+                return 0
+            print(f"::warning::再取得トークンでも接続不可: {err}", file=sys.stderr)
+        except (InstagramConfigError, InstagramAPIError) as exc:
+            print(f"::warning::半永久トークン再取得に失敗: {exc}", file=sys.stderr)
 
-    refresh_candidates: list[tuple[str, str]] = []
-    user_access = os.environ.get("INSTAGRAM_USER_ACCESS_TOKEN", "").strip().strip('"').strip("'")
-    if user_access:
-        refresh_candidates.append(("INSTAGRAM_USER_ACCESS_TOKEN", user_access))
-    if token and token != user_access:
-        refresh_candidates.append(("INSTAGRAM_ACCESS_TOKEN（ユーザートークンとして再試行）", token))
+    err = probe_media_access(token, user_id)
+    if err is None:
+        print("既存 INSTAGRAM_ACCESS_TOKEN で Instagram API に接続できました。")
+        write_github_output("value", token)
+        write_github_output("secrets_update_needed", "false")
+        return 0
 
-    last_err = err
-    for label, candidate in refresh_candidates:
-        print(f"ページトークン再取得を試行: {label}", file=sys.stderr)
-        page_token, refresh_info = try_refresh(candidate, app_id, app_secret, user_id)
-        if page_token:
-            print(f"ページトークンを再取得しました（{refresh_info}）。")
-            print(
-                "::warning::Secrets の INSTAGRAM_ACCESS_TOKEN をログに表示された新トークンに更新してください。",
-                file=sys.stderr,
-            )
-            write_github_output("value", page_token)
-            return 0
-        last_err = refresh_info or last_err
-        print(f"::warning::{label} で再取得失敗: {refresh_info}", file=sys.stderr)
-
-    print(f"::error::トークン再取得に失敗しました: {last_err}", file=sys.stderr)
+    print(f"::error::{err}", file=sys.stderr)
     print(f"::error::{TOKEN_HELP}", file=sys.stderr)
     return 1
 

@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 import re
 import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -36,7 +37,7 @@ def load_env_file(path: Path) -> None:
         key, _, value = line.partition("=")
         key = key.strip()
         value = value.strip().strip('"').strip("'")
-        if key and key not in os.environ:
+        if key and (key not in os.environ or not os.environ[key].strip()):
             os.environ[key] = value
 
 
@@ -157,6 +158,30 @@ def token_expires_within_days(info: dict[str, Any], days: int) -> bool:
     return expiry <= int(time.time()) + days * 86400
 
 
+def format_token_expiry(info: dict[str, Any]) -> str:
+    """debug_token の expires_at を人間向け文字列に。"""
+    expires_at = info.get("expires_at")
+    if expires_at in (None, "", 0, "0"):
+        return "なし（無期限）"
+    try:
+        exp_dt = datetime.fromtimestamp(int(expires_at), tz=timezone.utc)
+        return exp_dt.strftime("%Y-%m-%d %H:%M UTC")
+    except (TypeError, ValueError, OSError):
+        return "不明"
+
+
+def is_non_expiring_token(info: dict[str, Any]) -> bool:
+    expires_at = info.get("expires_at")
+    return expires_at in (None, "", 0, "0")
+
+
+def refresh_long_lived_user_token(
+    user_token: str, app_id: str, app_secret: str
+) -> tuple[str, int | None]:
+    """長期ユーザートークンを再発行する（さらに約60日延長）。"""
+    return exchange_long_lived_user_token(user_token, app_id, app_secret)
+
+
 def refresh_instagram_access_token(
     token: str,
     app_id: str,
@@ -230,6 +255,28 @@ def verify_connection(token: str, user_id: str) -> dict[str, str]:
     )
     username = data.get("username") or data.get("name") or user_id
     return {"username": username, "user_id": user_id}
+
+
+def probe_media_access(token: str, user_id: str) -> str | None:
+    """Blog 同期に使えるか検証。問題なければ None、失敗理由を文字列で返す。"""
+    if not token:
+        return "トークンが空です"
+    try:
+        account = verify_connection(token, user_id)
+    except InstagramAPIError as exc:
+        return str(exc)
+    try:
+        items = iter_media(token, user_id, 1)
+    except InstagramAPIError as exc:
+        return str(exc)
+    if not items:
+        username = account.get("username") or user_id
+        return (
+            f"@{username} から投稿を1件も取得できません。"
+            " INSTAGRAM_USER_ID が @4mnion の ID か、トークン権限"
+            "（instagram_basic, pages_show_list, pages_read_engagement）を確認してください。"
+        )
+    return None
 
 
 def iter_media(token: str, user_id: str, max_items: int) -> list[dict[str, Any]]:

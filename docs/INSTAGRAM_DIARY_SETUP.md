@@ -120,6 +120,37 @@ GitHub Actions（`Sync Instagram Diary`）でも、同期の直前に同じ延�
 
 手動で強制延長: `bash scripts/extend_instagram_token.sh --force`
 
+### D-2.6. 半永久トークン（推奨・30日切れ対策）
+
+Meta の仕様:
+
+| トークン | 期限 |
+|----------|------|
+| 短期ユーザートークン | 数時間 |
+| 長期ユーザートークン | **約60日**（デバッガーで30〜60日と表示されることも） |
+| **ページトークン**（長期ユーザートークンから取得） | **無期限**（Debugger で Expires: **Never**） |
+
+30日と表示されているのは、**ページトークンを直接コピーした**か、**ユーザートークン**の期限です。  
+Blog 同期では **長期ユーザートークン → ページトークン再取得** の順が正解で、ページ側は実質ずっと使えます。
+
+**一度だけ実行（ローカル）:**
+
+```bash
+bash scripts/setup_permanent_instagram_token.sh
+```
+
+これで `INSTAGRAM_USER_ACCESS_TOKEN`（約60日・同期のたびに自動延長）と  
+無期限の `INSTAGRAM_ACCESS_TOKEN`（ページ）が `instagram.env` に保存されます。
+
+**GitHub Actions 向け（任意・完全自動）:**
+
+1. 上記のあと `bash scripts/setup_github_secrets.sh` で Secrets 登録  
+2. （任意）Fine-grained PAT（`sayaka-site` の Secrets 書き込み）を Secret **`INSTAGRAM_SECRETS_PAT`** に登録  
+   → 同期のたびに延長したトークンが Secrets に自動反映され、手動更新不要
+
+同期ワークフローは **毎回** ユーザートークンからページトークンを取り直し、  
+ユーザートークンは **残り30日以内** なら自動延長します。
+
 ### D-3. ページのアクセストークン（推奨）
 
 1. 再び **Graph API エクスプローラ**  
@@ -159,7 +190,8 @@ git push -u origin main
 | `INSTAGRAM_USER_ID` | 下の「ID の調べ方」 |
 | `INSTAGRAM_APP_ID` | D-2.5（自動延長・推奨） |
 | `INSTAGRAM_APP_SECRET` | D-2.5（自動延長・推奨） |
-| `INSTAGRAM_USER_ACCESS_TOKEN` | （任意）D-1 の **ユーザー** トークン。ページトークン切れ時の自動再取得用 |
+| `INSTAGRAM_USER_ACCESS_TOKEN` | （推奨）D-1 の **ユーザー** トークン（延長済み）。半永久運用の要 |
+| `INSTAGRAM_SECRETS_PAT` | （任意）GitHub PAT。設定すると同期時に Secrets を自動更新 |
 
 ### Instagram ユーザー ID の調べ方（1回）
 
@@ -279,6 +311,8 @@ git push
 | 症状 | 対処 |
 |------|------|
 | Actions が赤い（190 / pages_show_list） | **ページトークン**の期限切れまたは権限不足。D-1〜D-3 をやり直し `INSTAGRAM_ACCESS_TOKEN` を更新（`bash scripts/setup_github_secrets.sh` でも可）。ローカル確認: `python3 scripts/check_instagram_token.py` |
+| トークンが30日で切れる | D-2.6 `bash scripts/setup_permanent_instagram_token.sh` で **ユーザートークン + 無期限ページトークン** に切り替え |
+| Actions が赤い（投稿 0 件） | 同上。**Blog が空になっていたら** `git checkout 3a68d46 -- data/diary.json images/diary/` で復元してからトークン更新 → 手動 Run workflow |
 | Actions が赤い（その他） | ログの **Resolve Instagram token for sync** を確認 |
 | Blog が空・古い | Actions → **Sync Instagram Diary** を手動実行。`data/diary.json` のコミットがあるか確認 |
 | 見た目だけ新しい | 投稿データは Actions 同期。`git push` だけでは増えません |

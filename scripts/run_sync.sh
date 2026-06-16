@@ -19,8 +19,8 @@ if ! python3 -c "import requests" 2>/dev/null; then
 fi
 
 if [[ -n "${INSTAGRAM_APP_ID:-}" && -n "${INSTAGRAM_APP_SECRET:-}" ]]; then
-  echo "トークン延長を確認しています…"
-  python3 "$ROOT/scripts/extend_instagram_token.py" --if-needed || true
+  echo "トークンを整えています（半永久運用）…"
+  python3 "$ROOT/scripts/maintain_instagram_tokens.py" --if-needed --write-env || true
   if [[ -f "$ENV_FILE" ]]; then
     set -a
     # shellcheck disable=SC1090
