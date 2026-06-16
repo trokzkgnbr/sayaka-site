@@ -5,6 +5,8 @@
 
 const SESSION_COOKIE = "diary_admin_session";
 const SESSION_TTL = 60 * 60 * 12;
+/** Cloudflare Workers Web Crypto は PBKDF2 を最大 100000 回まで */
+const PBKDF2_ITERATIONS = 100000;
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 export default {
@@ -105,7 +107,7 @@ async function verifyPassword(password, stored) {
     {
       name: "PBKDF2",
       salt: enc.encode(salt),
-      iterations: 600000,
+      iterations: PBKDF2_ITERATIONS,
       hash: "SHA-256",
     },
     keyMaterial,
@@ -160,6 +162,24 @@ function base64UrlDecode(str) {
   const out = new Uint8Array(binary.length);
   for (let i = 0; i < binary.length; i++) out[i] = binary.charCodeAt(i);
   return out;
+}
+
+/** GitHub Contents API の base64 を UTF-8 文字列へ（atob だけだと日本語が化ける） */
+function base64ToUtf8(b64) {
+  const binary = atob(String(b64).replace(/\n/g, ""));
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return new TextDecoder("utf-8").decode(bytes);
+}
+
+async function readFormField(field) {
+  if (field == null) return "";
+  if (typeof field === "string") return field;
+  if (typeof field.text === "function") return (await field.text()).trim();
+  if (typeof field.arrayBuffer === "function") {
+    return new TextDecoder("utf-8").decode(new Uint8Array(await field.arrayBuffer())).trim();
+  }
+  return String(field).trim();
 }
 
 async function importHmacKey(secret) {
@@ -250,7 +270,7 @@ async function getFileMeta(env, path) {
 async function loadDiary(env) {
   const meta = await getFileMeta(env, "data/diary.json");
   if (!meta || !meta.content) return { posts: [] };
-  const raw = atob(meta.content.replace(/\n/g, ""));
+  const raw = base64ToUtf8(meta.content);
   const data = JSON.parse(raw);
   return { posts: Array.isArray(data.posts) ? data.posts : [] };
 }
@@ -346,9 +366,9 @@ async function handleCreatePost(request, env) {
     return json({ ok: false, error: "ログインが必要です" }, 401);
   }
   const form = await request.formData();
-  const bodyText = String(form.get("body") || "").trim();
+  const bodyText = await readFormField(form.get("body"));
   if (!bodyText) return json({ ok: false, error: "本文を入力してください" }, 400);
-  const dateStr = normalizeDate(form.get("date"));
+  const dateStr = normalizeDate(await readFormField(form.get("date")));
   const image = form.get("image");
   if (!image || typeof image.arrayBuffer !== "function") {
     return json({ ok: false, error: "画像を選んでください" }, 400);

@@ -100,8 +100,16 @@
 
         const fd = new FormData();
         fd.append("image", imageInput.files[0]);
-        fd.append("body", DiaryAdmin.qs("#body").value);
-        fd.append("date", DiaryAdmin.qs("#date").value);
+        fd.append(
+          "body",
+          new Blob([DiaryAdmin.qs("#body").value], { type: "text/plain;charset=UTF-8" }),
+          "body.txt"
+        );
+        fd.append(
+          "date",
+          new Blob([DiaryAdmin.qs("#date").value], { type: "text/plain;charset=UTF-8" }),
+          "date.txt"
+        );
 
         try {
           await DiaryAdmin.api("api/posts", { method: "POST", body: fd });
