@@ -25,6 +25,14 @@
     return dateFmt.format(d);
   }
 
+  function bodyWithoutTitleLine(text) {
+    var lines = String(text || '').split(/\r?\n/);
+    if (lines.length <= 1) return '';
+    lines.shift();
+    while (lines.length && !lines[0].trim()) lines.shift();
+    return lines.join('\n');
+  }
+
   function renderBody(text) {
     return escapeHtml(text)
       .split(/\n\n+/)
@@ -92,7 +100,7 @@
         '</time>' +
         '</header>' +
         '<div class="diary-detail__body prose">' +
-        renderBody(post.body) +
+        renderBody(bodyWithoutTitleLine(post.body)) +
         '</div>' +
         '</div>' +
         '</div>';

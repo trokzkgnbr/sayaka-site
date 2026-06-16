@@ -1094,7 +1094,7 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
 
 .diary-detail__title {
   font-family: var(--font-serif);
-  font-size: 1.08rem;
+  font-size: 1.12rem;
   font-weight: 400;
   line-height: 1.5;
   letter-spacing: 0.04em;
@@ -1103,7 +1103,7 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
 
 .diary-detail__date {
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.92rem;
   letter-spacing: 0.12em;
   color: var(--text-muted);
   margin: 0;
@@ -1151,6 +1151,39 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
 
 .diary-detail__body p:last-child {
   margin-bottom: 0;
+}
+
+@media (min-width: 481px) {
+  .diary-detail__content {
+    display: grid;
+    grid-template-columns: 9rem minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: clamp(1rem, 3vw, 1.75rem);
+    row-gap: 1rem;
+    align-items: start;
+  }
+
+  .diary-detail__figure {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .diary-detail__head {
+    grid-column: 2;
+    grid-row: 1;
+    margin-bottom: 0;
+    align-self: center;
+  }
+
+  .diary-detail__main {
+    display: contents;
+  }
+
+  .diary-detail__body {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    font-size: 0.95rem;
+  }
 }
 
 @media (max-width: 480px) {
