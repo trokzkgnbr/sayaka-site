@@ -5,12 +5,6 @@
   const params = new URLSearchParams(window.location.search);
   const postId = params.get('id');
 
-  const dateFmt = new Intl.DateTimeFormat('ja-JP', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-
   function escapeHtml(str) {
     return String(str)
       .replace(/&/g, '&amp;')
@@ -20,9 +14,16 @@
   }
 
   function formatDate(isoDate) {
-    const d = new Date(isoDate + 'T12:00:00');
-    if (Number.isNaN(d.getTime())) return isoDate;
-    return dateFmt.format(d);
+    const value = String(isoDate || '').trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return value.replace(/-/g, '/');
+    }
+    const d = new Date(value.includes('T') ? value : value + 'T12:00:00');
+    if (Number.isNaN(d.getTime())) return value;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '/' + m + '/' + day;
   }
 
   /** 1行目はタイトル用なので本文表示から除外 */

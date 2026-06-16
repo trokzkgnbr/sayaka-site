@@ -5,11 +5,18 @@
 
   const PAGE_SIZE = 30;
 
-  const dateFmt = new Intl.DateTimeFormat('ja-JP', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+  function formatDate(isoDate) {
+    const value = String(isoDate || '').trim();
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return value.replace(/-/g, '/');
+    }
+    const d = new Date(value.includes('T') ? value : value + 'T12:00:00');
+    if (Number.isNaN(d.getTime())) return value;
+    const y = d.getFullYear();
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return y + '/' + m + '/' + day;
+  }
 
   function escapeHtml(str) {
     return String(str)
@@ -17,12 +24,6 @@
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;');
-  }
-
-  function formatDate(isoDate) {
-    const d = new Date(isoDate + 'T12:00:00');
-    if (Number.isNaN(d.getTime())) return isoDate;
-    return dateFmt.format(d);
   }
 
   function postHref(id) {
