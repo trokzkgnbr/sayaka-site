@@ -42,39 +42,25 @@
       window.location.href = "login.html";
       return false;
     } catch (_err) {
-      if (window.DiaryAdminAuth && window.DiaryAdminAuth.staticAuthEnabled()) {
-        return window.DiaryAdminAuth.ensureClientAuth();
-      }
       window.location.href = "login.html";
       return false;
     }
   }
 
   async function login(password) {
-    try {
-      await api("api/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password: password }),
-      });
-      return true;
-    } catch (err) {
-      if (window.DiaryAdminAuth && window.DiaryAdminAuth.staticAuthEnabled()) {
-        await window.DiaryAdminAuth.loginClient(password);
-        return true;
-      }
-      throw err;
-    }
+    await api("api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ password: password }),
+    });
+    return true;
   }
 
   async function logout() {
     try {
       await api("api/logout", { method: "POST" });
     } catch (_err) {
-      /* static mode */
-    }
-    if (window.DiaryAdminAuth) {
-      window.DiaryAdminAuth.clearClientSession();
+      /* ignore */
     }
     window.location.href = "login.html";
   }

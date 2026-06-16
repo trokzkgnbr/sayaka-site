@@ -38,8 +38,6 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Assemble public site
-        env:
-          ADMIN_PASSWORD_HASH: ${{ secrets.ADMIN_PASSWORD_HASH }}
         run: bash scripts/prepare-pages-site.sh _site
 
       - name: Checkout gh-pages

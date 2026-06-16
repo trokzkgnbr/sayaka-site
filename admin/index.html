@@ -23,7 +23,7 @@
     </nav>
 
     <div class="admin-card">
-      <p>公開 Blog の更新はここから行います。`GITHUB_TOKEN` 設定時は自動で本番へ反映されます。</p>
+      <p>スマホから投稿・削除できます。反映は GitHub 更新後、すぐまたは1日2回（9:00 / 21:00 JST）の自動デプロイで https://sayayosui.site/ に載ります。</p>
       <p class="admin-hint">登録と削除は画面を分けています。パスワードはサーバー側だけで検証され、GitHub には保存されません。</p>
     </div>
 
@@ -31,8 +31,6 @@
       <button type="button" class="admin-nav__logout" id="logout-btn">ログアウト</button>
     </footer>
   </div>
-  <script src="auth-config.js"></script>
-  <script src="js/auth-gate.js"></script>
   <script src="js/admin.js"></script>
   <script>
     (async function () {

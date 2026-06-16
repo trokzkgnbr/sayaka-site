@@ -31,11 +31,8 @@
           <button class="admin-btn" type="submit">ログイン</button>
         </div>
       </form>
-      <p class="admin-hint">投稿・削除は Mac で <code>bash scripts/run_diary_admin.sh</code> を実行しているときだけ使えます。</p>
     </div>
   </div>
-  <script src="auth-config.js"></script>
-  <script src="js/auth-gate.js"></script>
   <script src="js/admin.js"></script>
   <script>
     (function () {
@@ -56,18 +53,16 @@
 
       DiaryAdmin.api("api/session")
         .then(function (session) {
-          if (session.setupRequired) {
-            window.location.href = "setup.html";
-            return;
-          }
           if (session.authenticated) {
             window.location.href = "./";
           }
         })
         .catch(function () {
-          if (window.DiaryAdminAuth && window.DiaryAdminAuth.clientAuthenticated()) {
-            window.location.href = "./";
-          }
+          DiaryAdmin.showMessage(
+            message,
+            "管理 API が未設定です。Cloudflare Worker のセットアップが必要です（docs/ADMIN_PHONE.md）。",
+            "error"
+          );
         });
     })();
   </script>
