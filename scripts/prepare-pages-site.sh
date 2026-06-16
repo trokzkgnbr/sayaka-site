@@ -35,6 +35,19 @@ if [[ -f "$ADMIN_PATH_FILE" && -d "$ROOT/admin" ]]; then
   if [[ "$ADMIN_PATH" =~ ^[a-zA-Z0-9_-]+$ ]]; then
     mkdir -p "$OUT/$ADMIN_PATH"
     cp -R "$ROOT/admin/." "$OUT/$ADMIN_PATH/"
+    HASH=""
+    if [[ -f "$ROOT/config/admin.env" ]]; then
+      HASH="$(grep '^ADMIN_PASSWORD_HASH=' "$ROOT/config/admin.env" | cut -d= -f2- || true)"
+    fi
+    if [[ -z "$HASH" && -n "${ADMIN_PASSWORD_HASH:-}" ]]; then
+      HASH="$ADMIN_PASSWORD_HASH"
+    fi
+    if [[ -n "$HASH" ]]; then
+      python3 "$ROOT/scripts/generate_admin_auth_config.py" "$OUT/$ADMIN_PATH/auth-config.js" "$HASH"
+      echo "Admin auth config: /${ADMIN_PATH}/auth-config.js"
+    else
+      echo "警告: ADMIN_PASSWORD_HASH 未設定 — サイト上の管理画面はパスワード保護されません" >&2
+    fi
     mkdir -p "$OUT"
     {
       echo "User-agent: *"

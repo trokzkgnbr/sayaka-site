@@ -31,9 +31,11 @@
           <button class="admin-btn" type="submit">ログイン</button>
         </div>
       </form>
-      <p class="admin-hint admin-hint--desktop">この URL は公開サイトと同じパスです。投稿・削除は Mac で <code>bash scripts/run_diary_admin.sh</code> を実行しているときだけ使えます。</p>
+      <p class="admin-hint">投稿・削除は Mac で <code>bash scripts/run_diary_admin.sh</code> を実行しているときだけ使えます。</p>
     </div>
   </div>
+  <script src="auth-config.js"></script>
+  <script src="js/auth-gate.js"></script>
   <script src="js/admin.js"></script>
   <script>
     (function () {
@@ -45,11 +47,7 @@
         DiaryAdmin.showMessage(message, "", "error");
         const password = DiaryAdmin.qs("#password").value;
         try {
-          await DiaryAdmin.api("api/login", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ password: password }),
-          });
+          await DiaryAdmin.login(password);
           window.location.href = "./";
         } catch (err) {
           DiaryAdmin.showMessage(message, err.message, "error");
@@ -67,14 +65,9 @@
           }
         })
         .catch(function () {
-          const onPublicSite = /\.site$|github\.io$/.test(window.location.hostname);
-          DiaryAdmin.showMessage(
-            message,
-            onPublicSite
-              ? "この URL では閲覧のみです。投稿・削除は Mac で bash scripts/run_diary_admin.sh を実行してから、http://127.0.0.1:8765/blog-mgt-bf8fa662/ を開いてください。"
-              : "管理サーバーに接続できません。bash scripts/run_diary_admin.sh を実行してください。",
-            "error"
-          );
+          if (window.DiaryAdminAuth && window.DiaryAdminAuth.clientAuthenticated()) {
+            window.location.href = "./";
+          }
         });
     })();
   </script>

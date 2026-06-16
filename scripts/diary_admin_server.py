@@ -334,6 +334,20 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(data)
 
+    def _serve_auth_config(self) -> None:
+        pwd_hash = self.env.get("ADMIN_PASSWORD_HASH", "")
+        if not pwd_hash:
+            self.send_error(HTTPStatus.NOT_FOUND)
+            return
+        payload = json.dumps({"hash": pwd_hash, "iterations": 600_000}, ensure_ascii=False)
+        data = f"window.ADMIN_AUTH={payload};\n".encode("utf-8")
+        self.send_response(HTTPStatus.OK)
+        self.send_header("Content-Type", "application/javascript; charset=utf-8")
+        self.send_header("Content-Length", str(len(data)))
+        self.send_header("Cache-Control", "no-store")
+        self.end_headers()
+        self.wfile.write(data)
+
     def _serve_admin_page(self, name: str) -> None:
         if self.setup_required():
             if name not in {"setup.html", "login.html"}:
@@ -402,6 +416,10 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
                         "setupRequired": self.setup_required(),
                     },
                 )
+                return
+
+            if admin_rel == "auth-config.js":
+                self._serve_auth_config()
                 return
 
             if admin_rel == "" or admin_rel == "index.html":
