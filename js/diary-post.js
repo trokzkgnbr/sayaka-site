@@ -74,6 +74,13 @@
 
       root.innerHTML =
         '<p class="diary-back-wrap"><a class="diary-back" href="diary.html">← blog 一覧</a></p>' +
+        '<div class="diary-detail__content">' +
+        '<figure class="diary-detail__figure">' +
+        '<img src="' +
+        escapeHtml(post.image) +
+        '" alt="" width="360" height="360" loading="eager" decoding="async">' +
+        '</figure>' +
+        '<div class="diary-detail__main">' +
         '<header class="diary-detail__head">' +
         '<h1 class="diary-detail__title">' +
         escapeHtml(post.title) +
@@ -84,14 +91,9 @@
         escapeHtml(formatDate(post.date)) +
         '</time>' +
         '</header>' +
-        '<div class="diary-detail__content">' +
-        '<figure class="diary-detail__figure">' +
-        '<img src="' +
-        escapeHtml(post.image) +
-        '" alt="" width="360" height="360" loading="eager" decoding="async">' +
-        '</figure>' +
         '<div class="diary-detail__body prose">' +
         renderBody(post.body) +
+        '</div>' +
         '</div>' +
         '</div>';
     })
