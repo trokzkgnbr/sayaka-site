@@ -1142,7 +1142,8 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
 .diary-detail__body {
   font-size: 0.95rem;
   line-height: 1.85;
-  margin-top: 1.5lh;
+  /* 日付〜本文: 本文フォント1行分（1em）の 1.5 倍 */
+  margin-top: 1.5em;
   max-width: none;
 }
 
