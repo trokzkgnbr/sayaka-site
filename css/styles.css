@@ -1089,7 +1089,7 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
   flex-direction: column;
   align-items: flex-start;
   gap: 0.35rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0;
 }
 
 .diary-detail__title {
@@ -1141,7 +1141,9 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
 
 .diary-detail__body {
   font-size: 0.95rem;
+  line-height: 1.85;
   max-width: none;
+  margin-top: calc(2 * 1.85em);
 }
 
 .diary-detail__body p {
@@ -1159,7 +1161,7 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
     grid-template-columns: 9rem minmax(0, 1fr);
     grid-template-rows: auto auto;
     column-gap: clamp(1rem, 3vw, 1.75rem);
-    row-gap: 1rem;
+    row-gap: calc(2 * 0.95rem * 1.85);
     align-items: start;
   }
 
@@ -1183,6 +1185,7 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
     grid-column: 1 / -1;
     grid-row: 2;
     font-size: 0.95rem;
+    margin-top: 0;
   }
 }
 
