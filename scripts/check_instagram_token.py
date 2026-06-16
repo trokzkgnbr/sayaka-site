@@ -13,6 +13,7 @@ from lib_instagram import (
     load_config,
     load_meta_app_credentials,
     probe_media_access,
+    probe_token_connection,
 )
 from maintain_instagram_tokens import maintain_from_env, print_result
 
@@ -26,9 +27,17 @@ def main() -> int:
 
     token = cfg["token"]
     user_id = cfg["user_id"]
-    err = probe_media_access(token, user_id)
-    if err is None:
-        print("OK: このトークンで Instagram 投稿を取得できます。")
+    conn_err, account = probe_token_connection(token, user_id)
+    if conn_err is not None:
+        print(f"× Instagram に接続できません:\n  {conn_err}")
+    else:
+        post_err = probe_media_access(token, user_id, require_posts=True)
+        username = (account or {}).get("username") or user_id
+        if post_err is None:
+            print("OK: このトークンで Instagram 投稿を取得できます。")
+        else:
+            print(f"OK: @{username} に接続できます（API 上の投稿は 0 件）。")
+            print("   Blog の既存データは維持されます。新規同期には @4mnion への画像投稿が必要です。")
         print(f"   INSTAGRAM_USER_ID={user_id}")
         try:
             app_id, app_secret = load_meta_app_credentials()
@@ -48,14 +57,14 @@ def main() -> int:
             pass
         return 0
 
-    print(f"× 現在の INSTAGRAM_ACCESS_TOKEN では取得できません:\n  {err}")
+    print(f"× 現在の INSTAGRAM_ACCESS_TOKEN では取得できません:\n  {conn_err}")
 
     app_id = os.environ.get("INSTAGRAM_APP_ID", "").strip()
     app_secret = os.environ.get("INSTAGRAM_APP_SECRET", "").strip()
     if app_id and app_secret:
         try:
             result = maintain_from_env(force_user_refresh=False, if_needed=False)
-            err2 = probe_media_access(result.page_token, user_id)
+            err2 = probe_token_connection(result.page_token, user_id)[0]
             if err2 is None:
                 print_result(result)
                 print("OK: ページトークンを再取得すれば使えます。")

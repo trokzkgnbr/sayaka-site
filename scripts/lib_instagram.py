@@ -257,19 +257,29 @@ def verify_connection(token: str, user_id: str) -> dict[str, str]:
     return {"username": username, "user_id": user_id}
 
 
-def probe_media_access(token: str, user_id: str) -> str | None:
-    """Blog 同期に使えるか検証。問題なければ None、失敗理由を文字列で返す。"""
+def probe_token_connection(
+    token: str, user_id: str
+) -> tuple[str | None, dict[str, str] | None]:
+    """アカウントに接続できるかだけ検証（投稿0件でも成功）。"""
     if not token:
-        return "トークンが空です"
+        return "トークンが空です", None
     try:
         account = verify_connection(token, user_id)
     except InstagramAPIError as exc:
-        return str(exc)
+        return str(exc), None
+    return None, account
+
+
+def probe_media_access(token: str, user_id: str, *, require_posts: bool = True) -> str | None:
+    """Blog 同期に使えるか検証。問題なければ None、失敗理由を文字列で返す。"""
+    err, account = probe_token_connection(token, user_id)
+    if err is not None or account is None:
+        return err
     try:
         items = iter_media(token, user_id, 1)
     except InstagramAPIError as exc:
         return str(exc)
-    if not items:
+    if not items and require_posts:
         username = account.get("username") or user_id
         return (
             f"@{username} から投稿を1件も取得できません。"

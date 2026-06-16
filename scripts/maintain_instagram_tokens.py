@@ -25,6 +25,7 @@ from lib_instagram import (
     load_env_file,
     load_meta_app_credentials,
     probe_media_access,
+    probe_token_connection,
     refresh_long_lived_user_token,
     site_root,
     token_expires_within_days,
@@ -173,7 +174,7 @@ def maintain_from_env(
         if not token_expires_within_days(user_info_before, refresh_user_within_days):
             page_token = page_access.strip().strip('"').strip("'")
             if page_token:
-                err = probe_media_access(page_token, user_id)
+                err, _ = probe_token_connection(page_token, user_id)
                 if err is None:
                     page_info = debug_token_info(page_token, app_id, app_secret)
                     if is_non_expiring_token(page_info):
@@ -318,10 +319,23 @@ def main() -> int:
         print(f"::error::{msg}" if args.export_github_output else f"× {msg}", file=sys.stderr)
         return 1
 
-    err = probe_media_access(result.page_token, user_id)
+    err, account = probe_token_connection(result.page_token, user_id)
     if err is not None:
         print(f"::error::{err}" if args.export_github_output else f"× {err}", file=sys.stderr)
         return 1
+
+    post_err = probe_media_access(result.page_token, user_id, require_posts=True)
+    if post_err is not None:
+        username = (account or {}).get("username") or user_id
+        msg = (
+            f"@{username} の Instagram API 投稿が 0 件です。"
+            " Blog の既存データは維持します。@4mnion に画像投稿があるか、"
+            " Meta アプリの Instagram テスター設定を確認してください。"
+        )
+        if args.export_github_output:
+            print(f"::warning::{msg}", file=sys.stderr)
+        else:
+            print(f"注意: {msg}", file=sys.stderr)
 
     print_result(result)
 

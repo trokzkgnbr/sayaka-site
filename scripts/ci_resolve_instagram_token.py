@@ -16,6 +16,7 @@ from lib_instagram import (
     InstagramConfigError,
     load_config,
     probe_media_access,
+    probe_token_connection,
 )
 from maintain_instagram_tokens import (
     export_github_outputs,
@@ -38,6 +39,27 @@ def write_github_output(name: str, value: str) -> None:
         fh.write(f"{name}<<{delimiter}\n{value}\n{delimiter}\n")
 
 
+def accept_token(token: str, user_id: str, label: str) -> bool:
+    err, account = probe_token_connection(token, user_id)
+    if err is not None:
+        print(f"::warning::{label}: {err}", file=sys.stderr)
+        return False
+
+    post_err = probe_media_access(token, user_id, require_posts=True)
+    if post_err is not None:
+        username = (account or {}).get("username") or user_id
+        print(
+            f"::warning::@{username} の Instagram API 投稿が 0 件です。"
+            " Blog の既存データは維持します。",
+            file=sys.stderr,
+        )
+
+    write_github_output("value", token)
+    write_github_output("secrets_update_needed", "false")
+    print(f"{label} で Instagram アカウントに接続できました。")
+    return True
+
+
 def main() -> int:
     try:
         cfg = load_config()
@@ -54,10 +76,18 @@ def main() -> int:
     if app_id and app_secret and (user_access or token):
         try:
             result = maintain_from_env(if_needed=True)
-            err = probe_media_access(result.page_token, user_id)
+            err, account = probe_token_connection(result.page_token, user_id)
             if err is None:
                 print_result(result)
                 export_github_outputs(result)
+                post_err = probe_media_access(result.page_token, user_id, require_posts=True)
+                if post_err is not None:
+                    username = (account or {}).get("username") or user_id
+                    print(
+                        f"::warning::@{username} の Instagram API 投稿が 0 件です。"
+                        " Blog の既存データは維持します。",
+                        file=sys.stderr,
+                    )
                 if result.secrets_update_needed:
                     print(
                         "::notice::トークンを更新しました。"
@@ -69,14 +99,10 @@ def main() -> int:
         except (InstagramConfigError, InstagramAPIError) as exc:
             print(f"::warning::半永久トークン再取得に失敗: {exc}", file=sys.stderr)
 
-    err = probe_media_access(token, user_id)
-    if err is None:
-        print("既存 INSTAGRAM_ACCESS_TOKEN で Instagram API に接続できました。")
-        write_github_output("value", token)
-        write_github_output("secrets_update_needed", "false")
+    if accept_token(token, user_id, "既存 INSTAGRAM_ACCESS_TOKEN"):
         return 0
 
-    print(f"::error::{err}", file=sys.stderr)
+    print(f"::error::Instagram に接続できません。", file=sys.stderr)
     print(f"::error::{TOKEN_HELP}", file=sys.stderr)
     return 1
 
