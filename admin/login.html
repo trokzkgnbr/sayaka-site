@@ -6,12 +6,12 @@
   <meta name="theme-color" content="#ffffff">
   <meta name="robots" content="noindex, nofollow">
   <title>Blog 管理 — ログイン</title>
-  <link rel="stylesheet" href="/admin/css/admin.css">
+  <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
   <div class="admin-shell">
     <header class="admin-header">
-      <a class="admin-brand" href="/admin/" aria-label="SAYAYOSUI">
+      <a class="admin-brand" href="./" aria-label="SAYAYOSUI">
         <img class="admin-brand__img" src="/images/logo.png?v=61" alt="Saya Yosui" width="1024" height="187">
       </a>
     </header>
@@ -31,10 +31,10 @@
           <button class="admin-btn" type="submit">ログイン</button>
         </div>
       </form>
-      <p class="admin-hint admin-hint--desktop">先にターミナルで <code>bash scripts/run_diary_admin.sh</code> を実行し、<strong>http://127.0.0.1:8765/admin/</strong> を開いてください（公開サイトの URL では動きません）。<br>初回は <a href="/admin/setup.html">セットアップ画面</a> でパスワードを決められます。</p>
+      <p class="admin-hint admin-hint--desktop">初回は <a href="setup.html">セットアップ画面</a> でパスワードを決められます。</p>
     </div>
   </div>
-  <script src="/admin/js/admin.js"></script>
+  <script src="js/admin.js"></script>
   <script>
     (function () {
       const form = DiaryAdmin.qs("#login-form");
@@ -45,25 +45,25 @@
         DiaryAdmin.showMessage(message, "", "error");
         const password = DiaryAdmin.qs("#password").value;
         try {
-          await DiaryAdmin.api("/admin/api/login", {
+          await DiaryAdmin.api("api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ password: password }),
           });
-          window.location.href = "/admin/";
+          window.location.href = "./";
         } catch (err) {
           DiaryAdmin.showMessage(message, err.message, "error");
         }
       });
 
-      DiaryAdmin.api("/admin/api/session")
+      DiaryAdmin.api("api/session")
         .then(function (session) {
           if (session.setupRequired) {
-            window.location.href = "/admin/setup.html";
+            window.location.href = "setup.html";
             return;
           }
           if (session.authenticated) {
-            window.location.href = "/admin/";
+            window.location.href = "./";
           }
         })
         .catch(function () {

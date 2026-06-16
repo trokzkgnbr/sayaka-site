@@ -6,24 +6,24 @@
   <meta name="theme-color" content="#ffffff">
   <meta name="robots" content="noindex, nofollow">
   <title>Blog 管理</title>
-  <link rel="stylesheet" href="/admin/css/admin.css">
+  <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
   <div class="admin-shell">
     <header class="admin-header">
-      <a class="admin-brand" href="/admin/" aria-label="SAYAYOSUI — Blog 管理">
+      <a class="admin-brand" href="./" aria-label="SAYAYOSUI — Blog 管理">
         <img class="admin-brand__img" src="/images/logo.png?v=61" alt="Saya Yosui" width="1024" height="187">
       </a>
     </header>
     <h1 class="admin-title">Blog 管理</h1>
 
     <nav class="admin-nav" aria-label="管理メニュー">
-      <a class="admin-nav__link" href="/admin/register.html">投稿を登録</a>
-      <a class="admin-nav__link" href="/admin/delete.html">投稿を削除</a>
+      <a class="admin-nav__link" href="register.html">投稿を登録</a>
+      <a class="admin-nav__link" href="delete.html">投稿を削除</a>
     </nav>
 
     <div class="admin-card">
-      <p>公開 Blog の更新はここから行います。変更後は GitHub へ push すると本番に反映されます。</p>
+      <p>公開 Blog の更新はここから行います。`GITHUB_TOKEN` 設定時は自動で本番へ反映されます。</p>
       <p class="admin-hint">登録と削除は画面を分けています。パスワードはサーバー側だけで検証され、GitHub には保存されません。</p>
     </div>
 
@@ -31,7 +31,7 @@
       <button type="button" class="admin-nav__logout" id="logout-btn">ログアウト</button>
     </footer>
   </div>
-  <script src="/admin/js/admin.js"></script>
+  <script src="js/admin.js"></script>
   <script>
     (async function () {
       if (!(await DiaryAdmin.ensureAuth())) return;

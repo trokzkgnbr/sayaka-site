@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """
-Blog 管理用ローカルサーバー。
+Blog 管理サーバー。
 
-- パスワードは config/admin.env のハッシュのみ（平文は Git に入れない）
-- 既定は 127.0.0.1 のみ（インターネットから直接アクセス不可）
-- admin/ は GitHub Pages には公開されない
+- パスワードは ADMIN_PASSWORD_HASH（平文は Git に入れない）
+- 既定は 127.0.0.1（ローカル）。外出先利用時は ADMIN_PATH + GITHUB_TOKEN でクラウド公開
+- admin/ は GitHub Pages には載せない
 """
 
 from __future__ import annotations
@@ -27,7 +27,7 @@ from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import urlparse
 
 JST = timezone(timedelta(hours=9))
 SESSION_COOKIE = "diary_admin_session"
@@ -39,17 +39,44 @@ def site_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+
 def load_env(path: Path) -> dict[str, str]:
     env: dict[str, str] = {}
-    if not path.is_file():
-        return env
-    for line in path.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
+    if path.is_file():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line or line.startswith("#") or "=" not in line:
+                continue
+            key, _, value = line.partition("=")
+            env[key.strip()] = value.strip()
+    for key, value in os.environ.items():
+        if not value.strip():
             continue
-        key, _, value = line.partition("=")
-        env[key.strip()] = value.strip()
+        if key in {
+            "ADMIN_PASSWORD_HASH",
+            "SESSION_SECRET",
+            "ADMIN_BIND",
+            "ADMIN_PORT",
+            "ADMIN_PATH",
+            "ADMIN_HTTPS",
+            "GITHUB_TOKEN",
+            "GITHUB_REPO",
+            "GITHUB_BRANCH",
+            "PORT",
+        }:
+            env[key] = value.strip()
+    if os.environ.get("PORT") and not env.get("ADMIN_PORT"):
+        env["ADMIN_PORT"] = os.environ["PORT"].strip()
     return env
+
+
+def normalize_admin_path(raw: str) -> str:
+    value = raw.strip().strip("/")
+    if not value or ".." in value or "/" in value or not re.fullmatch(r"[a-zA-Z0-9_-]+", value):
+        raise ValueError("ADMIN_PATH は英数字・-_ のみ（例: blog-mgt-k7p2xq9）")
+    return f"/{value}"
 
 
 def hash_password(password: str) -> str:
@@ -134,7 +161,7 @@ def images_dir() -> Path:
     return site_root() / "images" / "diary"
 
 
-def load_diary() -> dict[str, Any]:
+def load_diary_local() -> dict[str, Any]:
     path = diary_path()
     if not path.is_file():
         return {"posts": []}
@@ -147,10 +174,45 @@ def load_diary() -> dict[str, Any]:
     return {"posts": posts}
 
 
-def save_diary(data: dict[str, Any]) -> None:
+def save_diary_local(data: dict[str, Any]) -> None:
     path = diary_path()
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+def load_diary(env: dict[str, str]) -> dict[str, Any]:
+    from github_publish import github_enabled, load_diary_from_github
+
+    if github_enabled(env):
+        try:
+            return load_diary_from_github(env)
+        except Exception as exc:
+            sys.stderr.write(f"GitHub から diary を読めませんでした: {exc}\n")
+    return load_diary_local()
+
+
+def persist_diary(
+    env: dict[str, str],
+    data: dict[str, Any],
+    *,
+    message: str,
+    new_images: dict[str, bytes] | None = None,
+    deleted_images: list[str] | None = None,
+) -> None:
+    from github_publish import GitHubPublishError, github_enabled, publish_diary_changes
+
+    save_diary_local(data)
+    if github_enabled(env):
+        try:
+            publish_diary_changes(
+                env,
+                data,
+                message=message,
+                new_images=new_images,
+                deleted_images=deleted_images,
+            )
+        except GitHubPublishError as exc:
+            raise RuntimeError(str(exc)) from exc
 
 
 def title_from_body(body: str) -> str:
@@ -183,6 +245,7 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
     env: dict[str, str] = {}
     env_path: Path = site_root() / "config" / "admin.env"
     admin_dir: Path = site_root() / "admin"
+    admin_prefix: str = "/admin"
 
     def log_message(self, fmt: str, *args) -> None:
         sys.stderr.write("%s - %s\n" % (self.address_string(), fmt % args))
@@ -190,6 +253,29 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
     @classmethod
     def setup_required(cls) -> bool:
         return not cls.env.get("ADMIN_PASSWORD_HASH") or not cls.env.get("SESSION_SECRET")
+
+    def _admin_url(self, suffix: str = "") -> str:
+        suffix = suffix.lstrip("/")
+        if not suffix:
+            return f"{self.admin_prefix}/"
+        return f"{self.admin_prefix}/{suffix}"
+
+    def _cookie_header(self, value: str, *, max_age: int | None = None) -> str:
+        secure = (
+            self.env.get("ADMIN_HTTPS") == "1"
+            or self.headers.get("X-Forwarded-Proto", "").lower() == "https"
+        )
+        parts = [
+            f"{SESSION_COOKIE}={value}",
+            f"Path={self.admin_prefix}/",
+            "HttpOnly",
+            "SameSite=Strict",
+        ]
+        if secure:
+            parts.append("Secure")
+        if max_age is not None:
+            parts.append(f"Max-Age={max_age}")
+        return "; ".join(parts)
 
     def _read_body(self) -> bytes:
         length = int(self.headers.get("Content-Length", 0))
@@ -200,6 +286,7 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
         self.send_response(status)
         self.send_header("Content-Type", "application/json; charset=utf-8")
         self.send_header("Content-Length", str(len(body)))
+        self.send_header("Cache-Control", "no-store")
         self.end_headers()
         self.wfile.write(body)
 
@@ -207,15 +294,9 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
         self.send_response(HTTPStatus.FOUND)
         self.send_header("Location", location)
         if cookie:
-            self.send_header(
-                "Set-Cookie",
-                f"{SESSION_COOKIE}={cookie}; Path=/; HttpOnly; SameSite=Strict; Max-Age={SESSION_TTL}",
-            )
+            self.send_header("Set-Cookie", self._cookie_header(cookie, max_age=SESSION_TTL))
         if clear_cookie:
-            self.send_header(
-                "Set-Cookie",
-                f"{SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0",
-            )
+            self.send_header("Set-Cookie", self._cookie_header("", max_age=0))
         self.end_headers()
 
     def _session_token(self) -> str | None:
@@ -256,59 +337,85 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
     def _serve_admin_page(self, name: str) -> None:
         if self.setup_required():
             if name not in {"setup.html", "login.html"}:
-                self._redirect("/admin/setup.html")
+                self._redirect(self._admin_url("setup.html"))
                 return
             if name == "login.html":
-                self._redirect("/admin/setup.html")
+                self._redirect(self._admin_url("setup.html"))
                 return
         elif name == "setup.html":
-            self._redirect("/admin/login.html")
+            self._redirect(self._admin_url("login.html"))
             return
 
         protected = {"index.html", "register.html", "delete.html"}
         if name in protected and not self._authenticated():
             if self.setup_required():
-                self._redirect("/admin/setup.html")
+                self._redirect(self._admin_url("setup.html"))
             else:
-                self._redirect("/admin/login.html")
+                self._redirect(self._admin_url("login.html"))
             return
         path = self.admin_dir / name
         if not path.is_file():
             self.send_error(HTTPStatus.NOT_FOUND)
             return
-        data = path.read_bytes()
-        self.send_response(HTTPStatus.OK)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(data)))
-        self.send_header("Cache-Control", "no-store")
-        self.end_headers()
-        self.wfile.write(data)
+        self._serve_file(path)
+
+    def _serve_admin_static(self, rel: str) -> None:
+        if ".." in rel or rel.startswith("/"):
+            self.send_error(HTTPStatus.FORBIDDEN)
+            return
+        path = self.admin_dir / rel
+        self._serve_file(path)
+
+    def _path_under_admin(self, path: str) -> str | None:
+        prefix = self.admin_prefix
+        if path == prefix or path == prefix + "/":
+            return ""
+        needle = prefix + "/"
+        if path.startswith(needle):
+            return path[len(needle) :]
+        return None
 
     def do_GET(self) -> None:
         parsed = urlparse(self.path)
         path = parsed.path
+        admin_rel = self._path_under_admin(path)
 
-        if path == "/admin/api/posts":
-            if not self._require_auth_api():
+        if admin_rel is not None:
+            if admin_rel == "api/posts":
+                if not self._require_auth_api():
+                    return
+                data = load_diary(self.env)
+                posts = sorted(
+                    data.get("posts", []),
+                    key=lambda p: p.get("publishedAt") or p.get("date") or "",
+                    reverse=True,
+                )
+                self._json_response(HTTPStatus.OK, {"ok": True, "posts": posts})
                 return
-            data = load_diary()
-            posts = sorted(
-                data.get("posts", []),
-                key=lambda p: p.get("publishedAt") or p.get("date") or "",
-                reverse=True,
-            )
-            self._json_response(HTTPStatus.OK, {"ok": True, "posts": posts})
-            return
 
-        if path == "/admin/api/session":
-            self._json_response(
-                HTTPStatus.OK,
-                {
-                    "ok": True,
-                    "authenticated": self._authenticated(),
-                    "setupRequired": self.setup_required(),
-                },
-            )
+            if admin_rel == "api/session":
+                self._json_response(
+                    HTTPStatus.OK,
+                    {
+                        "ok": True,
+                        "authenticated": self._authenticated(),
+                        "setupRequired": self.setup_required(),
+                    },
+                )
+                return
+
+            if admin_rel == "" or admin_rel == "index.html":
+                self._serve_admin_page("index.html")
+                return
+
+            if admin_rel.endswith("/"):
+                admin_rel += "index.html"
+
+            if admin_rel.endswith(".html"):
+                self._serve_admin_page(admin_rel)
+                return
+
+            self._serve_admin_static(admin_rel)
             return
 
         if path.startswith("/images/diary/"):
@@ -320,7 +427,23 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
                 self.send_error(HTTPStatus.FORBIDDEN)
                 return
             file_path = site_root() / rel
-            self._serve_file(file_path)
+            if file_path.is_file():
+                self._serve_file(file_path)
+                return
+            from github_publish import get_file_bytes, github_enabled
+
+            if github_enabled(self.env):
+                blob = get_file_bytes(rel, self.env)
+                if blob:
+                    ctype = mimetypes.guess_type(rel)[0] or "application/octet-stream"
+                    self.send_response(HTTPStatus.OK)
+                    self.send_header("Content-Type", ctype)
+                    self.send_header("Content-Length", str(len(blob)))
+                    self.send_header("Cache-Control", "no-store")
+                    self.end_headers()
+                    self.wfile.write(blob)
+                    return
+            self.send_error(HTTPStatus.NOT_FOUND)
             return
 
         if path.startswith("/images/"):
@@ -328,22 +451,7 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
             if ".." in rel:
                 self.send_error(HTTPStatus.FORBIDDEN)
                 return
-            file_path = site_root() / rel
-            self._serve_file(file_path)
-            return
-
-        if path == "/admin" or path == "/admin/":
-            self._serve_admin_page("index.html")
-            return
-
-        if path.startswith("/admin/"):
-            rel = path[len("/admin/") :]
-            if ".." in rel or rel.startswith("/"):
-                self.send_error(HTTPStatus.FORBIDDEN)
-                return
-            if rel.endswith("/"):
-                rel += "index.html"
-            self._serve_admin_page(rel)
+            self._serve_file(site_root() / rel)
             return
 
         self.send_error(HTTPStatus.NOT_FOUND)
@@ -351,8 +459,12 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
     def do_POST(self) -> None:
         parsed = urlparse(self.path)
         path = parsed.path
+        admin_rel = self._path_under_admin(path)
+        if admin_rel is None:
+            self.send_error(HTTPStatus.NOT_FOUND)
+            return
 
-        if path == "/admin/api/setup":
+        if admin_rel == "api/setup":
             if not self.setup_required():
                 self._json_response(
                     HTTPStatus.BAD_REQUEST,
@@ -386,7 +498,7 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
             self._json_response(HTTPStatus.OK, {"ok": True})
             return
 
-        if path == "/admin/api/login":
+        if admin_rel == "api/login":
             if self.setup_required():
                 self._json_response(
                     HTTPStatus.BAD_REQUEST,
@@ -409,28 +521,22 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
             body = json.dumps({"ok": True}, ensure_ascii=False).encode("utf-8")
             self.send_response(HTTPStatus.OK)
             self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header(
-                "Set-Cookie",
-                f"{SESSION_COOKIE}={token}; Path=/; HttpOnly; SameSite=Strict; Max-Age={SESSION_TTL}",
-            )
+            self.send_header("Set-Cookie", self._cookie_header(token, max_age=SESSION_TTL))
             self.send_header("Content-Length", str(len(body)))
             self.end_headers()
             self.wfile.write(body)
             return
 
-        if path == "/admin/api/logout":
+        if admin_rel == "api/logout":
             self.send_response(HTTPStatus.OK)
             self.send_header("Content-Type", "application/json; charset=utf-8")
-            self.send_header(
-                "Set-Cookie",
-                f"{SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0",
-            )
+            self.send_header("Set-Cookie", self._cookie_header("", max_age=0))
             self.send_header("Content-Length", "11")
             self.end_headers()
             self.wfile.write(b'{"ok":true}')
             return
 
-        if path == "/admin/api/posts":
+        if admin_rel == "api/posts":
             if not self._require_auth_api():
                 return
             ctype = self.headers.get("Content-Type", "")
@@ -469,12 +575,13 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
                 )
                 return
 
+            image_bytes = file_item.file.read()
             post_id = f"post-{uuid.uuid4().hex[:12]}"
             fname = safe_image_name(post_id)
             rel_image = f"images/diary/{fname}"
             dest = images_dir() / fname
             images_dir().mkdir(parents=True, exist_ok=True)
-            dest.write_bytes(file_item.file.read())
+            dest.write_bytes(image_bytes)
 
             post = {
                 "id": post_id,
@@ -485,25 +592,35 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
                 "image": rel_image,
             }
 
-            data = load_diary()
+            data = load_diary(self.env)
             posts = data.setdefault("posts", [])
             posts.insert(0, post)
-            save_diary(data)
-            self._json_response(HTTPStatus.OK, {"ok": True, "post": post})
+            try:
+                persist_diary(
+                    self.env,
+                    data,
+                    message="Update blog posts.",
+                    new_images={rel_image: image_bytes},
+                )
+            except RuntimeError as exc:
+                self._json_response(HTTPStatus.BAD_GATEWAY, {"ok": False, "error": str(exc)})
+                return
+            self._json_response(HTTPStatus.OK, {"ok": True, "post": post, "published": True})
             return
 
         self.send_error(HTTPStatus.NOT_FOUND)
 
     def do_DELETE(self) -> None:
         parsed = urlparse(self.path)
-        if not parsed.path.startswith("/admin/api/posts/"):
+        admin_rel = self._path_under_admin(parsed.path)
+        if admin_rel is None or not admin_rel.startswith("api/posts/"):
             self.send_error(HTTPStatus.NOT_FOUND)
             return
         if not self._require_auth_api():
             return
 
-        post_id = parsed.path.rsplit("/", 1)[-1]
-        data = load_diary()
+        post_id = admin_rel.rsplit("/", 1)[-1]
+        data = load_diary(self.env)
         posts = data.get("posts", [])
         target = next((p for p in posts if p.get("id") == post_id), None)
         if not target:
@@ -511,15 +628,31 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
             return
 
         data["posts"] = [p for p in posts if p.get("id") != post_id]
-        save_diary(data)
+        deleted_image = str(target.get("image") or "")
+        img_path = site_root() / deleted_image if deleted_image else None
+        if img_path and img_path.is_file():
+            img_path.unlink()
 
-        image = target.get("image")
-        if image:
-            img_path = site_root() / str(image)
-            if img_path.is_file():
-                img_path.unlink()
+        try:
+            persist_diary(
+                self.env,
+                data,
+                message="Update blog posts.",
+                deleted_images=[deleted_image] if deleted_image else None,
+            )
+        except RuntimeError as exc:
+            self._json_response(HTTPStatus.BAD_GATEWAY, {"ok": False, "error": str(exc)})
+            return
 
-        self._json_response(HTTPStatus.OK, {"ok": True, "deleted": post_id})
+        self._json_response(HTTPStatus.OK, {"ok": True, "deleted": post_id, "published": True})
+
+
+def public_base_url(env: dict[str, str], bind: str, port: int, admin_prefix: str) -> str:
+    public = env.get("ADMIN_PUBLIC_URL", "").strip().rstrip("/")
+    if public:
+        return f"{public}{admin_prefix}/"
+    host = bind if bind not in {"0.0.0.0", "::"} else "127.0.0.1"
+    return f"http://{host}:{port}{admin_prefix}/"
 
 
 def main() -> int:
@@ -527,39 +660,46 @@ def main() -> int:
     env_path = root / "config" / "admin.env"
     example = root / "config" / "admin.env.example"
 
-    if not env_path.is_file():
-        if example.is_file():
-            env_path.parent.mkdir(parents=True, exist_ok=True)
-            env_path.write_text(example.read_text(encoding="utf-8"), encoding="utf-8")
-            try:
-                env_path.chmod(0o600)
-            except OSError:
-                pass
-            print(f"初回: {env_path} を作成しました")
-        else:
-            print("× config/admin.env.example がありません", file=sys.stderr)
-            return 1
+    if not env_path.is_file() and example.is_file():
+        env_path.parent.mkdir(parents=True, exist_ok=True)
+        env_path.write_text(example.read_text(encoding="utf-8"), encoding="utf-8")
+        try:
+            env_path.chmod(0o600)
+        except OSError:
+            pass
+        print(f"初回: {env_path} を作成しました")
+    elif not env_path.is_file() and not example.is_file():
+        print("× config/admin.env.example がありません", file=sys.stderr)
+        return 1
 
     env = load_env(env_path)
+    try:
+        admin_prefix = normalize_admin_path(env.get("ADMIN_PATH", "admin"))
+    except ValueError as exc:
+        print(f"× {exc}", file=sys.stderr)
+        return 1
+
     bind = env.get("ADMIN_BIND", "127.0.0.1")
     port = int(env.get("ADMIN_PORT", "8765"))
 
     DiaryAdminHandler.env = env
     DiaryAdminHandler.env_path = env_path
     DiaryAdminHandler.admin_dir = root / "admin"
+    DiaryAdminHandler.admin_prefix = admin_prefix
 
     server = ThreadingHTTPServer((bind, port), DiaryAdminHandler)
-    base = f"http://{bind}:{port}/admin/"
+    base = public_base_url(env, bind, port, admin_prefix)
     if DiaryAdminHandler.setup_required():
-        url = f"http://{bind}:{port}/admin/setup.html"
+        url = f"{base}setup.html"
         print(f"Blog 管理サーバー（初回セットアップ）: {url}")
         print("ブラウザでパスワードを設定してください")
     else:
-        url = base
-        print(f"Blog 管理サーバー: {url}")
+        print(f"Blog 管理サーバー: {base}")
+    if env.get("GITHUB_TOKEN"):
+        print("GitHub 自動反映: 有効（投稿・削除後に main へ push）")
     print("停止: Ctrl+C")
     if bind == "127.0.0.1":
-        print("（127.0.0.1 のみ。インターネットから直接はアクセスできません）")
+        print("（127.0.0.1 のみ。外出先公開は Render 等 + ADMIN_BIND=0.0.0.0 を参照）")
     try:
         server.serve_forever()
     except KeyboardInterrupt:

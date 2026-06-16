@@ -30,17 +30,17 @@
   }
 
   async function ensureAuth() {
-    const data = await api("/admin/api/session");
+    const data = await api("api/session");
     if (!data.authenticated) {
-      window.location.href = "/admin/login.html";
+      window.location.href = "login.html";
       return false;
     }
     return true;
   }
 
   async function logout() {
-    await api("/admin/api/logout", { method: "POST" });
-    window.location.href = "/admin/login.html";
+    await api("api/logout", { method: "POST" });
+    window.location.href = "login.html";
   }
 
   window.DiaryAdmin = {

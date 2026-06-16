@@ -6,12 +6,12 @@
   <meta name="theme-color" content="#ffffff">
   <meta name="robots" content="noindex, nofollow">
   <title>Blog 管理 — 初回セットアップ</title>
-  <link rel="stylesheet" href="/admin/css/admin.css">
+  <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
   <div class="admin-shell">
     <header class="admin-header">
-      <a class="admin-brand" href="/admin/" aria-label="SAYAYOSUI">
+      <a class="admin-brand" href="./" aria-label="SAYAYOSUI">
         <img class="admin-brand__img" src="/images/logo.png?v=61" alt="Saya Yosui" width="1024" height="187">
       </a>
     </header>
@@ -36,7 +36,7 @@
       </form>
     </div>
   </div>
-  <script src="/admin/js/admin.js"></script>
+  <script src="js/admin.js"></script>
   <script>
     (function () {
       const form = DiaryAdmin.qs("#setup-form");
@@ -52,21 +52,21 @@
           return;
         }
         try {
-          await DiaryAdmin.api("/admin/api/setup", {
+          await DiaryAdmin.api("api/setup", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ password: password, confirm: password2 }),
           });
-          window.location.href = "/admin/login.html";
+          window.location.href = "login.html";
         } catch (err) {
           DiaryAdmin.showMessage(message, err.message, "error");
         }
       });
 
-      DiaryAdmin.api("/admin/api/session")
+      DiaryAdmin.api("api/session")
         .then(function (session) {
           if (!session.setupRequired) {
-            window.location.href = "/admin/login.html";
+            window.location.href = "login.html";
           }
         })
         .catch(function () {

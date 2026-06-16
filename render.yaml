@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: sayaka-blog-admin
+    runtime: python
+    plan: free
+    buildCommand: echo "Blog admin (stdlib only)"
+    startCommand: python3 scripts/diary_admin_server.py
+    envVars:
+      - key: ADMIN_BIND
+        value: 0.0.0.0
+      - key: ADMIN_HTTPS
+        value: "1"
+      - key: GITHUB_REPO
+        value: trokzkgnbr/sayaka-site
+      - key: GITHUB_BRANCH
+        value: main
+      - key: PYTHON_VERSION
+        value: 3.11.11
