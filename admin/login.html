@@ -31,7 +31,7 @@
           <button class="admin-btn" type="submit">ログイン</button>
         </div>
       </form>
-      <p class="admin-hint admin-hint--desktop">初回は <a href="setup.html">セットアップ画面</a> でパスワードを決められます。</p>
+      <p class="admin-hint admin-hint--desktop">この URL は公開サイトと同じパスです。投稿・削除は Mac で <code>bash scripts/run_diary_admin.sh</code> を実行しているときだけ使えます。</p>
     </div>
   </div>
   <script src="js/admin.js"></script>
@@ -67,9 +67,12 @@
           }
         })
         .catch(function () {
+          const onPublicSite = /\.site$|github\.io$/.test(window.location.hostname);
           DiaryAdmin.showMessage(
             message,
-            "管理サーバーに接続できません。ターミナルで bash scripts/run_diary_admin.sh を実行してください。",
+            onPublicSite
+              ? "この URL では閲覧のみです。投稿・削除は Mac で bash scripts/run_diary_admin.sh を実行してから、http://127.0.0.1:8765/blog-mgt-bf8fa662/ を開いてください。"
+              : "管理サーバーに接続できません。bash scripts/run_diary_admin.sh を実行してください。",
             "error"
           );
         });

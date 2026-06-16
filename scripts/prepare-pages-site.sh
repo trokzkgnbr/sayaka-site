@@ -29,4 +29,22 @@ for dir in css js images data; do
   fi
 done
 
+ADMIN_PATH_FILE="$ROOT/config/blog-admin-path.txt"
+if [[ -f "$ADMIN_PATH_FILE" && -d "$ROOT/admin" ]]; then
+  ADMIN_PATH="$(tr -d '[:space:]' < "$ADMIN_PATH_FILE")"
+  if [[ "$ADMIN_PATH" =~ ^[a-zA-Z0-9_-]+$ ]]; then
+    mkdir -p "$OUT/$ADMIN_PATH"
+    cp -R "$ROOT/admin/." "$OUT/$ADMIN_PATH/"
+    mkdir -p "$OUT"
+    {
+      echo "User-agent: *"
+      echo "Disallow: /${ADMIN_PATH}/"
+    } >>"$OUT/robots.txt"
+    echo "Admin UI (static): /${ADMIN_PATH}/"
+  else
+    echo "× config/blog-admin-path.txt の形式が不正です" >&2
+    exit 1
+  fi
+fi
+
 echo "Prepared $(find "$OUT" -type f | wc -l | tr -d ' ') files in $OUT"

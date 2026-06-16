@@ -13,7 +13,8 @@ Blog（Diary）の投稿登録・削除は **ローカル管理サーバー** �
 
 ## 外出先から使う
 
-秘密 URL + パスワードで Render 等に公開する手順: **[DIARY_ADMIN_REMOTE.md](./DIARY_ADMIN_REMOTE.md)**
+秘密 URL + パスワードのみ。**Render は不要**です。  
+手順: **[DIARY_ADMIN_REMOTE.md](./DIARY_ADMIN_REMOTE.md)**
 
 ## 初回セットアップ（1回）
 
@@ -46,16 +47,13 @@ bash scripts/run_diary_admin.sh
 
 ## 本番への反映
 
-管理サーバーは `data/diary.json` と `images/diary/` を更新します。  
-本番サイトへ反映するには:
+管理サーバーは `data/diary.json` と `images/diary/` を更新します。
 
-```bash
-git add data/diary.json images/diary/
-git commit -m "Update blog posts."
-git push origin main
-```
+- **`GITHUB_TOKEN` あり** … 投稿・削除後に GitHub へ自動 push → すぐ Deploy ワークフローが走る
+- **手動 push** … `git add data/diary.json images/diary/` → push
+- **1日2回（9:00 / 21:00 JST）** … 変更があるか自動確認し、あれば GitHub Pages へデプロイ（取りこぼし防止）
 
-`Deploy GitHub Pages` ワークフローが走り、数分で公開されます。
+公開 Blog: https://sayayosui.site/
 
 ## セキュリティ
 

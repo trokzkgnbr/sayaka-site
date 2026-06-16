@@ -1,6 +1,4 @@
 # 静的サイトを gh-pages ブランチへ公開（Settings → Pages: gh-pages / root）
-# 公式 Actions デプロイへ移行する場合は Settings で Source を GitHub Actions に変更し、
-# 本ファイルを configure-pages + deploy-pages 方式に差し替える（docs/GITHUB_PAGES_SETUP.md）
 name: Deploy GitHub Pages
 
 on:
@@ -12,10 +10,17 @@ on:
       - "js/**"
       - "images/**"
       - "data/**"
+      - "config/blog-admin-path.txt"
+      - "admin/**"
       - ".nojekyll"
       - "CNAME"
       - ".github/workflows/deploy-pages.yml"
       - "scripts/prepare-pages-site.sh"
+      - "scripts/check-pages-deploy-needed.sh"
+  schedule:
+    # 09:00 / 21:00 JST（UTC 0:00 / 12:00）
+    - cron: "0 0 * * *"
+    - cron: "0 12 * * *"
   workflow_dispatch:
 
 permissions:
@@ -29,16 +34,43 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout main
         uses: actions/checkout@v4
 
       - name: Assemble public site
         run: bash scripts/prepare-pages-site.sh _site
 
+      - name: Checkout gh-pages
+        if: github.event_name == 'schedule'
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: _gh-pages-live
+        continue-on-error: true
+
+      - name: Check for changes (scheduled)
+        if: github.event_name == 'schedule'
+        id: check
+        run: |
+          set +e
+          bash scripts/check-pages-deploy-needed.sh _site _gh-pages-live
+          code=$?
+          set -e
+          if [[ "$code" -eq 1 ]]; then
+            echo "deploy=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Publish to gh-pages branch
+        if: github.event_name != 'schedule' || steps.check.outputs.deploy == 'true'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: _site
           branch: gh-pages
           single-commit: true
           clean: true
+
+      - name: No changes
+        if: github.event_name == 'schedule' && steps.check.outputs.deploy == 'false'
+        run: echo "変更なしのためデプロイをスキップしました"
