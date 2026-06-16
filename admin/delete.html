@@ -30,6 +30,7 @@
     </div>
 
     <footer class="admin-footer">
+      <p class="admin-hint">困ったら寺尾まで</p>
       <button type="button" class="admin-nav__logout" id="logout-btn">ログアウト</button>
     </footer>
   </div>
@@ -86,7 +87,7 @@
           await DiaryAdmin.api("api/posts/" + encodeURIComponent(id), {
             method: "DELETE",
           });
-          DiaryAdmin.showMessage(message, "削除しました。本番サイトへ反映中です。", "success");
+          DiaryAdmin.showMessage(message, "削除しました。", "success");
           await loadPosts();
         } catch (err) {
           DiaryAdmin.showMessage(message, err.message, "error");

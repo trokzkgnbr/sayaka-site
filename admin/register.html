@@ -52,6 +52,7 @@
     </div>
 
     <footer class="admin-footer">
+      <p class="admin-hint">困ったら寺尾まで</p>
       <button type="button" class="admin-nav__logout" id="logout-btn">ログアウト</button>
     </footer>
   </div>
@@ -104,7 +105,7 @@
 
         try {
           await DiaryAdmin.api("api/posts", { method: "POST", body: fd });
-          DiaryAdmin.showMessage(message, "登録しました。本番サイトへ反映中です。", "success");
+          DiaryAdmin.showMessage(message, "登録しました。", "success");
           form.reset();
           preview.hidden = true;
           imageName.hidden = true;

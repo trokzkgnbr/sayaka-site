@@ -31,6 +31,7 @@
           <button class="admin-btn" type="submit">ログイン</button>
         </div>
       </form>
+      <p class="admin-hint">困ったら寺尾まで</p>
     </div>
   </div>
   <script src="js/admin.js"></script>
@@ -58,11 +59,7 @@
           }
         })
         .catch(function () {
-          DiaryAdmin.showMessage(
-            message,
-            "管理 API が未設定です。Cloudflare Worker のセットアップが必要です（docs/ADMIN_PHONE.md）。",
-            "error"
-          );
+          DiaryAdmin.showMessage(message, "困ったら寺尾まで", "error");
         });
     })();
   </script>

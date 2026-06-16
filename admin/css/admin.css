@@ -125,6 +125,11 @@ body {
   padding-top: 2rem;
 }
 
+.admin-footer .admin-hint {
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
 .admin-nav__logout {
   appearance: none;
   border: 1px solid var(--line);
