@@ -4,16 +4,13 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 ENV_FILE="$ROOT/config/admin.env"
+EXAMPLE="$ROOT/config/admin.env.example"
 
-if [[ ! -f "$ENV_FILE" ]]; then
-  echo "× config/admin.env がありません" >&2
-  echo "  bash scripts/setup_admin_password.sh" >&2
-  exit 1
+if [[ ! -f "$ENV_FILE" && -f "$EXAMPLE" ]]; then
+  cp "$EXAMPLE" "$ENV_FILE"
+  chmod 600 "$ENV_FILE" 2>/dev/null || true
+  echo "初回: config/admin.env を作成しました"
+  echo "起動後、ブラウザでパスワードを設定できます"
 fi
-
-set -a
-# shellcheck disable=SC1090
-source "$ENV_FILE"
-set +a
 
 exec python3 "$ROOT/scripts/diary_admin_server.py"

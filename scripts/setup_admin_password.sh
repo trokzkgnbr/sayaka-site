@@ -17,7 +17,7 @@ if [[ -f "$TARGET" ]]; then
   [[ "${ans,,}" == "y" ]] || exit 0
 fi
 
-read -r -s -p "Blog 管理用パスワード: " pass1
+read -r -s -p "Blog 管理用パスワード（入力は画面に表示されません）: " pass1
 echo
 read -r -s -p "もう一度: " pass2
 echo

@@ -52,6 +52,38 @@ def load_env(path: Path) -> dict[str, str]:
     return env
 
 
+def hash_password(password: str) -> str:
+    salt = secrets.token_hex(16)
+    digest = hashlib.pbkdf2_hmac(
+        "sha256", password.encode("utf-8"), salt.encode("utf-8"), 600_000
+    )
+    return f"pbkdf2_sha256${salt}${digest.hex()}"
+
+
+def write_admin_env(env_path: Path, password: str) -> dict[str, str]:
+    example = env_path.parent / "admin.env.example"
+    if not example.is_file():
+        raise FileNotFoundError("config/admin.env.example がありません")
+    lines = example.read_text(encoding="utf-8").splitlines(keepends=True)
+    pwd_hash = hash_password(password)
+    session_secret = secrets.token_hex(32)
+    out: list[str] = []
+    for line in lines:
+        if line.startswith("ADMIN_PASSWORD_HASH="):
+            out.append(f"ADMIN_PASSWORD_HASH={pwd_hash}\n")
+        elif line.startswith("SESSION_SECRET="):
+            out.append(f"SESSION_SECRET={session_secret}\n")
+        else:
+            out.append(line)
+    env_path.parent.mkdir(parents=True, exist_ok=True)
+    env_path.write_text("".join(out), encoding="utf-8")
+    try:
+        env_path.chmod(0o600)
+    except OSError:
+        pass
+    return load_env(env_path)
+
+
 def verify_password(password: str, stored: str) -> bool:
     try:
         algo, salt, digest_hex = stored.split("$", 2)
@@ -149,10 +181,15 @@ def safe_image_name(post_id: str) -> str:
 
 class DiaryAdminHandler(BaseHTTPRequestHandler):
     env: dict[str, str] = {}
+    env_path: Path = site_root() / "config" / "admin.env"
     admin_dir: Path = site_root() / "admin"
 
     def log_message(self, fmt: str, *args) -> None:
         sys.stderr.write("%s - %s\n" % (self.address_string(), fmt % args))
+
+    @classmethod
+    def setup_required(cls) -> bool:
+        return not cls.env.get("ADMIN_PASSWORD_HASH") or not cls.env.get("SESSION_SECRET")
 
     def _read_body(self) -> bytes:
         length = int(self.headers.get("Content-Length", 0))
@@ -217,9 +254,23 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
         self.wfile.write(data)
 
     def _serve_admin_page(self, name: str) -> None:
+        if self.setup_required():
+            if name not in {"setup.html", "login.html"}:
+                self._redirect("/admin/setup.html")
+                return
+            if name == "login.html":
+                self._redirect("/admin/setup.html")
+                return
+        elif name == "setup.html":
+            self._redirect("/admin/login.html")
+            return
+
         protected = {"index.html", "register.html", "delete.html"}
         if name in protected and not self._authenticated():
-            self._redirect("/admin/login.html")
+            if self.setup_required():
+                self._redirect("/admin/setup.html")
+            else:
+                self._redirect("/admin/login.html")
             return
         path = self.admin_dir / name
         if not path.is_file():
@@ -252,7 +303,11 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
         if path == "/admin/api/session":
             self._json_response(
                 HTTPStatus.OK,
-                {"ok": True, "authenticated": self._authenticated()},
+                {
+                    "ok": True,
+                    "authenticated": self._authenticated(),
+                    "setupRequired": self.setup_required(),
+                },
             )
             return
 
@@ -260,6 +315,15 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
             if not self._authenticated():
                 self.send_error(HTTPStatus.FORBIDDEN)
                 return
+            rel = path.lstrip("/")
+            if ".." in rel:
+                self.send_error(HTTPStatus.FORBIDDEN)
+                return
+            file_path = site_root() / rel
+            self._serve_file(file_path)
+            return
+
+        if path.startswith("/images/"):
             rel = path.lstrip("/")
             if ".." in rel:
                 self.send_error(HTTPStatus.FORBIDDEN)
@@ -288,7 +352,47 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = parsed.path
 
+        if path == "/admin/api/setup":
+            if not self.setup_required():
+                self._json_response(
+                    HTTPStatus.BAD_REQUEST,
+                    {"ok": False, "error": "すでにパスワードが設定されています"},
+                )
+                return
+            try:
+                payload = json.loads(self._read_body().decode("utf-8"))
+            except json.JSONDecodeError:
+                self._json_response(HTTPStatus.BAD_REQUEST, {"ok": False, "error": "JSON が不正です"})
+                return
+            password = str(payload.get("password", ""))
+            confirm = str(payload.get("confirm", ""))
+            if len(password) < 8:
+                self._json_response(
+                    HTTPStatus.BAD_REQUEST,
+                    {"ok": False, "error": "パスワードは8文字以上にしてください"},
+                )
+                return
+            if password != confirm:
+                self._json_response(
+                    HTTPStatus.BAD_REQUEST,
+                    {"ok": False, "error": "パスワードが一致しません"},
+                )
+                return
+            try:
+                self.__class__.env = write_admin_env(self.env_path, password)
+            except FileNotFoundError as exc:
+                self._json_response(HTTPStatus.INTERNAL_SERVER_ERROR, {"ok": False, "error": str(exc)})
+                return
+            self._json_response(HTTPStatus.OK, {"ok": True})
+            return
+
         if path == "/admin/api/login":
+            if self.setup_required():
+                self._json_response(
+                    HTTPStatus.BAD_REQUEST,
+                    {"ok": False, "error": "先に初回セットアップでパスワードを設定してください"},
+                )
+                return
             try:
                 payload = json.loads(self._read_body().decode("utf-8"))
             except json.JSONDecodeError:
@@ -421,22 +525,38 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
 def main() -> int:
     root = site_root()
     env_path = root / "config" / "admin.env"
+    example = root / "config" / "admin.env.example"
+
+    if not env_path.is_file():
+        if example.is_file():
+            env_path.parent.mkdir(parents=True, exist_ok=True)
+            env_path.write_text(example.read_text(encoding="utf-8"), encoding="utf-8")
+            try:
+                env_path.chmod(0o600)
+            except OSError:
+                pass
+            print(f"初回: {env_path} を作成しました")
+        else:
+            print("× config/admin.env.example がありません", file=sys.stderr)
+            return 1
+
     env = load_env(env_path)
-
-    if not env.get("ADMIN_PASSWORD_HASH") or not env.get("SESSION_SECRET"):
-        print("× config/admin.env の ADMIN_PASSWORD_HASH / SESSION_SECRET を設定してください", file=sys.stderr)
-        print("  bash scripts/setup_admin_password.sh", file=sys.stderr)
-        return 1
-
     bind = env.get("ADMIN_BIND", "127.0.0.1")
     port = int(env.get("ADMIN_PORT", "8765"))
 
     DiaryAdminHandler.env = env
+    DiaryAdminHandler.env_path = env_path
     DiaryAdminHandler.admin_dir = root / "admin"
 
     server = ThreadingHTTPServer((bind, port), DiaryAdminHandler)
-    url = f"http://{bind}:{port}/admin/"
-    print(f"Blog 管理サーバー: {url}")
+    base = f"http://{bind}:{port}/admin/"
+    if DiaryAdminHandler.setup_required():
+        url = f"http://{bind}:{port}/admin/setup.html"
+        print(f"Blog 管理サーバー（初回セットアップ）: {url}")
+        print("ブラウザでパスワードを設定してください")
+    else:
+        url = base
+        print(f"Blog 管理サーバー: {url}")
     print("停止: Ctrl+C")
     if bind == "127.0.0.1":
         print("（127.0.0.1 のみ。インターネットから直接はアクセスできません）")
