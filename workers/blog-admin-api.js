@@ -38,11 +38,7 @@ export default {
           return json({ ok: false, error: "ログインが必要です" }, 401);
         }
         const data = await loadDiary(env);
-        const posts = [...(data.posts || [])].sort((a, b) => {
-          const av = a.publishedAt || a.date || "";
-          const bv = b.publishedAt || b.date || "";
-          return bv.localeCompare(av);
-        });
+        const posts = sortPostsByDate(data.posts || []);
         return json({ ok: true, posts });
       }
       if (sub === "posts" && request.method === "POST") {
@@ -321,6 +317,9 @@ async function deleteFile(env, path, sha, message) {
 }
 
 async function publishDiary(env, diaryData, { newImages = {}, deletedImages = [] } = {}) {
+  if (Array.isArray(diaryData.posts)) {
+    diaryData.posts = sortPostsByDate(diaryData.posts);
+  }
   const message = "Update blog posts.";
   const diaryJson = JSON.stringify(diaryData, null, 2) + "\n";
   const enc = new TextEncoder();
@@ -337,6 +336,14 @@ async function publishDiary(env, diaryData, { newImages = {}, deletedImages = []
     const meta = await getFileMeta(env, repoPath);
     if (meta?.sha) await deleteFile(env, repoPath, meta.sha, message);
   }
+}
+
+function sortPostsByDate(posts) {
+  return [...posts].sort((a, b) => {
+    const byDate = (b.date || "").localeCompare(a.date || "");
+    if (byDate !== 0) return byDate;
+    return (b.publishedAt || "").localeCompare(a.publishedAt || "");
+  });
 }
 
 function titleFromBody(body) {

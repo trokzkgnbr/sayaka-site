@@ -82,7 +82,7 @@ def normalize_admin_path(raw: str) -> str:
 def hash_password(password: str) -> str:
     salt = secrets.token_hex(16)
     digest = hashlib.pbkdf2_hmac(
-        "sha256", password.encode("utf-8"), salt.encode("utf-8"), 600_000
+        "sha256", password.encode("utf-8"), salt.encode("utf-8"), 100_000
     )
     return f"pbkdf2_sha256${salt}${digest.hex()}"
 
@@ -119,7 +119,7 @@ def verify_password(password: str, stored: str) -> bool:
     if algo != "pbkdf2_sha256":
         return False
     digest = hashlib.pbkdf2_hmac(
-        "sha256", password.encode("utf-8"), salt.encode("utf-8"), 600_000
+        "sha256", password.encode("utf-8"), salt.encode("utf-8"), 100_000
     )
     return hmac.compare_digest(digest.hex(), digest_hex)
 
@@ -159,6 +159,14 @@ def diary_path() -> Path:
 
 def images_dir() -> Path:
     return site_root() / "images" / "diary"
+
+
+def sort_posts_by_date(posts: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return sorted(
+        posts,
+        key=lambda p: (p.get("date") or "", p.get("publishedAt") or ""),
+        reverse=True,
+    )
 
 
 def load_diary_local() -> dict[str, Any]:
@@ -201,6 +209,8 @@ def persist_diary(
 ) -> None:
     from github_publish import GitHubPublishError, github_enabled, publish_diary_changes
 
+    if isinstance(data.get("posts"), list):
+        data["posts"] = sort_posts_by_date(data["posts"])
     save_diary_local(data)
     if github_enabled(env):
         try:
@@ -339,7 +349,7 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
         if not pwd_hash:
             self.send_error(HTTPStatus.NOT_FOUND)
             return
-        payload = json.dumps({"hash": pwd_hash, "iterations": 600_000}, ensure_ascii=False)
+        payload = json.dumps({"hash": pwd_hash, "iterations": 100_000}, ensure_ascii=False)
         data = f"window.ADMIN_AUTH={payload};\n".encode("utf-8")
         self.send_response(HTTPStatus.OK)
         self.send_header("Content-Type", "application/javascript; charset=utf-8")
@@ -399,11 +409,7 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
                 if not self._require_auth_api():
                     return
                 data = load_diary(self.env)
-                posts = sorted(
-                    data.get("posts", []),
-                    key=lambda p: p.get("publishedAt") or p.get("date") or "",
-                    reverse=True,
-                )
+                posts = sort_posts_by_date(data.get("posts", []))
                 self._json_response(HTTPStatus.OK, {"ok": True, "posts": posts})
                 return
 

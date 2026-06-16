@@ -119,6 +119,14 @@
     paginationEl.innerHTML = parts.join('');
   }
 
+  function sortPostsByDate(posts) {
+    return posts.slice().sort(function (a, b) {
+      var byDate = (b.date || '').localeCompare(a.date || '');
+      if (byDate !== 0) return byDate;
+      return (b.publishedAt || '').localeCompare(a.publishedAt || '');
+    });
+  }
+
   function renderPage(posts, page) {
     const totalPages = Math.max(1, Math.ceil(posts.length / PAGE_SIZE));
     const safePage = Math.min(page, totalPages);
@@ -140,8 +148,8 @@
       return res.json();
     })
     .then(function (data) {
-      // diary.json の配列順（新しい順）をそのまま使う
-      const posts = (data.posts || []).slice();
+      // 投稿日（手動入力）の新しい順
+      const posts = sortPostsByDate(data.posts || []);
       if (!posts.length) {
         showEmpty('まだ投稿がありません。');
         return;
