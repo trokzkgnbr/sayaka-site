@@ -140,7 +140,7 @@
       return res.json();
     })
     .then(function (data) {
-      // diary.json の配列順（= Instagram 新しい順）をそのまま使う
+      // diary.json の配列順（新しい順）をそのまま使う
       const posts = (data.posts || []).slice();
       if (!posts.length) {
         showEmpty('まだ投稿がありません。');

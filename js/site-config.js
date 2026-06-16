@@ -64,7 +64,7 @@ window.SITE = {
 
   homeVisual: 'images/home/main-visual.jpg',
 
-  /** ヘッダー右上 SNS（@pikinsaya）。Blog 同期元は @4mnion → config/instagram.env */
+  /** ヘッダー右上 SNS（@pikinsaya） */
   sns: {
     instagram: 'https://www.instagram.com/pikinsaya/',
     x: 'https://x.com/pikinsaya',
