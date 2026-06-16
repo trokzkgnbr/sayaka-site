@@ -33,4 +33,4 @@
 
 ## 公開されないファイル
 
-`scripts/prepare-pages-site.sh` により配信しないもの: `scripts/`, `docs/`, `config/`, `.github/`, `README.md`
+`scripts/prepare-pages-site.sh` により配信しないもの: `scripts/`, `docs/`, `config/`, `admin/`, `.github/`, `README.md`

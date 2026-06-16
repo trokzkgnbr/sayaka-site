@@ -21,7 +21,12 @@
 - 一覧: `diary.html` — サムネ・タイトル（先頭行）・投稿日。
 - 詳細: `diary-post.html?id=...` — 全文・画像1枚（正方形想定）。
 - データ正本: `data/diary.json` + `images/diary/*.jpg`
-- 更新: 非公開の管理ページから行う予定（準備中）
+- **更新:** 非公開の管理サーバー — [`docs/DIARY_ADMIN.md`](docs/DIARY_ADMIN.md)
+
+```bash
+bash scripts/setup_admin_password.sh   # 初回のみ
+bash scripts/run_diary_admin.sh        # http://127.0.0.1:8765/admin/
+```
 
 ## ローカル表示
 

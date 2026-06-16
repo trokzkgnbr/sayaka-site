@@ -1,4 +1,5 @@
 config/instagram.env
+config/admin.env
 __pycache__/
 *.pyc
 scripts/.venv/

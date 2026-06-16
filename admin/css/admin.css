@@ -1,0 +1,243 @@
+/* Blog 管理（非公開・ローカルサーバー専用） */
+
+:root {
+  --bg: #ffffff;
+  --text: #696b6e;
+  --text-muted: #8a8c8f;
+  --line: #e5e5e5;
+  --max-w: 560px;
+  --font-serif: "Gurmukhi MT", "Hiragino Mincho ProN", "Hiragino Mincho Pro", "Yu Mincho",
+    "YuMincho", serif;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: var(--font-serif);
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.7;
+}
+
+.admin-shell {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: clamp(1.5rem, 5vw, 2.5rem) clamp(1rem, 4vw, 1.5rem) 3rem;
+}
+
+.admin-brand {
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  margin: 0 0 0.35rem;
+}
+
+.admin-title {
+  font-size: clamp(1.35rem, 4vw, 1.65rem);
+  font-weight: 500;
+  margin: 0 0 1.5rem;
+}
+
+.admin-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.admin-nav a,
+.admin-nav button {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.92rem;
+  letter-spacing: 0.06em;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.admin-nav a:hover,
+.admin-nav button:hover {
+  border-color: #ccc;
+}
+
+.admin-card {
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1.25rem 1.25rem 1.5rem;
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.admin-field {
+  margin-bottom: 1.1rem;
+}
+
+.admin-field label {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.admin-field input[type="text"],
+.admin-field input[type="password"],
+.admin-field input[type="date"],
+.admin-field input[type="file"],
+.admin-field textarea {
+  width: 100%;
+  font: inherit;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.65rem 0.75rem;
+  background: #fff;
+}
+
+.admin-field textarea {
+  min-height: 9rem;
+  resize: vertical;
+}
+
+.admin-hint {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0.25rem 0 0;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 1.25rem;
+}
+
+.admin-btn {
+  appearance: none;
+  border: 1px solid var(--text);
+  background: var(--text);
+  color: #fff;
+  font: inherit;
+  font-size: 0.92rem;
+  letter-spacing: 0.06em;
+  padding: 0.65rem 1.25rem;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.admin-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.admin-btn--ghost {
+  background: #fff;
+  color: var(--text);
+  border-color: var(--line);
+}
+
+.admin-btn--danger {
+  background: #fff;
+  color: #a33;
+  border-color: #d8a0a0;
+}
+
+.admin-message {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 10px;
+  font-size: 0.9rem;
+}
+
+.admin-message--error {
+  background: #fff3f3;
+  color: #8a3030;
+  border: 1px solid #f0caca;
+}
+
+.admin-message--success {
+  background: #f4fff6;
+  color: #2f6a3d;
+  border: 1px solid #c8e6cf;
+}
+
+.admin-post-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.admin-post-item {
+  display: grid;
+  grid-template-columns: 72px 1fr auto;
+  gap: 0.85rem;
+  align-items: center;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.admin-post-item:last-child {
+  border-bottom: 0;
+}
+
+.admin-post-item img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #f5f5f5;
+}
+
+.admin-post-meta {
+  min-width: 0;
+}
+
+.admin-post-meta strong {
+  display: block;
+  font-weight: 500;
+  margin-bottom: 0.15rem;
+}
+
+.admin-post-meta time,
+.admin-post-meta span {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.admin-empty {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.admin-preview {
+  margin-top: 0.75rem;
+  max-width: 180px;
+}
+
+.admin-preview img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+}
+
+@media (max-width: 520px) {
+  .admin-post-item {
+    grid-template-columns: 56px 1fr;
+  }
+
+  .admin-post-item .admin-btn {
+    grid-column: 1 / -1;
+    justify-self: start;
+  }
+}

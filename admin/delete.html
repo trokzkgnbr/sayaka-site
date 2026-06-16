@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Blog 管理 — 削除</title>
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <p class="admin-brand">SAYAYOSUI</p>
+    <h1 class="admin-title">Blog 管理 — 投稿を削除</h1>
+
+    <nav class="admin-nav" aria-label="管理メニュー">
+      <a href="/admin/">トップ</a>
+      <a href="/admin/register.html">投稿を登録</a>
+      <button type="button" id="logout-btn">ログアウト</button>
+    </nav>
+
+    <div class="admin-card">
+      <p id="message" class="admin-message" hidden></p>
+      <ul class="admin-post-list" id="post-list" aria-live="polite">
+        <li class="admin-empty">読み込み中…</li>
+      </ul>
+    </div>
+  </div>
+  <script src="/admin/js/admin.js"></script>
+  <script>
+    (async function () {
+      if (!(await DiaryAdmin.ensureAuth())) return;
+      DiaryAdmin.qs("#logout-btn").addEventListener("click", DiaryAdmin.logout);
+
+      const list = DiaryAdmin.qs("#post-list");
+      const message = DiaryAdmin.qs("#message");
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      async function loadPosts() {
+        const data = await DiaryAdmin.api("/admin/api/posts");
+        const posts = data.posts || [];
+        if (!posts.length) {
+          list.innerHTML = '<li class="admin-empty">投稿がありません。</li>';
+          return;
+        }
+        list.innerHTML = posts
+          .map(function (post) {
+            return (
+              '<li class="admin-post-item">' +
+              '<img src="/' + escapeHtml(post.image) + '" alt="">' +
+              '<div class="admin-post-meta">' +
+              "<strong>" + escapeHtml(post.title || "（無題）") + "</strong>" +
+              "<time>" + escapeHtml(post.date || "") + "</time>" +
+              "</div>" +
+              '<button type="button" class="admin-btn admin-btn--danger" data-id="' +
+              escapeHtml(post.id) +
+              '">削除</button>' +
+              "</li>"
+            );
+          })
+          .join("");
+      }
+
+      list.addEventListener("click", async function (event) {
+        const btn = event.target.closest("button[data-id]");
+        if (!btn) return;
+        const id = btn.getAttribute("data-id");
+        if (!window.confirm("この投稿を削除しますか？")) return;
+        DiaryAdmin.showMessage(message, "", "error");
+        btn.disabled = true;
+        try {
+          await DiaryAdmin.api("/admin/api/posts/" + encodeURIComponent(id), {
+            method: "DELETE",
+          });
+          DiaryAdmin.showMessage(message, "削除しました。", "success");
+          await loadPosts();
+        } catch (err) {
+          DiaryAdmin.showMessage(message, err.message, "error");
+          btn.disabled = false;
+        }
+      });
+
+      try {
+        await loadPosts();
+      } catch (err) {
+        list.innerHTML = '<li class="admin-empty">' + escapeHtml(err.message) + "</li>";
+      }
+    })();
+  </script>
+</body>
+</html>

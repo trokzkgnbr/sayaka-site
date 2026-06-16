@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Blog 管理 — 登録</title>
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <p class="admin-brand">SAYAYOSUI</p>
+    <h1 class="admin-title">Blog 管理 — 投稿を登録</h1>
+
+    <nav class="admin-nav" aria-label="管理メニュー">
+      <a href="/admin/">トップ</a>
+      <a href="/admin/delete.html">投稿を削除</a>
+      <button type="button" id="logout-btn">ログアウト</button>
+    </nav>
+
+    <div class="admin-card">
+      <p id="message" class="admin-message" hidden></p>
+      <form id="register-form">
+        <div class="admin-field">
+          <label for="image">画像</label>
+          <input id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp" required>
+        </div>
+        <div class="admin-preview" id="preview" hidden>
+          <img id="preview-img" alt="">
+        </div>
+        <div class="admin-field">
+          <label for="date">日付</label>
+          <input id="date" name="date" type="date">
+          <p class="admin-hint">空欄の場合は今日（日本時間）が使われます。</p>
+        </div>
+        <div class="admin-field">
+          <label for="body">本文</label>
+          <textarea id="body" name="body" required placeholder="1行目が Blog のタイトルになります。"></textarea>
+        </div>
+        <div class="admin-actions">
+          <button class="admin-btn" type="submit">登録する</button>
+          <a class="admin-btn admin-btn--ghost" href="/admin/">戻る</a>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="/admin/js/admin.js"></script>
+  <script>
+    (async function () {
+      if (!(await DiaryAdmin.ensureAuth())) return;
+      DiaryAdmin.qs("#logout-btn").addEventListener("click", DiaryAdmin.logout);
+
+      const form = DiaryAdmin.qs("#register-form");
+      const message = DiaryAdmin.qs("#message");
+      const imageInput = DiaryAdmin.qs("#image");
+      const preview = DiaryAdmin.qs("#preview");
+      const previewImg = DiaryAdmin.qs("#preview-img");
+
+      imageInput.addEventListener("change", function () {
+        const file = imageInput.files && imageInput.files[0];
+        if (!file) {
+          preview.hidden = true;
+          return;
+        }
+        previewImg.src = URL.createObjectURL(file);
+        preview.hidden = false;
+      });
+
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        DiaryAdmin.showMessage(message, "", "error");
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+
+        const fd = new FormData();
+        fd.append("image", imageInput.files[0]);
+        fd.append("body", DiaryAdmin.qs("#body").value);
+        fd.append("date", DiaryAdmin.qs("#date").value);
+
+        try {
+          await DiaryAdmin.api("/admin/api/posts", { method: "POST", body: fd });
+          DiaryAdmin.showMessage(message, "登録しました。", "success");
+          form.reset();
+          preview.hidden = true;
+        } catch (err) {
+          DiaryAdmin.showMessage(message, err.message, "error");
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

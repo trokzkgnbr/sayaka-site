@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Blog 管理</title>
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <p class="admin-brand">SAYAYOSUI</p>
+    <h1 class="admin-title">Blog 管理</h1>
+
+    <nav class="admin-nav" aria-label="管理メニュー">
+      <a href="/admin/register.html">投稿を登録</a>
+      <a href="/admin/delete.html">投稿を削除</a>
+      <button type="button" id="logout-btn">ログアウト</button>
+    </nav>
+
+    <div class="admin-card">
+      <p>公開 Blog の更新はここから行います。変更後は GitHub へ push すると本番に反映されます。</p>
+      <p class="admin-hint">登録と削除は画面を分けています。パスワードはサーバー側だけで検証され、GitHub には保存されません。</p>
+    </div>
+  </div>
+  <script src="/admin/js/admin.js"></script>
+  <script>
+    (async function () {
+      if (!(await DiaryAdmin.ensureAuth())) return;
+      DiaryAdmin.qs("#logout-btn").addEventListener("click", DiaryAdmin.logout);
+    })();
+  </script>
+</body>
+</html>

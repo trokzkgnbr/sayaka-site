@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Blog 管理 — ログイン</title>
+  <link rel="stylesheet" href="/admin/css/admin.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <p class="admin-brand">SAYAYOSUI</p>
+    <h1 class="admin-title">Blog 管理 — ログイン</h1>
+
+    <div class="admin-card">
+      <p id="message" class="admin-message admin-message--error" hidden></p>
+      <form id="login-form">
+        <div class="admin-field">
+          <label for="password">パスワード</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" required>
+        </div>
+        <div class="admin-actions">
+          <button class="admin-btn" type="submit">ログイン</button>
+        </div>
+      </form>
+      <p class="admin-hint">このページは公開サイトにはリンクしていません。ローカル管理サーバー専用です。</p>
+    </div>
+  </div>
+  <script src="/admin/js/admin.js"></script>
+  <script>
+    (async function () {
+      const session = await DiaryAdmin.api("/admin/api/session");
+      if (session.authenticated) {
+        window.location.href = "/admin/";
+        return;
+      }
+
+      const form = DiaryAdmin.qs("#login-form");
+      const message = DiaryAdmin.qs("#message");
+
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        DiaryAdmin.showMessage(message, "", "error");
+        const password = DiaryAdmin.qs("#password").value;
+        try {
+          await DiaryAdmin.api("/admin/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ password: password }),
+          });
+          window.location.href = "/admin/";
+        } catch (err) {
+          DiaryAdmin.showMessage(message, err.message, "error");
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
