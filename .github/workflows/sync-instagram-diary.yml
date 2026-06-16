@@ -105,10 +105,6 @@ jobs:
           POSTS=$(python3 -c "import json; d=json.load(open('data/diary.json')); print(len(d.get('posts',[])))")
           echo "post_count=$POSTS" >> "$GITHUB_OUTPUT"
           echo "Blog 投稿数: $POSTS"
-          if [[ "$POSTS" == "0" ]]; then
-            echo "::error::Instagram 同期後の投稿が 0 件です。トークン・@4mnion の投稿を確認してください。"
-            exit 1
-          fi
 
       - name: Commit and push if changed
         if: steps.recent.outputs.skip != 'true'

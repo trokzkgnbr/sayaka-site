@@ -28,6 +28,7 @@ from lib_instagram import (
     normalize_published_at,
     parse_timestamp,
     post_id_from_media,
+    probe_token_connection,
     site_root,
 )
 
@@ -89,18 +90,30 @@ def sync_limit_reached(media_count: int, limit: int) -> bool:
     return media_count >= limit
 
 
-def refuse_empty_api_sync(media_count: int, existing_post_count: int) -> str | None:
+def refuse_untrusted_empty_sync(
+    token: str,
+    user_id: str,
+    media_count: int,
+    existing_post_count: int,
+) -> str | None:
     """
-    API が 0 件を返したのに Blog に既存投稿があるときは中止する。
+    API が 0 件のとき、Instagram に接続できなければ Blog を維持する。
 
-    期限切れトークン等で空配列だけ返るケースから、既存データを消さないため。
+    接続OKなら Instagram が空 = Blog も空に合わせる（常に一致させる）。
     """
-    if media_count == 0 and existing_post_count > 0:
+    if media_count > 0 or existing_post_count == 0:
+        return None
+    err, account = probe_token_connection(token, user_id)
+    if err is not None:
         return (
-            f"Instagram API が投稿 0 件を返したため中止しました"
-            f"（Blog の既存 {existing_post_count} 件は変更しません）。"
-            " INSTAGRAM_ACCESS_TOKEN・INSTAGRAM_USER_ID・@4mnion の投稿を確認してください。"
+            f"Instagram に接続できないため同期を中止しました"
+            f"（Blog の既存 {existing_post_count} 件は維持）: {err}"
         )
+    username = (account or {}).get("username") or user_id
+    print(
+        f"Instagram @{username} は投稿 0 件。Blog を Instagram に合わせます。",
+        file=sys.stderr,
+    )
     return None
 
 
@@ -391,14 +404,12 @@ def main() -> int:
         print(f"API エラー: {exc}", file=sys.stderr)
         return 1
 
-    refuse_msg = refuse_empty_api_sync(len(media_items), len(existing_posts))
+    refuse_msg = refuse_untrusted_empty_sync(
+        cfg["token"], cfg["user_id"], len(media_items), len(existing_posts)
+    )
     if refuse_msg:
         print(f"同期中止: {refuse_msg}", file=sys.stderr)
-        print(
-            f"既存 Blog {len(existing_posts)} 件は維持します（Instagram API が 0 件を返しました）。",
-            file=sys.stderr,
-        )
-        return 0
+        return 1
 
     managed_window = extract_managed_window(media_items)
     limit_reached = sync_limit_reached(len(media_items), limit)
