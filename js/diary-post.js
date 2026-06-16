@@ -25,15 +25,18 @@
     return dateFmt.format(d);
   }
 
+  /** 1行目はタイトル用なので本文表示から除外 */
   function bodyWithoutTitleLine(text) {
     var lines = String(text || '').split(/\r?\n/);
-    if (lines.length <= 1) return '';
+    if (!lines.length) return '';
     lines.shift();
     while (lines.length && !lines[0].trim()) lines.shift();
     return lines.join('\n');
   }
 
   function renderBody(text) {
+    var trimmed = String(text || '').trim();
+    if (!trimmed) return '';
     return escapeHtml(text)
       .split(/\n\n+/)
       .map(function (block) {
