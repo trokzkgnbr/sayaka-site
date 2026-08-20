@@ -983,7 +983,7 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
 }
 
 .diary-card__thumb {
-  flex: 0 0 clamp(5.5rem, 22vw, 7.5rem);
+  flex: 0 0 clamp(11rem, 44vw, 15rem);
   display: block;
   aspect-ratio: 1;
   overflow: hidden;
@@ -1116,9 +1116,9 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
 }
 
 .diary-detail__figure {
-  flex: 0 0 9rem;
-  width: 9rem;
-  height: 9rem;
+  flex: 0 0 18rem;
+  width: 18rem;
+  height: 18rem;
   margin: 0;
   padding: 0;
   aspect-ratio: 1;
@@ -1165,7 +1165,7 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
   }
 
   .diary-detail__figure {
-    flex: 0 0 9rem;
+    flex: 0 0 18rem;
   }
 
   .diary-detail__main {
@@ -1183,7 +1183,7 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
   }
 
   .diary-card__thumb {
-    width: min(100%, 12rem);
+    width: min(100%, 24rem);
     flex-basis: auto;
   }
 
