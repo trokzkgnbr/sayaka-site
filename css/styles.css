@@ -29,6 +29,8 @@
   --home-image-w: min(55.5vw, 735px);
   --home-image-display-w: min(calc(var(--home-image-w) * 0.9), 100%);
   --artwork-pad-x: clamp(0.35rem, 1vw, 0.75rem);
+  --page-align-left: var(--artwork-pad-x);
+  --home-caption-mobile-h: 0px;
   --artwork-top-extra: clamp(1.75rem, 4.5vh, 3.5rem);
   --artwork-top-pad: calc(3.1rem + env(safe-area-inset-top, 0px) + var(--artwork-top-extra));
   --home-image-display-h: auto;
@@ -1981,10 +1983,7 @@ body.page-inner .diary-detail__body {
 
   /* スマホ: ホーム作品と同じ左余白で左揃え（全ページ） */
   body.page-inner .page-main:not(.page-main--gallery) {
-    padding-left: max(
-      var(--artwork-pad-x),
-      calc((100vw - var(--home-image-display-w)) / 2)
-    );
+    padding-left: var(--page-align-left);
     padding-right: var(--artwork-pad-x);
   }
 
@@ -2006,10 +2005,7 @@ body.page-inner .diary-detail__body {
   .page-main--gallery .gallery__work,
   .gallery__series-title,
   .gallery__intro {
-    margin-left: max(
-      var(--artwork-pad-x),
-      calc((100vw - var(--home-image-display-w)) / 2)
-    );
+    margin-left: var(--page-align-left);
     margin-right: auto;
   }
 

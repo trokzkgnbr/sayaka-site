@@ -5,6 +5,11 @@
   function applyMetrics(metrics) {
     if (!metrics || metrics.width <= 0 || metrics.height <= 0) return;
 
+    if (window.LayoutMetrics && typeof LayoutMetrics.applyMeasured === 'function') {
+      LayoutMetrics.applyMeasured(metrics.width, metrics.height);
+      return;
+    }
+
     var wPx = Math.round(metrics.width) + 'px';
     var hPx = Math.round(metrics.height) + 'px';
 
@@ -14,17 +19,29 @@
     try {
       sessionStorage.setItem(STORAGE_W, String(Math.round(metrics.width)));
       sessionStorage.setItem(STORAGE_H, String(Math.round(metrics.height)));
+      sessionStorage.setItem('homeArtworkViewportW', String(window.innerWidth));
       sessionStorage.removeItem('homeArtworkDisplayLeft');
     } catch (e) {}
   }
 
   function restoreStoredMetrics() {
+    if (window.LayoutMetrics && typeof LayoutMetrics.restoreOrCompute === 'function') {
+      LayoutMetrics.restoreOrCompute();
+      return true;
+    }
+
     var w = null;
     var h = null;
+    var vw = null;
     try {
       w = sessionStorage.getItem(STORAGE_W);
       h = sessionStorage.getItem(STORAGE_H);
+      vw = sessionStorage.getItem('homeArtworkViewportW');
     } catch (e) {}
+
+    if (vw && String(window.innerWidth) !== String(parseInt(vw, 10))) {
+      return false;
+    }
 
     if (w) {
       document.documentElement.style.setProperty('--home-image-display-w', w + 'px');
@@ -53,10 +70,7 @@
     }
     var availW;
     if (options.useUniformPageWidth) {
-      var padXVal =
-        parseFloat(
-          getComputedStyle(document.documentElement).getPropertyValue('--artwork-pad-x')
-        ) || 0;
+      var padXVal = readRootPxVar('--artwork-pad-x', 0);
       availW = window.innerWidth - 2 * padXVal;
     } else {
       availW = container.clientWidth - padX;
@@ -64,10 +78,7 @@
     var availH;
 
     if (options.useViewportHeight) {
-      var topPad =
-        parseFloat(
-          getComputedStyle(document.documentElement).getPropertyValue('--artwork-top-pad')
-        ) || 0;
+      var topPad = readRootPxVar('--artwork-top-pad', 0);
       var captionReserve = options.captionReserve || 0;
       availH = window.innerHeight - topPad - captionReserve - captionH;
     } else {
@@ -143,10 +154,20 @@
   var galleryReferenceImagesPromise = null;
 
   function readRootPxVar(name, fallback) {
-    var value = parseFloat(
-      getComputedStyle(document.documentElement).getPropertyValue(name)
-    );
-    return value > 0 ? value : fallback;
+    var raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    if (raw.endsWith('px')) {
+      var parsed = parseFloat(raw);
+      if (parsed > 0) return parsed;
+    }
+    var probe = document.createElement('div');
+    probe.style.cssText =
+      'position:absolute;left:-9999px;top:0;height:0;pointer-events:none;width:var(' +
+      name +
+      ')';
+    document.documentElement.appendChild(probe);
+    var px = probe.getBoundingClientRect().width;
+    document.documentElement.removeChild(probe);
+    return px > 0 ? px : fallback;
   }
 
   function getGalleryAvailWidth() {
