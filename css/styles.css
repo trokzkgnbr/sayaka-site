@@ -1156,7 +1156,7 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
   margin-bottom: 0;
 }
 
-@media (min-width: 481px) {
+@media (min-width: 761px) {
   .diary-detail__content {
     display: flex;
     flex-direction: row;
@@ -1185,10 +1185,6 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
   .diary-card__thumb {
     width: min(100%, 24rem);
     flex-basis: auto;
-  }
-
-  .diary-detail__content {
-    flex-direction: column;
   }
 }
 
@@ -1675,6 +1671,21 @@ body.page-inner .diary-detail__body {
   max-width: 100%;
 }
 
+/* ブログ: 固定ヘッダーを白背景にして本文と重ねない */
+body.page-inner[data-page="diary"] .site-header,
+body.page-inner[data-page="diary-post"] .site-header,
+body.page-inner[data-page="diary"] .site-header.is-scrolled,
+body.page-inner[data-page="diary-post"] .site-header.is-scrolled,
+body.page-inner[data-page="diary"] .site-header--overlay:not(.site-header--ethereal),
+body.page-inner[data-page="diary-post"] .site-header--overlay:not(.site-header--ethereal),
+body.page-inner[data-page="diary"] .site-header--overlay:not(.site-header--ethereal).is-scrolled,
+body.page-inner[data-page="diary-post"] .site-header--overlay:not(.site-header--ethereal).is-scrolled {
+  background: #ffffff;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: 1px solid var(--line);
+}
+
 .page-main--about .page-head__title,
 .page-main--diary .page-head__title {
   text-transform: lowercase;
@@ -1962,6 +1973,24 @@ body.page-inner .diary-detail__body {
     max-width: 100%;
     margin-left: 0;
     margin-right: 0;
+  }
+
+  /* ブログ記事: 本文はおよそ23文字幅。画像と本文は縦積み */
+  body.page-inner[data-page="diary-post"] .page-main--diary > * {
+    width: min(100%, 23em);
+    max-width: 100%;
+  }
+
+  .diary-detail__content {
+    flex-direction: column;
+  }
+
+  .diary-detail__figure {
+    flex: none;
+    width: 100%;
+    max-width: 18rem;
+    height: auto;
+    aspect-ratio: 1;
   }
 
   body.page-inner .page-main--about .about-body p,
