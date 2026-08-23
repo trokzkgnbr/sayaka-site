@@ -282,6 +282,12 @@ body {
   border: 1px solid #c8e6cf;
 }
 
+.admin-message--warn {
+  background: #fff8e8;
+  color: #7a5a12;
+  border: 1px solid #ead8a0;
+}
+
 .admin-file-picker {
   display: flex;
   flex-direction: column;

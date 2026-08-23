@@ -1,11 +1,16 @@
 # Blog 管理（非公開）
 
-更新日: 2026-06-16 JST
+更新日: 2026-08-24 JST
 
 ## スマホから更新（通常）
 
 **[ADMIN_PHONE.md](./ADMIN_PHONE.md)** — Mac 不要。  
 `https://sayayosui.site/blog-mgt-bf8fa662/` から投稿 → GitHub → 本番サイトへ自動反映。
+
+画像は管理画面で自動縮小（長辺 1600px・JPEG）してから GitHub に保存します。  
+枚数上限ではなく容量（公開サイト目安 1GB）が制約です。詳細は `docs/CLIENT_HANDOFF.txt` の「4.5」を参照。
+
+GitHub の接続トークンはデフォルト 30 日で切れることがあります。作成時に無期限（または 366 日）にしてください。
 
 ## ローカル Mac（開発・テスト用）
 

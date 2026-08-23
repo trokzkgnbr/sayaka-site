@@ -131,6 +131,11 @@ def publish_diary_changes(
     new_images = new_images or {}
     deleted_images = deleted_images or []
 
+    for rel_path, blob in new_images.items():
+        repo_path = rel_path.lstrip("/")
+        meta = get_file_meta(repo_path, env)
+        _put_file(repo_path, blob, message, env, sha=meta.get("sha") if meta else None)
+
     diary_json = json.dumps(diary_data, ensure_ascii=False, indent=2) + "\n"
     diary_meta = get_file_meta("data/diary.json", env)
     _put_file(
@@ -141,11 +146,6 @@ def publish_diary_changes(
         sha=diary_meta.get("sha") if diary_meta else None,
     )
 
-    for rel_path, blob in new_images.items():
-        repo_path = rel_path.lstrip("/")
-        meta = get_file_meta(repo_path, env)
-        _put_file(repo_path, blob, message, env, sha=meta.get("sha") if meta else None)
-
     for rel_path in deleted_images:
         repo_path = rel_path.lstrip("/")
         meta = get_file_meta(repo_path, env)
@@ -155,3 +155,22 @@ def publish_diary_changes(
 
 def github_enabled(env: dict[str, str]) -> bool:
     return bool(env.get("GITHUB_TOKEN", "").strip())
+
+
+def check_github(env: dict[str, str]) -> tuple[bool, str | None]:
+    try:
+        token, repo, _branch = github_settings(env)
+    except GitHubPublishError as exc:
+        return False, str(exc)
+    url = f"https://api.github.com/repos/{repo}"
+    try:
+        _request(url, token)
+        return True, None
+    except GitHubPublishError as exc:
+        text = str(exc)
+        if "401" in text or "403" in text:
+            return (
+                False,
+                "GitHub 連携の期限が切れているか、権限がありません。寺尾までご連絡ください。",
+            )
+        return False, text

@@ -28,7 +28,7 @@
         <div class="admin-field">
           <label class="admin-file-picker" for="image">
             <span class="admin-file-picker__title">画像を選ぶ</span>
-            <span class="admin-file-picker__hint">カメラロールから JPEG / PNG / WebP</span>
+            <span class="admin-file-picker__hint">カメラロールから選べます。大きな写真は自動で軽くします</span>
             <span class="admin-file-picker__name" id="image-name" hidden></span>
           </label>
           <input class="admin-file-picker__input" id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/*" required>
@@ -98,8 +98,18 @@
         const submitBtn = form.querySelector('button[type="submit"]');
         submitBtn.disabled = true;
 
+        let imageFile;
+        try {
+          DiaryAdmin.showMessage(message, "画像を軽量化しています…", "success");
+          imageFile = await DiaryAdmin.prepareImage(imageInput.files[0]);
+        } catch (err) {
+          DiaryAdmin.showMessage(message, err.message, "error");
+          submitBtn.disabled = false;
+          return;
+        }
+
         const fd = new FormData();
-        fd.append("image", imageInput.files[0]);
+        fd.append("image", imageFile);
         fd.append(
           "body",
           new Blob([DiaryAdmin.qs("#body").value], { type: "text/plain;charset=UTF-8" }),
@@ -112,8 +122,9 @@
         );
 
         try {
+          DiaryAdmin.showMessage(message, "登録しています…", "success");
           await DiaryAdmin.api("api/posts", { method: "POST", body: fd });
-          DiaryAdmin.showMessage(message, "登録しました。", "success");
+          DiaryAdmin.showMessage(message, "登録しました。本番への反映は通常 1〜3 分です。", "success");
           form.reset();
           preview.hidden = true;
           imageName.hidden = true;

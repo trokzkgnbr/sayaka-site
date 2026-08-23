@@ -1979,20 +1979,37 @@ body.page-inner .diary-detail__body {
     box-shadow: none;
   }
 
-  /* Profile / blog一覧: スマホは左揃え（作品幅センター寄せを解除） */
-  body.page-inner[data-page="about"] .page-main:not(.page-main--gallery) > *,
-  body.page-inner[data-page="diary"] .page-main:not(.page-main--gallery) > * {
+  /* スマホ: ホーム作品と同じ左余白で左揃え（全ページ） */
+  body.page-inner .page-main:not(.page-main--gallery) {
+    padding-left: max(
+      var(--artwork-pad-x),
+      calc((100vw - var(--home-image-display-w)) / 2)
+    );
+    padding-right: var(--artwork-pad-x);
+  }
+
+  body.page-inner .page-main:not(.page-main--gallery) > * {
     width: 100%;
     max-width: 100%;
     margin-left: 0;
     margin-right: 0;
   }
 
-  /* ブログ記事: 本文はおよそ23文字幅・左揃え。画像と本文は縦積み */
+  /* ブログ記事: 同じ左余白からおよそ23文字幅 */
   body.page-inner[data-page="diary-post"] .page-main:not(.page-main--gallery) > * {
     width: min(100%, 23em);
     max-width: 100%;
     margin-left: 0;
+    margin-right: auto;
+  }
+
+  .page-main--gallery .gallery__work,
+  .gallery__series-title,
+  .gallery__intro {
+    margin-left: max(
+      var(--artwork-pad-x),
+      calc((100vw - var(--home-image-display-w)) / 2)
+    );
     margin-right: auto;
   }
 

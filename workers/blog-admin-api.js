@@ -3,12 +3,13 @@
  * Route: /<ADMIN_PATH>/api/*
  */
 
-const PAGES_BRANCH = "gh-pages";
 const SESSION_COOKIE = "diary_admin_session";
 const SESSION_TTL = 60 * 60 * 12;
 /** Cloudflare Workers Web Crypto は PBKDF2 を最大 100000 回まで */
 const PBKDF2_ITERATIONS = 100000;
 const ALLOWED_IMAGE_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+/** 管理画面で縮小した JPEG を想定。未圧縮のスマホ原版（数MB）は拒否する */
+const MAX_IMAGE_BYTES = 1.5 * 1024 * 1024;
 
 export default {
   async fetch(request, env) {
@@ -34,6 +35,9 @@ export default {
       if (sub === "logout" && request.method === "POST") {
         return json({ ok: true }, 200, clearSessionCookie(adminPath));
       }
+      if (sub === "health" && request.method === "GET") {
+        return handleHealth(request, env);
+      }
       if (sub === "posts" && request.method === "GET") {
         if (!(await isAuthenticated(request, env))) {
           return json({ ok: false, error: "ログインが必要です" }, 401);
@@ -50,7 +54,7 @@ export default {
       }
       return json({ ok: false, error: "Not Found" }, 404);
     } catch (err) {
-      return json({ ok: false, error: String(err.message || err) }, 500);
+      return json({ ok: false, error: mapPublishError(err) }, 500);
     }
   },
 };
@@ -320,17 +324,75 @@ async function deleteFile(env, path, sha, message, branch = null) {
   if (!res.ok) throw new Error(`GitHub DELETE ${path}: ${await res.text()}`);
 }
 
+async function handleHealth(request, env) {
+  if (!(await isAuthenticated(request, env))) {
+    return json({ ok: false, error: "ログインが必要です" }, 401);
+  }
+  try {
+    const { token, repo } = githubSettings(env);
+    const res = await fetch(`https://api.github.com/repos/${repo}`, {
+      headers: {
+        Accept: "application/vnd.github+json",
+        Authorization: `Bearer ${token}`,
+        "User-Agent": "sayaka-blog-admin-worker",
+      },
+    });
+    if (res.status === 401 || res.status === 403) {
+      return json({
+        ok: true,
+        github: false,
+        error:
+          "GitHub 連携の期限が切れているか、権限がありません。投稿するには再設定が必要です。寺尾までご連絡ください。",
+      });
+    }
+    if (!res.ok) {
+      return json({
+        ok: true,
+        github: false,
+        error: `GitHub に接続できませんでした（${res.status}）。`,
+      });
+    }
+    return json({ ok: true, github: true });
+  } catch (err) {
+    const msg = String(err && err.message ? err.message : err);
+    if (/GITHUB_TOKEN/.test(msg)) {
+      return json({
+        ok: true,
+        github: false,
+        error: "GitHub 連携が未設定です。寺尾までご連絡ください。",
+      });
+    }
+    return json({ ok: true, github: false, error: msg });
+  }
+}
+
+function mapPublishError(err) {
+  const msg = String(err && err.message ? err.message : err);
+  if (/401|bad credentials|requires authentication/i.test(msg)) {
+    return "GitHub 連携の期限が切れています。投稿するには再設定が必要です。寺尾までご連絡ください。";
+  }
+  if (/403.*rate limit|API rate limit/i.test(msg)) {
+    return "GitHub の利用上限に一時的に達しました。しばらく待ってから再度お試しください。";
+  }
+  if (/too large|too_large/i.test(msg)) {
+    return "画像が大きすぎて保存できませんでした。別の写真を選んでください。";
+  }
+  return msg;
+}
+
 async function publishBranchFiles(env, diaryData, message, branch, { newImages = {}, deletedImages = [] } = {}) {
   const enc = new TextEncoder();
   const diaryJson = JSON.stringify(diaryData, null, 2) + "\n";
-  const diaryMeta = await getFileMeta(env, "data/diary.json", branch);
-  await putFile(env, "data/diary.json", enc.encode(diaryJson), message, diaryMeta?.sha, branch);
 
   for (const [rel, bytes] of Object.entries(newImages)) {
     const repoPath = rel.replace(/^\//, "");
     const meta = await getFileMeta(env, repoPath, branch);
     await putFile(env, repoPath, bytes, message, meta?.sha, branch);
   }
+
+  const diaryMeta = await getFileMeta(env, "data/diary.json", branch);
+  await putFile(env, "data/diary.json", enc.encode(diaryJson), message, diaryMeta?.sha, branch);
+
   for (const rel of deletedImages) {
     const repoPath = rel.replace(/^\//, "");
     const meta = await getFileMeta(env, repoPath, branch);
@@ -342,10 +404,15 @@ async function publishDiary(env, diaryData, { newImages = {}, deletedImages = []
   if (Array.isArray(diaryData.posts)) {
     diaryData.posts = sortPostsByDate(diaryData.posts);
   }
-  const options = { newImages, deletedImages };
-  await publishBranchFiles(env, diaryData, "Update blog posts.", githubSettings(env).branch, options);
-  // 公開 Blog（GitHub Pages）は gh-pages を参照するため、こちらも同期する
-  await publishBranchFiles(env, diaryData, "Sync public blog.", PAGES_BRANCH, options);
+  // 公開サイトは GitHub Actions が main から gh-pages へコピーする。
+  // Worker から二重書き込みすると CPU・API 回数が増え、無料枠で失敗しやすくなる。
+  await publishBranchFiles(
+    env,
+    diaryData,
+    "Update blog posts.",
+    githubSettings(env).branch,
+    { newImages, deletedImages }
+  );
 }
 
 function sortPostsByDate(posts) {
@@ -395,6 +462,16 @@ async function handleCreatePost(request, env) {
     return json({ ok: false, error: "画像は JPEG / PNG / WebP にしてください" }, 400);
   }
   const imageBytes = new Uint8Array(await image.arrayBuffer());
+  if (imageBytes.byteLength > MAX_IMAGE_BYTES) {
+    return json(
+      {
+        ok: false,
+        error:
+          "画像が大きすぎます。別の写真を選ぶか、もう少し小さい画像にしてください。",
+      },
+      400
+    );
+  }
   const postId = `post-${crypto.randomUUID().replace(/-/g, "").slice(0, 12)}`;
   const fname = `${postId.replace(/[^a-zA-Z0-9_-]/g, "")}.jpg`;
   const relImage = `images/diary/${fname}`;

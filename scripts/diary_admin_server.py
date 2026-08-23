@@ -33,6 +33,7 @@ JST = timezone(timedelta(hours=9))
 SESSION_COOKIE = "diary_admin_session"
 SESSION_TTL = 60 * 60 * 12  # 12h
 ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
+MAX_IMAGE_BYTES = int(1.5 * 1024 * 1024)
 
 
 def site_root() -> Path:
@@ -424,6 +425,29 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
                 )
                 return
 
+            if admin_rel == "api/health":
+                if not self._require_auth_api():
+                    return
+                from github_publish import check_github, github_enabled
+
+                if not github_enabled(self.env):
+                    self._json_response(
+                        HTTPStatus.OK,
+                        {
+                            "ok": True,
+                            "github": True,
+                            "error": None,
+                            "localOnly": True,
+                        },
+                    )
+                    return
+                ok, error = check_github(self.env)
+                self._json_response(
+                    HTTPStatus.OK,
+                    {"ok": True, "github": ok, "error": error},
+                )
+                return
+
             if admin_rel == "auth-config.js":
                 self._serve_auth_config()
                 return
@@ -600,6 +624,15 @@ class DiaryAdminHandler(BaseHTTPRequestHandler):
                 return
 
             image_bytes = file_item.file.read()
+            if len(image_bytes) > MAX_IMAGE_BYTES:
+                self._json_response(
+                    HTTPStatus.BAD_REQUEST,
+                    {
+                        "ok": False,
+                        "error": "画像が大きすぎます。別の写真を選ぶか、もう少し小さい画像にしてください。",
+                    },
+                )
+                return
             post_id = f"post-{uuid.uuid4().hex[:12]}"
             fname = safe_image_name(post_id)
             rel_image = f"images/diary/{fname}"
