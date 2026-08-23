@@ -1981,10 +1981,10 @@ body.page-inner .diary-detail__body {
     box-shadow: none;
   }
 
-  /* スマホ: ホーム作品と同じ左余白で左揃え（全ページ） */
+  /* スマホ: ホーム作品と同じ左右余白。本文は左揃え */
   body.page-inner .page-main:not(.page-main--gallery) {
     padding-left: var(--page-align-left);
-    padding-right: var(--artwork-pad-x);
+    padding-right: var(--page-align-left);
   }
 
   body.page-inner .page-main:not(.page-main--gallery) > * {
@@ -1992,14 +1992,16 @@ body.page-inner .diary-detail__body {
     max-width: 100%;
     margin-left: 0;
     margin-right: 0;
+    text-align: left;
   }
 
-  /* ブログ記事: 同じ左余白からおよそ23文字幅 */
+  /* ブログ記事: 23文字幅を超えない。余白は左右対称、文字は左揃え */
   body.page-inner[data-page="diary-post"] .page-main:not(.page-main--gallery) > * {
     width: min(100%, 23em);
     max-width: 100%;
-    margin-left: 0;
+    margin-left: auto;
     margin-right: auto;
+    text-align: left;
   }
 
   .page-main--gallery .gallery__work,
