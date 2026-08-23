@@ -1671,20 +1671,6 @@ body.page-inner .diary-detail__body {
   max-width: 100%;
 }
 
-/* ブログ: 固定ヘッダーを白背景にして本文と重ねない */
-body.page-inner[data-page="diary"] .site-header,
-body.page-inner[data-page="diary-post"] .site-header,
-body.page-inner[data-page="diary"] .site-header.is-scrolled,
-body.page-inner[data-page="diary-post"] .site-header.is-scrolled,
-body.page-inner[data-page="diary"] .site-header--overlay:not(.site-header--ethereal),
-body.page-inner[data-page="diary-post"] .site-header--overlay:not(.site-header--ethereal),
-body.page-inner[data-page="diary"] .site-header--overlay:not(.site-header--ethereal).is-scrolled,
-body.page-inner[data-page="diary-post"] .site-header--overlay:not(.site-header--ethereal).is-scrolled {
-  background: #ffffff;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-  border-bottom: 1px solid var(--line);
-}
 
 .page-main--about .page-head__title,
 .page-main--diary .page-head__title {
@@ -1967,18 +1953,47 @@ body.page-inner[data-page="diary-post"] .site-header--overlay:not(.site-header--
     display: none;
   }
 
-  /* Profile: スマホは左端揃え・ギャラリー詩と同じ文字サイズ */
-  body.page-inner .page-main--about > * {
+  /* スマホ全ページ: 固定ヘッダーは白背景（罫線なし） */
+  .site-header,
+  .site-header.is-scrolled,
+  .site-header--overlay,
+  .site-header--overlay.is-scrolled,
+  .site-header--overlay:not(.site-header--ethereal),
+  .site-header--overlay:not(.site-header--ethereal).is-scrolled,
+  .site-header--ethereal,
+  .site-header--ethereal.is-on-content,
+  .page-home .site-header,
+  .page-home .site-header--ethereal,
+  .page-home .site-header--ethereal.is-on-content,
+  .page-inner .site-header,
+  .page-inner .site-header.is-scrolled,
+  .page-has-bg .site-header--overlay,
+  .page-has-bg .site-header--overlay.is-scrolled,
+  .page-has-bg .site-header--overlay:not(.site-header--ethereal),
+  .page-has-bg .site-header--overlay.is-scrolled:not(.site-header--ethereal) {
+    background: #ffffff;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: none;
+    border-bottom: none;
+    box-shadow: none;
+  }
+
+  /* Profile / blog一覧: スマホは左揃え（作品幅センター寄せを解除） */
+  body.page-inner[data-page="about"] .page-main:not(.page-main--gallery) > *,
+  body.page-inner[data-page="diary"] .page-main:not(.page-main--gallery) > * {
     width: 100%;
     max-width: 100%;
     margin-left: 0;
     margin-right: 0;
   }
 
-  /* ブログ記事: 本文はおよそ23文字幅。画像と本文は縦積み */
-  body.page-inner[data-page="diary-post"] .page-main--diary > * {
+  /* ブログ記事: 本文はおよそ23文字幅・左揃え。画像と本文は縦積み */
+  body.page-inner[data-page="diary-post"] .page-main:not(.page-main--gallery) > * {
     width: min(100%, 23em);
     max-width: 100%;
+    margin-left: 0;
+    margin-right: auto;
   }
 
   .diary-detail__content {
