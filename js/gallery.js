@@ -132,6 +132,7 @@ function renderWorkMeta(work, series) {
 }
 
 var galleryUniformFitSchedule = null;
+var lastGalleryViewportW = window.innerWidth;
 
 /** dawn 基準の共通横幅を全カテゴリに適用し、ディスプレイ中央に配置 */
 function applyGalleryImageSize() {
@@ -268,7 +269,11 @@ function initGalleryPage() {
   document.body.setAttribute('data-gallery-category', slug);
   initGalleryCategoryNav();
   loadGallerySeries(slug);
-  window.addEventListener('resize', applyGalleryImageSize);
+  window.addEventListener('resize', function () {
+    if (window.innerWidth <= 760 && window.innerWidth === lastGalleryViewportW) return;
+    lastGalleryViewportW = window.innerWidth;
+    applyGalleryImageSize();
+  });
 }
 
 if (document.readyState === 'loading') {

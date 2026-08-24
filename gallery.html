@@ -10,15 +10,18 @@
   <script>
     (function () {
       try {
-        var w = sessionStorage.getItem('galleryReferenceDisplayW');
-        if (w) {
-          document.documentElement.style.setProperty('--gallery-image-display-w', w + 'px');
+        if (window.innerWidth > 760) {
+          var w = sessionStorage.getItem('galleryReferenceDisplayW');
+          var vw = sessionStorage.getItem('galleryReferenceViewportW');
+          if (w && (!vw || String(window.innerWidth) === String(parseInt(vw, 10)))) {
+            document.documentElement.style.setProperty('--gallery-image-display-w', w + 'px');
+          }
         }
       } catch (e) {}
     })();
   </script>
-  <link rel="stylesheet" href="css/styles.css?v=79">
-  <script src="js/layout-metrics.js?v=78"></script>
+  <link rel="stylesheet" href="css/styles.css?v=80">
+  <script src="js/layout-metrics.js?v=79"></script>
 </head>
 <body class="page-inner" data-page="gallery">
   <header class="site-header site-header--overlay" id="site-header">
@@ -42,10 +45,10 @@
 
   <script src="js/site-config.js?v=63"></script>
   <script src="js/header-melt.js?v=57"></script>
-  <script src="js/artwork-size.js?v=45"></script>
+  <script src="js/artwork-size.js?v=46"></script>
   <script src="js/nav.js?v=50"></script>
   <script src="js/sns.js?v=57"></script>
   <script src="js/main.js?v=61"></script>
-  <script src="js/gallery.js?v=50"></script>
+  <script src="js/gallery.js?v=51"></script>
 </body>
 </html>

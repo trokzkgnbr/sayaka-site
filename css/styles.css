@@ -1181,11 +1181,12 @@ body.is-gallery-sized .page-main--gallery .gallery__img {
 @media (max-width: 480px) {
   .diary-card__link {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
 
   .diary-card__thumb {
-    width: min(100%, 24rem);
+    width: 100%;
+    max-width: 100%;
     flex-basis: auto;
   }
 }
@@ -2000,10 +2001,10 @@ body.page-inner .diary-detail__body {
     box-shadow: none;
   }
 
-  /* スマホ: ホーム作品と同じ左右余白。本文は左揃え */
+  /* スマホ: ホームと同じ左右余白。画像は幅いっぱい、文字はその左端から */
   body.page-inner .page-main:not(.page-main--gallery) {
-    padding-left: var(--page-align-left);
-    padding-right: var(--page-align-left);
+    padding-left: var(--artwork-pad-x);
+    padding-right: var(--artwork-pad-x);
   }
 
   body.page-inner .page-main:not(.page-main--gallery) > * {
@@ -2023,11 +2024,46 @@ body.page-inner .diary-detail__body {
     text-align: left;
   }
 
+  .page-main.page-main--gallery {
+    padding-left: var(--artwork-pad-x);
+    padding-right: var(--artwork-pad-x);
+  }
+
+  .gallery,
+  .gallery__series {
+    align-items: stretch;
+  }
+
   .page-main--gallery .gallery__work,
   .gallery__series-title,
   .gallery__intro {
-    margin-left: var(--page-align-left);
-    margin-right: auto;
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    text-align: left;
+  }
+
+  .page-main--gallery .gallery__img {
+    width: 100%;
+    height: auto;
+    max-height: none;
+  }
+
+  .diary-card__link {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .diary-card__thumb {
+    flex: none;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .diary-card__body {
+    width: 100%;
   }
 
   .diary-detail__content {

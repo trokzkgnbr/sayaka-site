@@ -33,7 +33,9 @@
     root.style.setProperty('--home-image-display-w', w + 'px');
     root.style.setProperty('--home-image-display-h', h + 'px');
     var pad = readCssPx('--artwork-pad-x', 6);
-    var left = Math.max(pad, Math.round((window.innerWidth - w) / 2));
+    var left = isMobileViewport()
+      ? pad
+      : Math.max(pad, Math.round((window.innerWidth - w) / 2));
     root.style.setProperty('--page-align-left', left + 'px');
     if (save) {
       try {
