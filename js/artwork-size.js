@@ -77,6 +77,15 @@
     }
     var availH;
 
+    var mobile = window.innerWidth <= 760;
+    if (mobile) {
+      var widthScale = availW / img.naturalWidth;
+      return {
+        width: Math.floor(img.naturalWidth * widthScale),
+        height: Math.floor(img.naturalHeight * widthScale),
+      };
+    }
+
     if (options.useViewportHeight) {
       var topPad = readRootPxVar('--artwork-top-pad', 0);
       var captionReserve = options.captionReserve || 0;
@@ -128,8 +137,13 @@
     if (img.complete) schedule();
     else img.addEventListener('load', schedule);
 
-    window.addEventListener('resize', schedule);
-    if (typeof ResizeObserver !== 'undefined') {
+    var lastViewportW = window.innerWidth;
+    window.addEventListener('resize', function () {
+      if (window.innerWidth <= 760 && window.innerWidth === lastViewportW) return;
+      lastViewportW = window.innerWidth;
+      schedule();
+    });
+    if (typeof ResizeObserver !== 'undefined' && window.innerWidth > 760) {
       var observer = new ResizeObserver(schedule);
       observer.observe(container);
       if (captionEl) observer.observe(captionEl);

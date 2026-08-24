@@ -22,6 +22,10 @@
     return px > 0 ? px : fallback;
   }
 
+  function isMobileViewport() {
+    return window.innerWidth <= 760;
+  }
+
   function apply(w, h, save) {
     w = Math.max(1, Math.round(w));
     h = Math.max(1, Math.round(h));
@@ -42,14 +46,15 @@
 
   function compute() {
     var pad = readCssPx('--artwork-pad-x', 6);
-    var top = readCssPx('--artwork-top-pad', 80);
-    var cap =
-      window.innerWidth <= 760
-        ? readCssPx('--home-caption-mobile-h', 0)
-        : readCssPx('--home-caption-fold-min-h', 0);
     var availW = window.innerWidth - 2 * pad;
-    var availH = window.innerHeight - top - cap;
     if (availW < 1) availW = window.innerWidth;
+    if (isMobileViewport()) {
+      apply(availW, availW * (HOME_NH / HOME_NW), false);
+      return;
+    }
+    var top = readCssPx('--artwork-top-pad', 80);
+    var cap = readCssPx('--home-caption-fold-min-h', 0);
+    var availH = window.innerHeight - top - cap;
     if (availH < 1) availH = window.innerHeight;
     var scale = Math.min(availW / HOME_NW, availH / HOME_NH) * SCALE;
     apply(HOME_NW * scale, HOME_NH * scale, false);
@@ -78,8 +83,11 @@
 
   restoreOrCompute();
 
+  var lastViewportW = window.innerWidth;
   var resizeTimer = 0;
   window.addEventListener('resize', function () {
+    if (isMobileViewport() && window.innerWidth === lastViewportW) return;
+    lastViewportW = window.innerWidth;
     window.clearTimeout(resizeTimer);
     resizeTimer = window.setTimeout(restoreOrCompute, 50);
   });

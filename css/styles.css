@@ -1902,16 +1902,35 @@ body.page-inner .diary-detail__body {
     max-width: 100%;
   }
 
+  .page-home .home-visual {
+    flex: 0 0 auto;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .page-home #home-visual {
+    width: 100%;
+    height: auto;
+    max-height: none;
+    object-fit: contain;
+  }
+
+  .page-home .home-caption.home-caption--fold {
+    width: 100%;
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
   .page-home .home-artwork {
     max-width: 100%;
   }
 
   /* トップ: キャプション全文を1画面内（fold に統合、rest は非表示） */
+  /* svh で固定し、アドレスバーの出し入れで画像が伸縮しないようにする */
   .page-home .home-stage {
     min-height: 100svh;
-    min-height: 100dvh;
     max-height: 100svh;
-    max-height: 100dvh;
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -1919,8 +1938,8 @@ body.page-inner .diary-detail__body {
 
   .page-home .home-fold {
     flex: 1 1 0;
-    min-height: 0;
-    max-height: none;
+    min-height: 100svh;
+    max-height: 100svh;
     overflow: hidden;
   }
 
