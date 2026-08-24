@@ -1,0 +1,65 @@
+{
+  "title": "walk in a dream",
+  "captionOrder": [
+    "title",
+    "year",
+    "size",
+    "medium"
+  ],
+  "intro": [
+    "drawingと絵画作品の違いは一概には言えませんが,いまのわたしの答えは作品とわたしの心の距離が密接に関係しているのではないかと考えます.脳が編集する前のその前の段階で,より形のない素のままのものがドロドロと手を伝って流れ出てきているのです.",
+    "夢の中を歩いているような,現実と非現実の隙間でネガティブとポジティブの境界線が曖昧な,一度も体験したことが無いはずなのに既に何処かの記憶で引っ掛かるような,掴みきれないそんな感覚で,わたしはその全ての絵画の芽となるような存在に\"walk in a dream\"と名付けました."
+  ],
+  "works": [
+    {
+      "src": "images/gallery/dream/01.jpg",
+      "alt": "walk in a dream",
+      "title": "walk in a dream",
+      "year": "2023",
+      "size": "727×910mm",
+      "medium": "oil on canvas",
+      "width": 2400,
+      "height": 1889
+    },
+    {
+      "src": "images/gallery/dream/02.jpg",
+      "alt": "walk in a dream",
+      "title": "walk in a dream",
+      "year": "2020",
+      "size": "318×410mm",
+      "medium": "oil on canvas",
+      "captionOrder": [
+        "title",
+        "year",
+        "size",
+        "medium",
+        "poem"
+      ],
+      "poem": [
+        "虫眼鏡で眺める",
+        "",
+        "木々のような　迷路のような　日々形を変える道があります.",
+        "雨上がりのある日　何時もとは違う道を歩きたくなって",
+        "知らない道を選らんで目的の場所を目指していました.",
+        "迷ったかもしれないと思った時",
+        "足元をどこか懐かしい顔をしたねこが通り過ぎて行き",
+        "わたしはいつの間にか花束を抱えてその後ろをついていくのです.",
+        "",
+        "小さい頃からずっとみる夢がいくつかあります.",
+        "それはずっと続く物語のようで　その中でもわたしはいきています."
+      ],
+      "width": 2400,
+      "height": 1872
+    },
+    {
+      "src": "images/gallery/dream/03.jpg",
+      "alt": "walk in a dream",
+      "title": "walk in a dream",
+      "year": "2021",
+      "size": "333×242mm",
+      "medium": "oil and charcoal on canvas",
+      "width": 1714,
+      "height": 2400
+    }
+  ]
+}

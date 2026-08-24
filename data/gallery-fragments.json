@@ -1,0 +1,69 @@
+{
+  "title": "fragments",
+  "captionOrder": [
+    "title",
+    "year",
+    "size",
+    "medium"
+  ],
+  "works": [
+    {
+      "src": "images/gallery/fragments/01.jpg",
+      "alt": "殻が消えないように。",
+      "title": "殻が消えないように。",
+      "year": "2025",
+      "size": "727×910mm",
+      "medium": "oil on canvas",
+      "width": 2400,
+      "height": 1889
+    },
+    {
+      "src": "images/gallery/fragments/02.jpg",
+      "alt": "amniotic fluid",
+      "title": "amniotic fluid",
+      "year": "2020",
+      "size": "727×1000mm",
+      "medium": "oil on canvas",
+      "width": 2400,
+      "height": 1723
+    },
+    {
+      "src": "images/gallery/fragments/03.jpg",
+      "alt": "どんな言葉であなたを愛そう",
+      "title": "どんな言葉であなたを愛そう",
+      "year": "2020",
+      "size": "1303×1620mm",
+      "medium": "oil on canvas",
+      "captionOrder": [
+        "title",
+        "year",
+        "size",
+        "medium",
+        "poem"
+      ],
+      "poem": [
+        "言葉は道具に近いようで凶器でもある。",
+        "物事の本質から遠ざけてしまう。",
+        "それでもわたしは言葉が好きだ。",
+        "道具であることとか、概念とか、",
+        "暴力的なものを包み込んで溶かしてしまえばいい。",
+        "",
+        "眼を凝らしてみてもずっと続く深海のように",
+        "そうやって言葉も紡いで織っていけばいい。",
+        "そうしたら不思議と魂の宿る巣となる。"
+      ],
+      "width": 2400,
+      "height": 1923
+    },
+    {
+      "src": "images/gallery/fragments/04.jpg",
+      "alt": "海が青くて空が青くて それがいまみえているわたしの世界",
+      "title": "海が青くて空が青くて\nそれがいまみえているわたしの世界",
+      "year": "2017",
+      "size": "803×1000mm",
+      "medium": "oil on canvas",
+      "width": 2400,
+      "height": 1911
+    }
+  ]
+}

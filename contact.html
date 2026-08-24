@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Contact">
+  <title>SAYAYOSUI｜contact</title>
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon.png">
+  <link rel="stylesheet" href="css/styles.css?v=81">
+  <script src="js/layout-metrics.js?v=79"></script>
+</head>
+<body class="page-inner" data-page="contact">
+  <header class="site-header site-header--overlay" id="site-header">
+    <nav class="site-nav" id="site-nav" aria-label="メインメニュー"></nav>
+    <div class="site-sns" id="site-sns" aria-label="SNS"></div>
+  </header>
+
+  <main class="page-main">
+    <header class="page-head">
+      <h1 class="page-head__title">Contact</h1>
+      <p class="page-head__lead">送信で Gmail の作成画面を開きます（ログインが必要です）</p>
+    </header>
+
+    <form class="contact-form" id="contact-form" novalidate>
+      <div class="contact-form__field">
+        <label class="contact-form__label" for="contact-name">お名前</label>
+        <input class="contact-form__input" type="text" id="contact-name" name="name" autocomplete="name">
+      </div>
+      <div class="contact-form__field">
+        <label class="contact-form__label" for="contact-email">メールアドレス</label>
+        <input class="contact-form__input" type="email" id="contact-email" name="email" autocomplete="email" placeholder="返信先（任意・本文に記載されます）">
+      </div>
+      <div class="contact-form__field">
+        <label class="contact-form__label" for="contact-message">メッセージ <span class="contact-form__req">必須</span></label>
+        <textarea class="contact-form__textarea" id="contact-message" name="message" rows="8" required placeholder="お問い合わせ内容を入力してください"></textarea>
+      </div>
+      <div class="contact-form__actions">
+        <button class="contact-form__submit" type="submit">送信（Gmailで開く）</button>
+        <button class="contact-form__submit contact-form__submit--secondary" type="button" id="contact-mailto">メールアプリで開く</button>
+      </div>
+    </form>
+  </main>
+
+  <footer class="site-footer site-footer--glass">
+    <p><small>&copy; <span id="year"></span> <span id="footer-name">SAYA YOSUI</span></small></p>
+  </footer>
+
+  <script src="js/site-config.js?v=63"></script>
+  <script src="js/header-melt.js?v=57"></script>
+  <script src="js/artwork-size.js?v=46"></script>
+  <script src="js/nav.js?v=50"></script>
+  <script src="js/sns.js?v=57"></script>
+  <script src="js/main.js?v=61"></script>
+  <script src="js/contact.js"></script>
+</body>
+</html>

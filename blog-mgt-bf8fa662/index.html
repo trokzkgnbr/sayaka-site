@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Blog 管理</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <header class="admin-header">
+      <a class="admin-brand" href="./" aria-label="SAYAYOSUI — Blog 管理">
+        <img class="admin-brand__img" src="/images/logo.png?v=61" alt="Saya Yosui" width="1024" height="187">
+      </a>
+    </header>
+    <h1 class="admin-title">Blog 管理</h1>
+    <p id="health-message" class="admin-message" hidden></p>
+
+    <nav class="admin-nav" aria-label="管理メニュー">
+      <a class="admin-nav__link" href="register.html">投稿を登録</a>
+      <a class="admin-nav__link" href="delete.html">投稿を削除</a>
+    </nav>
+
+    <footer class="admin-footer">
+      <p class="admin-hint">困ったら寺尾まで</p>
+      <button type="button" class="admin-nav__logout" id="logout-btn">ログアウト</button>
+    </footer>
+  </div>
+  <script src="js/admin.js"></script>
+  <script>
+    (async function () {
+      if (!(await DiaryAdmin.ensureAuth())) return;
+      DiaryAdmin.qs("#logout-btn").addEventListener("click", DiaryAdmin.logout);
+      const health = await DiaryAdmin.checkGithub();
+      if (!health.github) {
+        DiaryAdmin.showMessage(
+          DiaryAdmin.qs("#health-message"),
+          health.error || "GitHub 連携を確認できませんでした。投稿できない場合は寺尾までご連絡ください。",
+          "warn"
+        );
+      }
+    })();
+  </script>
+</body>
+</html>

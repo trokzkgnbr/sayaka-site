@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Blog 管理 — ログイン</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <header class="admin-header">
+      <a class="admin-brand" href="./" aria-label="SAYAYOSUI">
+        <img class="admin-brand__img" src="/images/logo.png?v=61" alt="Saya Yosui" width="1024" height="187">
+      </a>
+    </header>
+    <h1 class="admin-title">Blog 管理 — ログイン</h1>
+
+    <div class="admin-card">
+      <p id="message" class="admin-message admin-message--error" hidden></p>
+      <noscript>
+        <p class="admin-message admin-message--error">JavaScript を有効にしてください。</p>
+      </noscript>
+      <form id="login-form">
+        <div class="admin-field">
+          <label for="password">パスワード</label>
+          <input id="password" name="password" type="password" autocomplete="current-password" enterkeyhint="go" required autofocus>
+        </div>
+        <div class="admin-actions admin-actions--sticky">
+          <button class="admin-btn" type="submit">ログイン</button>
+        </div>
+      </form>
+      <p class="admin-hint">困ったら寺尾まで</p>
+    </div>
+  </div>
+  <script src="js/admin.js"></script>
+  <script>
+    (function () {
+      const form = DiaryAdmin.qs("#login-form");
+      const message = DiaryAdmin.qs("#message");
+
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        DiaryAdmin.showMessage(message, "", "error");
+        const password = DiaryAdmin.qs("#password").value;
+        try {
+          await DiaryAdmin.login(password);
+          window.location.href = "./";
+        } catch (err) {
+          DiaryAdmin.showMessage(message, err.message, "error");
+        }
+      });
+
+      DiaryAdmin.api("api/session")
+        .then(function (session) {
+          if (session.authenticated) {
+            window.location.href = "./";
+          }
+        })
+        .catch(function () {
+          DiaryAdmin.showMessage(message, "困ったら寺尾まで", "error");
+        });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#ffffff">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Blog 管理 — 登録</title>
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+  <div class="admin-shell">
+    <header class="admin-header">
+      <a class="admin-brand" href="./" aria-label="SAYAYOSUI — Blog 管理">
+        <img class="admin-brand__img" src="/images/logo.png?v=61" alt="Saya Yosui" width="1024" height="187">
+      </a>
+    </header>
+    <h1 class="admin-title">Blog 管理 — 投稿を登録</h1>
+
+    <nav class="admin-nav" aria-label="管理メニュー">
+      <a class="admin-nav__link" href="register.html" aria-current="page">投稿を登録</a>
+      <a class="admin-nav__link" href="delete.html">投稿を削除</a>
+    </nav>
+
+    <div class="admin-card">
+      <p id="message" class="admin-message" hidden></p>
+      <form id="register-form">
+        <div class="admin-field">
+          <label class="admin-file-picker" for="image">
+            <span class="admin-file-picker__title">画像を選ぶ</span>
+            <span class="admin-file-picker__hint">カメラロールから選べます。大きな写真は自動で軽くします</span>
+            <span class="admin-file-picker__name" id="image-name" hidden></span>
+          </label>
+          <input class="admin-file-picker__input" id="image" name="image" type="file" accept="image/jpeg,image/png,image/webp,image/*" required>
+        </div>
+        <div class="admin-preview" id="preview" hidden>
+          <img id="preview-img" alt="">
+        </div>
+        <div class="admin-field">
+          <label for="date">日付</label>
+          <input id="date" name="date" type="date">
+          <p class="admin-hint">空欄の場合は今日（日本時間）が使われます。</p>
+        </div>
+        <div class="admin-field">
+          <label for="body">本文</label>
+          <textarea id="body" name="body" required placeholder="1行目が Blog のタイトルになります。"></textarea>
+        </div>
+        <div class="admin-actions admin-actions--sticky">
+          <button class="admin-btn" type="submit">登録する</button>
+        </div>
+      </form>
+    </div>
+
+    <footer class="admin-footer">
+      <p class="admin-hint">困ったら寺尾まで</p>
+      <button type="button" class="admin-nav__logout" id="logout-btn">ログアウト</button>
+    </footer>
+  </div>
+  <script src="js/admin.js"></script>
+  <script>
+    (async function () {
+      if (!(await DiaryAdmin.ensureAuth())) return;
+      DiaryAdmin.qs("#logout-btn").addEventListener("click", DiaryAdmin.logout);
+
+      const form = DiaryAdmin.qs("#register-form");
+      const message = DiaryAdmin.qs("#message");
+      const imageInput = DiaryAdmin.qs("#image");
+      const imageName = DiaryAdmin.qs("#image-name");
+      const preview = DiaryAdmin.qs("#preview");
+      const previewImg = DiaryAdmin.qs("#preview-img");
+      const dateInput = DiaryAdmin.qs("#date");
+
+      if (dateInput && !dateInput.value) {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, "0");
+        const d = String(now.getDate()).padStart(2, "0");
+        dateInput.value = y + "-" + m + "-" + d;
+      }
+
+      imageInput.addEventListener("change", function () {
+        const file = imageInput.files && imageInput.files[0];
+        if (!file) {
+          preview.hidden = true;
+          imageName.hidden = true;
+          imageName.textContent = "";
+          return;
+        }
+        imageName.textContent = file.name;
+        imageName.hidden = false;
+        previewImg.src = URL.createObjectURL(file);
+        preview.hidden = false;
+      });
+
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+        DiaryAdmin.showMessage(message, "", "error");
+        const submitBtn = form.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+
+        let imageFile;
+        try {
+          DiaryAdmin.showMessage(message, "画像を軽量化しています…", "success");
+          imageFile = await DiaryAdmin.prepareImage(imageInput.files[0]);
+        } catch (err) {
+          DiaryAdmin.showMessage(message, err.message, "error");
+          submitBtn.disabled = false;
+          return;
+        }
+
+        const fd = new FormData();
+        fd.append("image", imageFile);
+        fd.append(
+          "body",
+          new Blob([DiaryAdmin.qs("#body").value], { type: "text/plain;charset=UTF-8" }),
+          "body.txt"
+        );
+        fd.append(
+          "date",
+          new Blob([DiaryAdmin.qs("#date").value], { type: "text/plain;charset=UTF-8" }),
+          "date.txt"
+        );
+
+        try {
+          DiaryAdmin.showMessage(message, "登録しています…", "success");
+          await DiaryAdmin.api("api/posts", { method: "POST", body: fd });
+          DiaryAdmin.showMessage(message, "登録しました。本番への反映は通常 1〜3 分です。", "success");
+          form.reset();
+          preview.hidden = true;
+          imageName.hidden = true;
+          imageName.textContent = "";
+          if (dateInput) {
+            const now = new Date();
+            dateInput.value =
+              now.getFullYear() +
+              "-" +
+              String(now.getMonth() + 1).padStart(2, "0") +
+              "-" +
+              String(now.getDate()).padStart(2, "0");
+          }
+        } catch (err) {
+          DiaryAdmin.showMessage(message, err.message, "error");
+        } finally {
+          submitBtn.disabled = false;
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
