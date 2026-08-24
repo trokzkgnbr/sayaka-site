@@ -1854,6 +1854,7 @@ body.page-inner .diary-detail__body {
 @media (max-width: 760px) {
   :root {
     --header-offset: 7.5rem;
+    --artwork-pad-x: clamp(0.875rem, 2.5vw, 1.875rem);
   }
 
   .site-header {
